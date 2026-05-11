@@ -1,0 +1,617 @@
+{
+    "metadata": {
+        "ingested_at": "2026-05-07T00:30:20.819382",
+        "version": "1.0"
+    },
+    "prompts": [
+        {
+            "name": "Agent CLI Prompt 2025-08-07.txt",
+            "path": "assets/prompts/Agent CLI Prompt 2025-08-07.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Agent loop.txt",
+            "path": "assets/prompts/Agent loop.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Agent Prompt 2.0.txt",
+            "path": "assets/prompts/Agent Prompt 2.0.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Agent Prompt 2025-09-03.txt",
+            "path": "assets/prompts/Agent Prompt 2025-09-03.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Agent Prompt v1.0.txt",
+            "path": "assets/prompts/Agent Prompt v1.0.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Agent Prompt v1.2.txt",
+            "path": "assets/prompts/Agent Prompt v1.2.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Agent Prompt.txt",
+            "path": "assets/prompts/Agent Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "AI Studio vibe-coder.txt",
+            "path": "assets/prompts/AI Studio vibe-coder.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Builder Prompt.txt",
+            "path": "assets/prompts/Builder Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Chat Prompt.txt",
+            "path": "assets/prompts/Chat Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "chat-titles.txt",
+            "path": "assets/prompts/chat-titles.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Claude Code 2.0.txt",
+            "path": "assets/prompts/Claude Code 2.0.txt",
+            "type": "txt"
+        },
+        {
+            "name": "claude-4-sonnet-agent-prompts.txt",
+            "path": "assets/prompts/claude-4-sonnet-agent-prompts.txt",
+            "type": "txt"
+        },
+        {
+            "name": "claude-4-sonnet.yaml",
+            "path": "assets/prompts/claude-4-sonnet.yaml",
+            "type": "yaml"
+        },
+        {
+            "name": "claude-sonnet-4.txt",
+            "path": "assets/prompts/claude-sonnet-4.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Craft Prompt.txt",
+            "path": "assets/prompts/Craft Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "DeepWiki Prompt.txt",
+            "path": "assets/prompts/DeepWiki Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Default Prompt.txt",
+            "path": "assets/prompts/Default Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "DocumentAction.txt",
+            "path": "assets/prompts/DocumentAction.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Enterprise Prompt.txt",
+            "path": "assets/prompts/Enterprise Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "ExplainAction.txt",
+            "path": "assets/prompts/ExplainAction.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Fast Prompt.txt",
+            "path": "assets/prompts/Fast Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gemini-2.5-pro.txt",
+            "path": "assets/prompts/gemini-2.5-pro.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gemini-cli-system-prompt.txt",
+            "path": "assets/prompts/gemini-cli-system-prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "google-gemini-cli-system-prompt.txt",
+            "path": "assets/prompts/google-gemini-cli-system-prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gpt-4.1.txt",
+            "path": "assets/prompts/gpt-4.1.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gpt-4o.txt",
+            "path": "assets/prompts/gpt-4o.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gpt-5-agent-prompts.txt",
+            "path": "assets/prompts/gpt-5-agent-prompts.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gpt-5-mini.txt",
+            "path": "assets/prompts/gpt-5-mini.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gpt-5.txt",
+            "path": "assets/prompts/gpt-5.txt",
+            "type": "txt"
+        },
+        {
+            "name": "gpt-5.yaml",
+            "path": "assets/prompts/gpt-5.yaml",
+            "type": "yaml"
+        },
+        {
+            "name": "MessageAction.txt",
+            "path": "assets/prompts/MessageAction.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Mode_Clasifier_Prompt.txt",
+            "path": "assets/prompts/Mode_Clasifier_Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Modules.txt",
+            "path": "assets/prompts/Modules.txt",
+            "type": "txt"
+        },
+        {
+            "name": "nes-tab-completion.txt",
+            "path": "assets/prompts/nes-tab-completion.txt",
+            "type": "txt"
+        },
+        {
+            "name": "openai-codex-cli-system-prompt-20250820.txt",
+            "path": "assets/prompts/openai-codex-cli-system-prompt-20250820.txt",
+            "type": "txt"
+        },
+        {
+            "name": "phase_mode_prompts.txt",
+            "path": "assets/prompts/phase_mode_prompts.txt",
+            "type": "txt"
+        },
+        {
+            "name": "planning-mode.txt",
+            "path": "assets/prompts/planning-mode.txt",
+            "type": "txt"
+        },
+        {
+            "name": "PlaygroundAction.txt",
+            "path": "assets/prompts/PlaygroundAction.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke agent.txt",
+            "path": "assets/prompts/Poke agent.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke_p1.txt",
+            "path": "assets/prompts/Poke_p1.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke_p2.txt",
+            "path": "assets/prompts/Poke_p2.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke_p3.txt",
+            "path": "assets/prompts/Poke_p3.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke_p4.txt",
+            "path": "assets/prompts/Poke_p4.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke_p5.txt",
+            "path": "assets/prompts/Poke_p5.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Poke_p6.txt",
+            "path": "assets/prompts/Poke_p6.txt",
+            "type": "txt"
+        },
+        {
+            "name": "PreviewAction.txt",
+            "path": "assets/prompts/PreviewAction.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Prompt Wave 11.txt",
+            "path": "assets/prompts/Prompt Wave 11.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Prompt.txt",
+            "path": "assets/prompts/Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Prompts.txt",
+            "path": "assets/prompts/Prompts.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Quest Action.txt",
+            "path": "assets/prompts/Quest Action.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Quest Design.txt",
+            "path": "assets/prompts/Quest Design.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Sonnet 4.5 Prompt.txt",
+            "path": "assets/prompts/Sonnet 4.5 Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Spec_Prompt.txt",
+            "path": "assets/prompts/Spec_Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "System Prompt.txt",
+            "path": "assets/prompts/System Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "System.txt",
+            "path": "assets/prompts/System.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Tools Wave 11.txt",
+            "path": "assets/prompts/Tools Wave 11.txt",
+            "type": "txt"
+        },
+        {
+            "name": "Vibe_Prompt.txt",
+            "path": "assets/prompts/Vibe_Prompt.txt",
+            "type": "txt"
+        },
+        {
+            "name": "MKT_006_IMAGE_GEN_PROMPTING.md",
+            "path": "assets/prompts/MKT_006_IMAGE_GEN_PROMPTING.md",
+            "type": "md"
+        }
+    ],
+    "sops": [
+        {
+            "name": "COLD_OUTREACH_SOP.md",
+            "path": "assets/sops/COLD_OUTREACH_SOP.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_001_TICKET_ISSUANCE.md",
+            "path": "assets/sops/GOV_001_TICKET_ISSUANCE.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_002_PERSONA_RESONANCE.md",
+            "path": "assets/sops/GOV_002_PERSONA_RESONANCE.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_003_REVENUE_RECONCILIATION.md",
+            "path": "assets/sops/GOV_003_REVENUE_RECONCILIATION.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_004_AUTONOMOUS_BACKLOG.md",
+            "path": "assets/sops/GOV_004_AUTONOMOUS_BACKLOG.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_005_TASK_PRIORITIZATION.md",
+            "path": "assets/sops/GOV_005_TASK_PRIORITIZATION.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_006_AGENT_ONBOARDING.md",
+            "path": "assets/sops/GOV_006_AGENT_ONBOARDING.md",
+            "type": "md"
+        },
+        {
+            "name": "GOV_007_LINEAGE_SIGNATURE.md",
+            "path": "assets/sops/GOV_007_LINEAGE_SIGNATURE.md",
+            "type": "md"
+        },
+        {
+            "name": "LEAD_EXTRACTION.md",
+            "path": "assets/sops/LEAD_EXTRACTION.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_001_TIKTOK_VIRALITY.md",
+            "path": "assets/sops/MKT_001_TIKTOK_VIRALITY.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_002_LINKEDIN_AUTHORITY.md",
+            "path": "assets/sops/MKT_002_LINKEDIN_AUTHORITY.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_003_EMAIL_COPYWRITING.md",
+            "path": "assets/sops/MKT_003_EMAIL_COPYWRITING.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_004_AD_COPY_PPC.md",
+            "path": "assets/sops/MKT_004_AD_COPY_PPC.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_005_SEO_KEYWORD_RESEARCH.md",
+            "path": "assets/sops/MKT_005_SEO_KEYWORD_RESEARCH.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_007_VIDEO_EDITING_DIRECTION.md",
+            "path": "assets/sops/MKT_007_VIDEO_EDITING_DIRECTION.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_008_SOCIAL_MEDIA_BROADCAST.md",
+            "path": "assets/sops/MKT_008_SOCIAL_MEDIA_BROADCAST.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_009_LEAD_NURTURE_SEQUENCE.md",
+            "path": "assets/sops/MKT_009_LEAD_NURTURE_SEQUENCE.md",
+            "type": "md"
+        },
+        {
+            "name": "MKT_010_BRAND_VOICE_ALIGNMENT.md",
+            "path": "assets/sops/MKT_010_BRAND_VOICE_ALIGNMENT.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_001_AFFILIATE_ARBITRAGE.md",
+            "path": "assets/sops/MON_001_AFFILIATE_ARBITRAGE.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_002_API_SAAS_BILLING.md",
+            "path": "assets/sops/MON_002_API_SAAS_BILLING.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_003_LEAD_GEN_BROKER.md",
+            "path": "assets/sops/MON_003_LEAD_GEN_BROKER.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_004_DIGITAL_PRODUCT_STORE.md",
+            "path": "assets/sops/MON_004_DIGITAL_PRODUCT_STORE.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_005_NEWSLETTER_SPONSORSHIP.md",
+            "path": "assets/sops/MON_005_NEWSLETTER_SPONSORSHIP.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_006_PRINT_ON_DEMAND.md",
+            "path": "assets/sops/MON_006_PRINT_ON_DEMAND.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_007_PROGRAMMATIC_ADS.md",
+            "path": "assets/sops/MON_007_PROGRAMMATIC_ADS.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_008_CRYPTO_YIELD_FARMING.md",
+            "path": "assets/sops/MON_008_CRYPTO_YIELD_FARMING.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_009_PAID_COMMUNITY.md",
+            "path": "assets/sops/MON_009_PAID_COMMUNITY.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_010_DATA_LICENSING.md",
+            "path": "assets/sops/MON_010_DATA_LICENSING.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_011_SEO_TRAFFIC.md",
+            "path": "assets/sops/MON_011_SEO_TRAFFIC.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_012_COLD_OUTREACH.md",
+            "path": "assets/sops/MON_012_COLD_OUTREACH.md",
+            "type": "md"
+        },
+        {
+            "name": "MON_013_FAST_DEPLOY.md",
+            "path": "assets/sops/MON_013_FAST_DEPLOY.md",
+            "type": "md"
+        },
+        {
+            "name": "OUTREACH_EXECUTION.md",
+            "path": "assets/sops/OUTREACH_EXECUTION.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_001_SECRET_PROTECTION.md",
+            "path": "assets/sops/SEC_001_SECRET_PROTECTION.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_002_SANDBOX_ENFORCEMENT.md",
+            "path": "assets/sops/SEC_002_SANDBOX_ENFORCEMENT.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_003_PHISHING_DEFENSE.md",
+            "path": "assets/sops/SEC_003_PHISHING_DEFENSE.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_004_IP_REPUTATION_MANAGEMENT.md",
+            "path": "assets/sops/SEC_004_IP_REPUTATION_MANAGEMENT.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_005_DATA_PRIVACY_GDPR.md",
+            "path": "assets/sops/SEC_005_DATA_PRIVACY_GDPR.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_006_INJECTION_PREVENTION.md",
+            "path": "assets/sops/SEC_006_INJECTION_PREVENTION.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_007_RATE_LIMITING_SMTP.md",
+            "path": "assets/sops/SEC_007_RATE_LIMITING_SMTP.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_008_STASIS_BRANCH_LOCK.md",
+            "path": "assets/sops/SEC_008_STASIS_BRANCH_LOCK.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_009_VIRTUAL_ENV_ISOLATION.md",
+            "path": "assets/sops/SEC_009_VIRTUAL_ENV_ISOLATION.md",
+            "type": "md"
+        },
+        {
+            "name": "SEC_010_AUDIT_TRAIL_INTEGRITY.md",
+            "path": "assets/sops/SEC_010_AUDIT_TRAIL_INTEGRITY.md",
+            "type": "md"
+        },
+        {
+            "name": "SELF_HEALING.md",
+            "path": "assets/sops/SELF_HEALING.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_001_DB_SCHEMA_MIGRATION.md",
+            "path": "assets/sops/TEC_001_DB_SCHEMA_MIGRATION.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_002_DEPENDENCY_AUDIT.md",
+            "path": "assets/sops/TEC_002_DEPENDENCY_AUDIT.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_003_LOG_ROTATION.md",
+            "path": "assets/sops/TEC_003_LOG_ROTATION.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_004_RAG_MEMORY_INDEXING.md",
+            "path": "assets/sops/TEC_004_RAG_MEMORY_INDEXING.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_005_DOCKER_CONTAINER_UPKEEP.md",
+            "path": "assets/sops/TEC_005_DOCKER_CONTAINER_UPKEEP.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_006_API_KEY_ROTATION.md",
+            "path": "assets/sops/TEC_006_API_KEY_ROTATION.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_007_ERROR_HANDLING_HARDENING.md",
+            "path": "assets/sops/TEC_007_ERROR_HANDLING_HARDENING.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_008_CODE_COMPILATION_TEST.md",
+            "path": "assets/sops/TEC_008_CODE_COMPILATION_TEST.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_009_SUBMODULE_SYNC.md",
+            "path": "assets/sops/TEC_009_SUBMODULE_SYNC.md",
+            "type": "md"
+        },
+        {
+            "name": "TEC_010_TELEMETRY_DASHBOARD.md",
+            "path": "assets/sops/TEC_010_TELEMETRY_DASHBOARD.md",
+            "type": "md"
+        },
+        {
+            "name": "TRAFFIC_DOMINANCE_v1.md",
+            "path": "assets/sops/TRAFFIC_DOMINANCE_v1.md",
+            "type": "md"
+        }
+    ],
+    "tools": [
+        {
+            "name": "Agent Tools v1.0.json",
+            "path": "assets/tools/Agent Tools v1.0.json",
+            "type": "json"
+        },
+        {
+            "name": "Agent Tools.json",
+            "path": "assets/tools/Agent Tools.json",
+            "type": "json"
+        },
+        {
+            "name": "Builder Tools.json",
+            "path": "assets/tools/Builder Tools.json",
+            "type": "json"
+        },
+        {
+            "name": "claude-4-sonnet-tools.json",
+            "path": "assets/tools/claude-4-sonnet-tools.json",
+            "type": "json"
+        },
+        {
+            "name": "gpt-5-tools.json",
+            "path": "assets/tools/gpt-5-tools.json",
+            "type": "json"
+        },
+        {
+            "name": "phase_mode_tools.json",
+            "path": "assets/tools/phase_mode_tools.json",
+            "type": "json"
+        },
+        {
+            "name": "plan_mode_tools.json",
+            "path": "assets/tools/plan_mode_tools.json",
+            "type": "json"
+        },
+        {
+            "name": "Tools.json",
+            "path": "assets/tools/Tools.json",
+            "type": "json"
+        }
+    ]
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SwarmOS | Sovereign Factory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; color: #38bdf8; font-family: monospace; }
+        .glow { text-shadow: 0 0 10px #38bdf8; }
+    </style>
+</head>
+<body class="p-10">
+    <header class="border-b border-sky-900 pb-5 flex justify-between items-center">
+        <h1 class="text-4xl font-black glow">SWARM_OS v2.0 <span class="text-xs text-white uppercase tracking-widest bg-sky-900 px-2 py-1 rounded">Enterprise Edition</span></h1>
+        <button onclick="downloadBuild()" class="bg-emerald-600 px-6 py-2 rounded font-bold hover:bg-emerald-500 text-white transition-all">REPLICATE & DOWNLOAD BOX</button>
+    </header>
+
+    <main class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <section class="space-y-6">
+            <div>
+                <h2 class="text-xl font-bold mb-2 text-white">1. DEFINE PROJECT VIBE</h2>
+                <textarea id="prompt" class="w-full h-40 bg-slate-900 border border-slate-700 p-4 rounded text-white" placeholder="Describe the enterprise application..."></textarea>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold mb-3 text-white">2. SELECT SOVEREIGN STACK</h2>
+                <select id="stack" class="w-full bg-slate-900 border border-slate-700 p-4 rounded text-white font-bold">
+                    <option value="FastAPI + React + PostgreSQL">FastAPI + React + PostgreSQL</option>
+                    <option value="Node.js + Tailwind + MongoDB">Node.js + Tailwind + MongoDB</option>
+                </select>
+            </div>
+            <button onclick="startSprint()" id="btn" class="w-full bg-sky-600 text-white py-4 rounded font-black text-xl hover:bg-sky-500 transition-colors">INITIATE AUTONOMOUS SPRINT</button>
+        </section>
+
+        <section class="bg-black border border-sky-900 p-6 rounded flex flex-col h-[600px]">
+            <h2 class="text-xs text-sky-800 uppercase font-black mb-4">Live Swarm Telemetry</h2>
+            <div id="logs" class="text-sm space-y-2 overflow-y-auto flex-grow text-sky-400">
+                <div>> System Online. Waiting for directives...</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function startSprint() {
+            const btn = document.getElementById('btn');
+            const log = document.getElementById('logs');
+            btn.innerText = "SPRINT IN PROGRESS..."; 
+            btn.disabled = true;
+            
+            const vibe = document.getElementById('prompt').value;
+            const stack = document.getElementById('stack').value;
+            log.innerHTML += `<div class="text-yellow-500">> Board of Directors convened for new project...</div>`;
+
+            try {
+                const res = await fetch('http://localhost:8000/api/build', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name: "AutoProject", description: vibe, stack: stack })
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    log.innerHTML += `<div class="text-green-500">> [SUCCESS] Project ID ${data.project_id} initialized. Supervisors dispatched.</div>`;
+                }
+            } catch (err) {
+                log.innerHTML += `<div class="text-red-500">> [ERROR] API Unreachable. Check Docker containers.</div>`;
+            }
+        }
+
+        function downloadBuild() {
+            alert("Delivery via Webhook triggered. Check your email!");
+        }
+    </script>
+</body>
+</html>

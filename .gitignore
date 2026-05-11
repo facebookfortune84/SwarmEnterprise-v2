@@ -1,0 +1,86 @@
+# Environment & Secrets
+.env
+.env.local
+.env*.local
+*.pem
+*.key
+secrets.json
+
+# Python Virtual Environments
+venv/
+env/
+ENV/
+.venv
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Dependencies
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+pytest.ini
+.hypothesis/
+
+# Database & Data
+*.db
+*.sqlite
+*.sqlite3
+pg_data/
+*.log
+logs/
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Build Artifacts
+output/src/
+*.zip
+*.tar.gz
+dist/
+
+# Node (Frontend)
+node_modules/
+frontend/dist/
+frontend/build/
+npm-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+.cache/
+
+# Machine Learning / Models (if applicable)
+*.onnx
+*.pb
+*.h5
+
+# Ollama cache (if local)
+.ollama/

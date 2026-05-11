@@ -1,0 +1,6 @@
+{
+  "package": {
+    "example": "lodash@latest",
+    "type": "string"
+  }
+}

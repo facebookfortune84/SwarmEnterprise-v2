@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: swarmOS-backend
+    ports:
+      - "8000:8000"
+    
+    volumes:
+      # Code mount (hot reload in dev)
+      - .:/mnt/c/SwarmEnterprise_v2
+      # Persist database
+      - ./pg_data:/mnt/c/SwarmEnterprise_v2/pg_data
+      # Persist output artifacts
+      - ./output:/mnt/c/SwarmEnterprise_v2/output
+    
+    environment:
+      # From .env file
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3.2:3b
+      - OLLAMA_TEMPERATURE=0.1
+      - EMBEDDING_MODEL=nomic-embed-text:latest
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+      - PYTHONPATH=.
+      - LOG_LEVEL=INFO
+      - CREWAI_DISABLE_TELEMETRY=true
+      - OTEL_SDK_DISABLED=true
+      # Stripe (if configured)
+      - STRIPE_API_KEY=${STRIPE_API_KEY:-sk_test_placeholder}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_placeholder}
+      # SMTP (if configured)
+      - SMTP_SERVER=${SMTP_SERVER:-smtp.realms2riches.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-sales@realms2riches.com}
+      - SMTP_PASS=${SMTP_PASS:-}
+    
+    # Enable host.docker.internal (Docker Desktop feature)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    
+    # Resource limits (optional but recommended)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+networks:
+  swarmnet:
+    driver: bridge
