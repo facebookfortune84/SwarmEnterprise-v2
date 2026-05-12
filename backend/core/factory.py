@@ -1,6 +1,5 @@
 import logging
-from agents.managers.board import strategic_board
-from backend.db.linear_engine import swarm_db
+from backend.db.linear_engine import get_swarm_db
 
 logger = logging.getLogger("SwarmFactory")
 
@@ -10,12 +9,14 @@ class SwarmFactory:
     def run_production_cycle(self, project_id: str, description: str):
         logger.info(f"FACTORY: Convening Board for {project_id}...")
         
-        # 1. Board Strategy Phase
+        # 1. Board Strategy Phase (import lazily to avoid heavy imports at module import time)
+        from agents.managers.board import strategic_board
         plan = strategic_board.convene(project_id, description)
         
-        # 2. Save Tickets to Database
+        # 2. Save Tickets to Database (get DB lazily)
+        db = get_swarm_db()
         for task in plan:
-            swarm_db.create_ticket(
+            db.create_ticket(
                 project_id=project_id,
                 dept=task.get('department', 'Engineering'),
                 title=task.get('title', 'Task'),

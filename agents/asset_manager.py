@@ -12,7 +12,7 @@ class OracleAssets:
     Handles large JSON files and multiple tool libraries gracefully.
     """
     
-    ASSET_ROOT = Path("/mnt/c/SwarmEnterprise_v2/assets")
+    ASSET_ROOT = Path(os.getenv("SWARM_ASSETS_DIR", Path(__file__).resolve().parents[2] / "assets"))
     
     def __init__(self):
         self.prompts = {}
@@ -153,4 +153,11 @@ class OracleAssets:
         }
 
 # Initialize on module import
-ORACLE = OracleAssets()
+# Lazy singleton to avoid import-time IO
+_ORACLE = None
+
+def get_oracle_assets():
+    global _ORACLE
+    if _ORACLE is None:
+        _ORACLE = OracleAssets()
+    return _ORACLE

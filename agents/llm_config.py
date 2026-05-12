@@ -1,6 +1,5 @@
 import os
 import logging
-from langchain_community.llms import Ollama
 
 logger = logging.getLogger("SwarmBrain")
 
@@ -73,7 +72,49 @@ class SwarmBrain:
             }
         }
 
-LOCAL_BRAIN = SwarmBrain.get_local_brain()
-EMBEDDER = SwarmBrain.get_embedder()
+# Avoid import-time initialization; use lazy factory
+LOCAL_BRAIN = None
+EMBEDDER = None
 
 logger.info("✅ SwarmBrain initialized with Ollama")
+
+# Lazy initialization helpers
+_local_brain = None
+_embedder = None
+
+def get_local_brain_instance(model_name="llama3.2:3b"):
+    global _local_brain
+    if _local_brain is None:
+        try:
+            ollama_url = NetworkBridge.discover_ollama_url()
+            logger.info(f"Initializing OllamaLLM: {model_name} @ {ollama_url}")
+            from langchain_community.llms import Ollama
+            _local_brain = Ollama(
+                model=model_name,
+                base_url=ollama_url,
+                temperature=float(os.getenv("OLLAMA_TEMPERATURE", 0.1)),
+                top_k=int(os.getenv("OLLAMA_TOP_K", 10)),
+                top_p=float(os.getenv("OLLAMA_TOP_P", 0.9)),
+                num_ctx=int(os.getenv("OLLAMA_NUM_CTX", 4096))
+            )
+        except Exception as e:
+            logger.error(f"Failed to initialize Ollama LLM: {e}")
+            _local_brain = None
+    return _local_brain
+
+def get_embedder_config():
+    global _embedder
+    if _embedder is None:
+        try:
+            ollama_url = NetworkBridge.discover_ollama_url()
+            _embedder = {
+                "provider": "ollama",
+                "config": {
+                    "model": os.getenv("EMBEDDING_MODEL", "nomic-embed-text:latest"),
+                    "base_url": ollama_url
+                }
+            }
+        except Exception as e:
+            logger.error(f"Failed to initialize embedder config: {e}")
+            _embedder = None
+    return _embedder

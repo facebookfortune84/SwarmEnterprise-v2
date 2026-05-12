@@ -1,4 +1,6 @@
+import os
 import uuid
+from pathlib import Path
 from datetime import datetime
 from sqlalchemy import create_engine, Column, String, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -18,7 +20,11 @@ class Ticket(Base):
 class LinearEngine:
     """Ticket persistence for the swarm"""
     def __init__(self):
-        self.engine = create_engine("sqlite:////mnt/c/SwarmEnterprise_v2/pg_data/swarm_tickets.db")
+        # Use configurable data directory (env or repo-relative)
+        db_dir = Path(os.getenv("SWARM_PG_DIR", Path(__file__).resolve().parents[2] / "pg_data"))
+        db_dir.mkdir(parents=True, exist_ok=True)
+        db_path = db_dir / "swarm_tickets.db"
+        self.engine = create_engine(f"sqlite:///{db_path.as_posix()}")
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
@@ -29,4 +35,11 @@ class LinearEngine:
         session.commit()
         session.close()
 
-swarm_db = LinearEngine()
+# Lazy singleton factory to avoid import-time DB creation
+_swarm_db = None
+
+def get_swarm_db():
+    global _swarm_db
+    if _swarm_db is None:
+        _swarm_db = LinearEngine()
+    return _swarm_db
