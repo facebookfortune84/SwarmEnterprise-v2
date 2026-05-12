@@ -27,15 +27,34 @@ class StrategicBoard:
             raise RuntimeError("crewai package required to construct Agent objects. Install or mock for tests.")
 
         brain = self.brain or get_local_brain_instance()
-        return [
-            Agent(
+        # Pull prompts and SOPs from Oracle assets to enrich agent backstory
+        try:
+            from agents.asset_manager import get_oracle_assets
+            oracle = get_oracle_assets()
+        except Exception:
+            oracle = None
+
+        agents = []
+        for role in self.roles:
+            prompt_snippet = None
+            if oracle:
+                ctx = oracle.build_agent_context(role)
+                prompt_snippet = ctx.get('prompt')
+
+            backstory = f"You are the {role} of a Sovereign Swarm. You operate using FOSS principles. You output JSON tickets."
+            if prompt_snippet:
+                # Append a short snippet of the canonical prompt to the backstory to bias agent behavior
+                backstory = backstory + "\n\nCanonical Prompt:\n" + (prompt_snippet[:800] + '...' if len(prompt_snippet) > 800 else prompt_snippet)
+
+            agents.append(Agent(
                 role=role,
                 goal=f"Decompose the project vibe into technical tickets from the perspective of a {role}.",
-                backstory=f"You are the {role} of a Sovereign Swarm. You operate using FOSS principles. You output JSON tickets.",
+                backstory=backstory,
                 llm=brain,
                 verbose=True
-            ) for role in self.roles
-        ]
+            ))
+
+        return agents
 
     def convene(self, project_id: str, description: str) -> List[Dict[str, Any]]:
         agents = self._get_agents()

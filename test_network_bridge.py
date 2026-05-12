@@ -7,7 +7,7 @@ Run: python test_network_bridge.py
 import sys
 import requests
 import logging
-from agents.llm_config import NetworkBridge, LOCAL_BRAIN
+from agents.llm_config import NetworkBridge, get_local_brain_instance
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BridgeTester")
@@ -44,9 +44,21 @@ def test_llm_inference():
     logger.info("\n🧠 Testing LLM inference...")
     
     try:
-        response = LOCAL_BRAIN.invoke("Say 'hello world' in JSON format: {\"message\": \"...\"}. Return ONLY valid JSON.")
+        brain = get_local_brain_instance()
+        if brain is None:
+            logger.warning("No local brain available; skipping LLM inference test.")
+            return False
+        # Call whatever interface the brain provides; trying .invoke or .generate
+        if hasattr(brain, 'invoke'):
+            response = brain.invoke("Say 'hello world' in JSON format: {\"message\": \"...\"}. Return ONLY valid JSON.")
+        elif hasattr(brain, 'generate'):
+            response = brain.generate("Say 'hello world' in JSON format: {\"message\": \"...\"}. Return ONLY valid JSON.")
+        else:
+            logger.warning("Local brain instance does not support invoke/generate API; skipping.")
+            return False
+
         logger.info(f"✅ LLM responded!")
-        logger.info(f"   Response: {response[:100]}...")
+        logger.info(f"   Response: {str(response)[:200]}...")
         return True
     except Exception as e:
         logger.error(f"❌ LLM inference failed: {e}")
@@ -57,7 +69,8 @@ def test_assets():
     logger.info("\n📦 Testing Asset loading...")
     
     try:
-        from agents.asset_manager import ORACLE
+        from agents.asset_manager import get_oracle_assets
+        ORACLE = get_oracle_assets()
         logger.info(f"✅ Assets loaded!")
         logger.info(f"   Prompts: {len(ORACLE.prompts)}")
         logger.info(f"   SOPs: {len(ORACLE.sops)}")
