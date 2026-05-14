@@ -12,6 +12,13 @@ from backend.api.voice import router as voice_router
 logging.basicConfig(level=logging.INFO, format="%(asctime)s[%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("SwarmOS")
 
+# Initialize telemetry (if available)
+try:
+    from backend import telemetry
+    telemetry.init()
+except Exception:
+    logger.debug("Telemetry not initialized")
+
 app = FastAPI(title="SwarmOS Sovereign Factory", version="2.0.0")
 
 app.add_middleware(
@@ -27,6 +34,13 @@ app.include_router(webhook_router)
 app.include_router(payments_router)
 app.include_router(admin_router)
 app.include_router(voice_router)
+
+# Leads API
+try:
+    from backend.api.leads import router as leads_router
+    app.include_router(leads_router)
+except Exception:
+    logger.debug("Leads router not available")
 
 # Ensure output directory exists for static files (use env override)
 OUTPUT_DIR = os.getenv('SWARM_OUTPUT_DIR', '/mnt/c/SwarmEnterprise_v2/output')
