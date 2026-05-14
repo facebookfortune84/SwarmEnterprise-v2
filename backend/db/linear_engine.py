@@ -27,6 +27,16 @@ class Project(Base):
     metadata_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class Lead(Base):
+    __tablename__ = 'leads'
+    id = Column(String, primary_key=True)
+    email = Column(String, index=True)
+    name = Column(String, nullable=True)
+    company = Column(String, nullable=True)
+    status = Column(String, default='NEW')
+    metadata_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class ProcessedEvent(Base):
     __tablename__ = 'processed_events'
     id = Column(String, primary_key=True)
@@ -57,6 +67,50 @@ class LinearEngine:
         session.add(p)
         session.commit()
         session.close()
+
+    def create_lead(self, email: str, name: str = None, company: str = None, metadata: dict = None) -> str:
+        session = self.Session()
+        lead_id = uuid.uuid4().hex[:8].upper()
+        l = Lead(id=lead_id, email=email, name=name, company=company, metadata_json=str(metadata) if metadata else None)
+        session.add(l)
+        session.commit()
+        session.close()
+        return lead_id
+
+    def list_leads(self, limit: int = 100):
+        session = self.Session()
+        rows = session.query(Lead).order_by(Lead.created_at.desc()).limit(limit).all()
+        result = []
+        for r in rows:
+            result.append({
+                'id': r.id,
+                'email': r.email,
+                'name': r.name,
+                'company': r.company,
+                'status': r.status,
+                'metadata': r.metadata_json,
+                'created_at': r.created_at.isoformat() if r.created_at else None
+            })
+        session.close()
+        return result
+
+    def get_lead(self, lead_id: str):
+        session = self.Session()
+        r = session.query(Lead).filter(Lead.id == lead_id).first()
+        if not r:
+            session.close()
+            return None
+        result = {
+            'id': r.id,
+            'email': r.email,
+            'name': r.name,
+            'company': r.company,
+            'status': r.status,
+            'metadata': r.metadata_json,
+            'created_at': r.created_at.isoformat() if r.created_at else None
+        }
+        session.close()
+        return result
 
     def is_event_processed(self, event_id: str) -> bool:
         session = self.Session()
