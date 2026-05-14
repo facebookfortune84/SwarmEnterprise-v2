@@ -54,6 +54,13 @@ OUTPUT_DIR = os.getenv('SWARM_OUTPUT_DIR', '/mnt/c/SwarmEnterprise_v2/output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(os.path.join(OUTPUT_DIR, 'src'), exist_ok=True)
 
+# Start outreach worker
+try:
+    from agents.outreach.worker import start_worker
+    start_worker()
+except Exception:
+    logger.debug("Outreach worker not started")
+
 @app.get("/health")
 def health_check():
     return {"status": "ONLINE", "version": "2.0.0", "engine": "SwarmOS"}
