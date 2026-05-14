@@ -43,7 +43,7 @@ class UsageEvent(Base):
     project_id = Column(String, index=True, nullable=True)
     event_type = Column(String)
     amount = Column(String, nullable=True)
-    metadata = Column(Text, nullable=True)
+    metadata_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class ProcessedEvent(Base):
@@ -124,7 +124,7 @@ class LinearEngine:
     def record_usage(self, project_id: str | None, event_type: str, amount: str | None = None, metadata: dict | None = None) -> str:
         session = self.Session()
         uid = uuid.uuid4().hex[:12]
-        u = UsageEvent(id=uid, project_id=project_id, event_type=event_type, amount=str(amount) if amount else None, metadata=str(metadata) if metadata else None)
+        u = UsageEvent(id=uid, project_id=project_id, event_type=event_type, amount=str(amount) if amount else None, metadata_json=str(metadata) if metadata else None)
         session.add(u)
         session.commit()
         session.close()
@@ -143,7 +143,7 @@ class LinearEngine:
                 'project_id': r.project_id,
                 'event_type': r.event_type,
                 'amount': r.amount,
-                'metadata': r.metadata,
+                'metadata': r.metadata_json,
                 'created_at': r.created_at.isoformat() if r.created_at else None
             })
         session.close()
