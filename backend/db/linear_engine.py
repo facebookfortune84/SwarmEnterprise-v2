@@ -37,6 +37,15 @@ class Lead(Base):
     metadata_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class UsageEvent(Base):
+    __tablename__ = 'usage_events'
+    id = Column(String, primary_key=True)
+    project_id = Column(String, index=True, nullable=True)
+    event_type = Column(String)
+    amount = Column(String, nullable=True)
+    metadata = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class ProcessedEvent(Base):
     __tablename__ = 'processed_events'
     id = Column(String, primary_key=True)
@@ -89,6 +98,52 @@ class LinearEngine:
                 'company': r.company,
                 'status': r.status,
                 'metadata': r.metadata_json,
+                'created_at': r.created_at.isoformat() if r.created_at else None
+            })
+        session.close()
+        return result
+
+    def get_lead(self, lead_id: str):
+        session = self.Session()
+        r = session.query(Lead).filter(Lead.id == lead_id).first()
+        if not r:
+            session.close()
+            return None
+        result = {
+            'id': r.id,
+            'email': r.email,
+            'name': r.name,
+            'company': r.company,
+            'status': r.status,
+            'metadata': r.metadata_json,
+            'created_at': r.created_at.isoformat() if r.created_at else None
+        }
+        session.close()
+        return result
+
+    def record_usage(self, project_id: str | None, event_type: str, amount: str | None = None, metadata: dict | None = None) -> str:
+        session = self.Session()
+        uid = uuid.uuid4().hex[:12]
+        u = UsageEvent(id=uid, project_id=project_id, event_type=event_type, amount=str(amount) if amount else None, metadata=str(metadata) if metadata else None)
+        session.add(u)
+        session.commit()
+        session.close()
+        return uid
+
+    def list_usage(self, project_id: str | None = None, limit: int = 100):
+        session = self.Session()
+        q = session.query(UsageEvent).order_by(UsageEvent.created_at.desc())
+        if project_id:
+            q = q.filter(UsageEvent.project_id == project_id)
+        rows = q.limit(limit).all()
+        result = []
+        for r in rows:
+            result.append({
+                'id': r.id,
+                'project_id': r.project_id,
+                'event_type': r.event_type,
+                'amount': r.amount,
+                'metadata': r.metadata,
                 'created_at': r.created_at.isoformat() if r.created_at else None
             })
         session.close()

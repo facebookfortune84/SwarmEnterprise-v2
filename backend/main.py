@@ -42,6 +42,13 @@ try:
 except Exception:
     logger.debug("Leads router not available")
 
+# Usage API
+try:
+    from backend.api.usage import router as usage_router
+    app.include_router(usage_router)
+except Exception:
+    logger.debug("Usage router not available")
+
 # Ensure output directory exists for static files (use env override)
 OUTPUT_DIR = os.getenv('SWARM_OUTPUT_DIR', '/mnt/c/SwarmEnterprise_v2/output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
