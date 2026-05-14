@@ -2,13 +2,10 @@ import os
 import time
 import threading
 import logging
-from queue import Queue, Empty
 from agents.outreach.email_engine import EmailTools
+from backend import queue as backend_queue
 
 logger = logging.getLogger("OutreachWorker")
-
-# Simple in-process queue. In production replace with Redis/RQ or Celery.
-_outreach_queue = Queue()
 
 class OutreachTask:
     def __init__(self, to_email: str, subject: str, body: str, attempts: int = 0):
@@ -19,17 +16,18 @@ class OutreachTask:
 
 
 def enqueue_outreach(to_email: str, subject: str, body: str):
-    _outreach_queue.put(OutreachTask(to_email, subject, body))
+    payload = {"to_email": to_email, "subject": subject, "body": body, "attempts": 0}
+    backend_queue.enqueue_task(payload)
     logger.info(f"Enqueued outreach to {to_email}")
 
 
 def _worker_loop(stop_event: threading.Event):
     email_tool = EmailTools()
     while not stop_event.is_set():
-        try:
-            task = _outreach_queue.get(timeout=1)
-        except Empty:
+        item = backend_queue.dequeue_task(timeout=1)
+        if not item:
             continue
+        task = OutreachTask(item.get('to_email'), item.get('subject'), item.get('body'), item.get('attempts', 0))
         try:
             res = email_tool.send_email(task.to_email, task.subject, task.body)
             if res.startswith('SUCCESS'):
@@ -41,11 +39,9 @@ def _worker_loop(stop_event: threading.Event):
                     task.attempts += 1
                     backoff = 2 ** task.attempts
                     time.sleep(backoff)
-                    _outreach_queue.put(task)
+                    backend_queue.enqueue_task({"to_email": task.to_email, "subject": task.subject, "body": task.body, "attempts": task.attempts})
         except Exception as e:
             logger.exception(f"Worker error: {e}")
-        finally:
-            _outreach_queue.task_done()
 
 _worker_thread = None
 _stop_event = None
