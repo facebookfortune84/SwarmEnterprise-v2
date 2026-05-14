@@ -102,6 +102,12 @@ async def stripe_webhook(request: Request):
             db = get_swarm_db()
             db.create_project(project_id=project_id, stripe_session=session_id, customer_email=customer_email, product_id=product_id, price_id=price_id, metadata=str(metadata))
 
+            # Record a usage event for billing/analytics
+            try:
+                db.record_usage(project_id, event_type='purchase', amount=str(metadata.get('amount')) if metadata.get('amount') else None, metadata={'session_id': session_id})
+            except Exception:
+                logger.exception("Failed to record usage event for purchase")
+
             # Trigger the build asynchronously
             import asyncio
             from backend.core.factory import swarm_factory
