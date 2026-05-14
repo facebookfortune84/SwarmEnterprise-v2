@@ -49,6 +49,13 @@ try:
 except Exception:
     logger.debug("Usage router not available")
 
+# Outreach API
+try:
+    from backend.api.outreach import router as outreach_router
+    app.include_router(outreach_router)
+except Exception:
+    logger.debug("Outreach router not available")
+
 # Ensure output directory exists for static files (use env override)
 OUTPUT_DIR = os.getenv('SWARM_OUTPUT_DIR', '/mnt/c/SwarmEnterprise_v2/output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
