@@ -37,11 +37,13 @@ services:
       - SMTP_PORT=${SMTP_PORT:-587}
       - SMTP_USER=${SMTP_USER:-sales@realms2riches.com}
       - SMTP_PASS=${SMTP_PASS:-}
+      # Redis for queueing (optional)
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     
     # Enable host.docker.internal (Docker Desktop feature)
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    
+
     # Health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -50,6 +52,13 @@ services:
       retries: 3
       start_period: 20s
     
+    restart: unless-stopped
+    networks:
+      - swarmnet
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: swarmOS-redis
     restart: unless-stopped
     networks:
       - swarmnet
