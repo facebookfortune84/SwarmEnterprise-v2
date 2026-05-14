@@ -27,6 +27,12 @@ class Project(Base):
     metadata_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class ProcessedEvent(Base):
+    __tablename__ = 'processed_events'
+    id = Column(String, primary_key=True)
+    event_id = Column(String, unique=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class LinearEngine:
     """Ticket persistence for the swarm"""
     def __init__(self):
@@ -51,6 +57,25 @@ class LinearEngine:
         session.add(p)
         session.commit()
         session.close()
+
+    def is_event_processed(self, event_id: str) -> bool:
+        session = self.Session()
+        try:
+            r = session.query(ProcessedEvent).filter(ProcessedEvent.event_id == event_id).first()
+            return bool(r)
+        finally:
+            session.close()
+
+    def mark_event_processed(self, event_id: str):
+        session = self.Session()
+        try:
+            exists = session.query(ProcessedEvent).filter(ProcessedEvent.event_id == event_id).first()
+            if not exists:
+                e = ProcessedEvent(id=uuid.uuid4().hex[:12], event_id=event_id)
+                session.add(e)
+                session.commit()
+        finally:
+            session.close()
 
     def list_projects(self, limit: int = 100):
         session = self.Session()

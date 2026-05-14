@@ -1,0 +1,14 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 26.3.1
+    hooks:
+      - id: black
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.0
+    hooks:
+      - id: ruff
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: 1.6.0
+    hooks:
+      - id: detect-secrets-hook
+        args: ["--baseline", ".secrets.baseline"]
