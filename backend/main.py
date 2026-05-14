@@ -12,6 +12,19 @@ from backend.api.voice import router as voice_router
 logging.basicConfig(level=logging.INFO, format="%(asctime)s[%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("SwarmOS")
 
+# Enable structured JSON logging if requested (requires python-json-logger)
+if os.getenv('ENABLE_JSON_LOGGING', 'FALSE').lower() in ('1','true','yes') or os.getenv('OTEL_OTLP_ENDPOINT'):
+    try:
+        from pythonjsonlogger import jsonlogger
+        root = logging.getLogger()
+        if root.handlers:
+            handler = root.handlers[0]
+            fmt = jsonlogger.JsonFormatter('%(asctime)s %(levelname)s %(name)s %(message)s')
+            handler.setFormatter(fmt)
+            logger.info('JSON logging enabled')
+    except Exception:
+        logger.warning('python-json-logger not available; falling back to text logs')
+
 # Initialize telemetry (if available)
 try:
     from backend import telemetry
