@@ -84,6 +84,31 @@ class LinearEngine:
         session.add(l)
         session.commit()
         session.close()
+
+        # Attempt immediate sync to external CRMs if configured
+        try:
+            properties = {"name": name or email, "company": company}
+            from backend.connectors import hubspot, close, sheets
+            # Best-effort, do not fail on errors
+            try:
+                hubspot.create_contact(email, properties)
+            except Exception:
+                logger = logging.getLogger("HubSpotConnector")
+                logger.exception("HubSpot sync failed")
+            try:
+                close.create_lead(email, properties)
+            except Exception:
+                logger = logging.getLogger("CloseConnector")
+                logger.exception("Close sync failed")
+            try:
+                sheets.push_row({"email": email, "name": name, "company": company, "lead_id": lead_id})
+            except Exception:
+                logger = logging.getLogger("SheetsConnector")
+                logger.exception("Sheets push failed")
+        except Exception:
+            # Ignore sync errors to avoid breaking lead creation
+            pass
+
         return lead_id
 
     def list_leads(self, limit: int = 100):
