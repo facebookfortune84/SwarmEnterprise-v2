@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger("SwarmOS.telemetry")
 
+
 def init():
     disabled = os.getenv("OTEL_SDK_DISABLED", "FALSE").lower() in ("1", "true", "yes")
     if disabled:

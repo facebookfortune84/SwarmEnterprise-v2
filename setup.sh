@@ -2,6 +2,11 @@
 
 set -e
 
+if [ ! -f .env ] && [ -f .env.example ]; then
+  cp .env.example .env
+  echo "Created .env from .env.example"
+fi
+
 echo "=========================================="
 echo "SwarmOS Setup: Environment & Dependencies"
 echo "=========================================="

@@ -3,16 +3,16 @@ import logging
 
 logger = logging.getLogger("RAG")
 
+
 def get_chroma_client():
     try:
         import chromadb
-        from chromadb.config import Settings
     except Exception as e:
         logger.error("chromadb library not available: %s", e)
         return None
 
-    host = os.getenv('CHROMA_SERVER_HOST', 'localhost')
-    port = os.getenv('CHROMA_SERVER_HTTP_PORT', '8000')
+    host = os.getenv("CHROMA_SERVER_HOST", "localhost")
+    port = os.getenv("CHROMA_SERVER_HTTP_PORT", "8000")
     url = f"http://{host}:{port}"
     try:
         client = chromadb.HttpClient(api_url=url)
@@ -22,7 +22,9 @@ def get_chroma_client():
         return None
 
 
-def upsert_documents(collection_name: str, documents: list, metadatas: list = None, ids: list = None):
+def upsert_documents(
+    collection_name: str, documents: list, metadatas: list = None, ids: list = None
+):
     client = get_chroma_client()
     if client is None:
         raise RuntimeError("Chroma client not available")

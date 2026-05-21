@@ -7,6 +7,7 @@ from backend import queue as backend_queue
 
 logger = logging.getLogger("OutreachWorker")
 
+
 class OutreachTask:
     def __init__(self, to_email: str, subject: str, body: str, attempts: int = 0):
         self.to_email = to_email
@@ -27,24 +28,35 @@ def _worker_loop(stop_event: threading.Event):
         item = backend_queue.dequeue_task(timeout=1)
         if not item:
             continue
-        task = OutreachTask(item.get('to_email'), item.get('subject'), item.get('body'), item.get('attempts', 0))
+        task = OutreachTask(
+            item.get("to_email"), item.get("subject"), item.get("body"), item.get("attempts", 0)
+        )
         try:
             res = email_tool.send_email(task.to_email, task.subject, task.body)
-            if res.startswith('SUCCESS'):
+            if res.startswith("SUCCESS"):
                 logger.info(f"Outreach sent to {task.to_email}")
             else:
                 logger.warning(f"Outreach failed for {task.to_email}: {res}")
                 # simple retry logic
-                if task.attempts < int(os.getenv('OUTREACH_MAX_RETRIES', '3')):
+                if task.attempts < int(os.getenv("OUTREACH_MAX_RETRIES", "3")):
                     task.attempts += 1
-                    backoff = 2 ** task.attempts
+                    backoff = 2**task.attempts
                     time.sleep(backoff)
-                    backend_queue.enqueue_task({"to_email": task.to_email, "subject": task.subject, "body": task.body, "attempts": task.attempts})
+                    backend_queue.enqueue_task(
+                        {
+                            "to_email": task.to_email,
+                            "subject": task.subject,
+                            "body": task.body,
+                            "attempts": task.attempts,
+                        }
+                    )
         except Exception as e:
             logger.exception(f"Worker error: {e}")
 
+
 _worker_thread = None
 _stop_event = None
+
 
 def start_worker():
     global _worker_thread, _stop_event

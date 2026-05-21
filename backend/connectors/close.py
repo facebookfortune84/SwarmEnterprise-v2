@@ -14,8 +14,16 @@ def create_lead(email: str, properties: dict) -> Optional[dict]:
         logger.debug("CLOSE_API_KEY not configured; skipping Close sync")
         return None
     url = f"{BASE}/lead/"
-    headers = {"Content-Type": "application/json", "Accept": "application/json", "Authorization": f"Bearer {API_KEY}"}
-    payload = {"name": properties.get('name') or email, "contacts": [{"emails": [email]}], "custom": properties}
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": f"Bearer {API_KEY}",
+    }
+    payload = {
+        "name": properties.get("name") or email,
+        "contacts": [{"emails": [email]}],
+        "custom": properties,
+    }
     try:
         r = requests.post(url, json=payload, headers=headers, timeout=TIMEOUT)
         r.raise_for_status()

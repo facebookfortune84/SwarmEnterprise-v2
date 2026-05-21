@@ -1,13 +1,20 @@
 import os
+import sys
 
-BASE_DIR = "/mnt/c/SwarmEnterprise_v2"
+sys.path.insert(0, os.path.dirname(__file__))
+from _paths import output_src_dir, repo_root  # noqa: E402
+
+BASE_DIR = repo_root()
+OUT_SRC = output_src_dir()
+
 
 def write_file(path, content):
     full_path = os.path.join(BASE_DIR, path)
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
-    with open(full_path, 'w', encoding='utf-8') as f:
+    with open(full_path, "w", encoding="utf-8") as f:
         f.write(content.strip() + "\n")
     print(f"[✓] Generated: {path}")
+
 
 def generate_phase3():
     print("==========================================")
@@ -15,7 +22,9 @@ def generate_phase3():
     print("==========================================")
 
     # 1. MAIN FASTAPI APP
-    write_file("backend/main.py", r"""
+    write_file(
+        "backend/main.py",
+        r"""
 import logging
 import os
 from fastapi import FastAPI
@@ -41,15 +50,18 @@ app.include_router(core_router)
 app.include_router(webhook_router)
 
 # Ensure output directory exists for static files
-os.makedirs("/mnt/c/SwarmEnterprise_v2/output/src", exist_ok=True)
+os.makedirs(OUT_SRC, exist_ok=True)
 
 @app.get("/health")
 def health_check():
     return {"status": "ONLINE", "version": "2.0.0", "engine": "SwarmOS"}
-""")
+""",
+    )
 
     # 2. CORE API ROUTES
-    write_file("backend/api/routes.py", r"""
+    write_file(
+        "backend/api/routes.py",
+        r"""
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from backend.db.linear_engine import swarm_db
@@ -71,10 +83,13 @@ async def trigger_build(request: BuildRequest):
         return {"status": "Build Initialized", "project_id": project_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-""")
+""",
+    )
 
     # 3. PREMIUM DASHBOARD UI
-    write_file("frontend/public/index.html", r"""
+    write_file(
+        "frontend/public/index.html",
+        r"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,17 +163,23 @@ async def trigger_build(request: BuildRequest):
     </script>
 </body>
 </html>
-""")
+""",
+    )
 
     # 4. TEST HARNESS (PYTEST)
-    write_file("pytest.ini", r"""
+    write_file(
+        "pytest.ini",
+        r"""
 [pytest]
 asyncio_mode = auto
 testpaths = tests
 python_files = test_*.py
-""")
+""",
+    )
 
-    write_file("tests/conftest.py", r"""
+    write_file(
+        "tests/conftest.py",
+        r"""
 import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
@@ -166,9 +187,12 @@ from backend.main import app
 @pytest.fixture
 def client():
     return TestClient(app)
-""")
+""",
+    )
 
-    write_file("tests/unit/backend/test_routes.py", r"""
+    write_file(
+        "tests/unit/backend/test_routes.py",
+        r"""
 def test_health_check(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -180,10 +204,13 @@ def test_build_trigger(client):
     response = client.post("/api/build", json=payload)
     assert response.status_code == 200
     assert "project_id" in response.json()
-""")
+""",
+    )
 
     # 5. DOCKER DEPLOYMENT MANIFEST
-    write_file("docker-compose.yml", r"""
+    write_file(
+        "docker-compose.yml",
+        r"""
 version: '3.8'
 
 services:
@@ -200,9 +227,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
-""")
+""",
+    )
 
-    write_file("backend/Dockerfile", r"""
+    write_file(
+        "backend/Dockerfile",
+        r"""
 FROM python:3.11-slim
 WORKDIR /mnt/c/SwarmEnterprise_v2
 COPY backend/requirements.txt /tmp/
@@ -210,9 +240,11 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 RUN pip install fastapi uvicorn stripe
 COPY . .
 CMD["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
-""")
+""",
+    )
 
     print("\n[✓] PHASE 3 GENERATION COMPLETE.")
+
 
 if __name__ == "__main__":
     generate_phase3()

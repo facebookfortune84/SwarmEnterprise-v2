@@ -76,6 +76,9 @@ tmp/
 temp/
 *.tmp
 .cache/
+.sconsign.dblite
+.ruff_cache/
+project_structure_clean.txt
 
 # Machine Learning / Models (if applicable)
 *.onnx
@@ -84,3 +87,4 @@ temp/
 
 # Ollama cache (if local)
 .ollama/
+.aider*

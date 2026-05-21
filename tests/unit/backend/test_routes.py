@@ -4,6 +4,7 @@ def test_health_check(client):
     assert response.json()["status"] == "ONLINE"
     assert response.json()["engine"] == "SwarmOS"
 
+
 def test_build_trigger(client):
     payload = {"name": "Test App", "description": "A testing vibe", "stack": "FastAPI"}
     response = client.post("/api/build", json=payload)

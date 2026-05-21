@@ -6,11 +6,12 @@ from threading import Lock
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
 logger = logging.getLogger("EmailEngine")
+
 
 class EmailTools:
     """Handles Cold Outreach and Product Delivery via SMTP with retries, rate limiting, and provider fallback"""
+
     # Shared rate-limiting state across instances
     _lock = Lock()
     _last_sent_ts = 0.0
@@ -18,20 +19,22 @@ class EmailTools:
     def __init__(self):
         # Primary provider
         primary = {
-            'server': os.getenv('SMTP_SERVER', 'smtp.realms2riches.com'),
-            'port': int(os.getenv('SMTP_PORT', 587)),
-            'user': os.getenv('SMTP_USER', 'sales@realms2riches.com'),
-            'password': os.getenv('SMTP_PASS', ''),
+            "server": os.getenv("SMTP_SERVER", "smtp.realms2riches.com"),
+            "port": int(os.getenv("SMTP_PORT", 587)),
+            "user": os.getenv("SMTP_USER", "sales@realms2riches.com"),
+            "password": os.getenv("SMTP_PASS", ""),
         }
 
         # Parse fallbacks from env: comma-separated server:port:user:pass
         fallbacks = []
-        fb_raw = os.getenv('SMTP_FALLBACKS', '').strip()
+        fb_raw = os.getenv("SMTP_FALLBACKS", "").strip()
         if fb_raw:
-            for part in fb_raw.split(','):
+            for part in fb_raw.split(","):
                 try:
-                    server, port, user, password = part.split(':', 3)
-                    fallbacks.append({'server': server, 'port': int(port), 'user': user, 'password': password})
+                    server, port, user, password = part.split(":", 3)
+                    fallbacks.append(
+                        {"server": server, "port": int(port), "user": user, "password": password}
+                    )
                 except ValueError:
                     logger.warning(f"Invalid SMTP_FALLBACKS entry skipped: {part}")
 
@@ -58,23 +61,25 @@ class EmailTools:
 
     def send_email(self, to_email: str, subject: str, html_body: str):
         # If no provider has a password configured, operate in mock mode
-        if not any(p.get('password') for p in self.providers):
-            logger.warning(f"No SMTP credentials configured. Mocking email to {to_email}: {subject}")
+        if not any(p.get("password") for p in self.providers):
+            logger.warning(
+                f"No SMTP credentials configured. Mocking email to {to_email}: {subject}"
+            )
             return "SUCCESS (MOCKED)"
 
         msg = MIMEMultipart()
-        msg['From'] = self.providers[0]['user']
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        msg.attach(MIMEText(html_body, 'html'))
+        msg["From"] = self.providers[0]["user"]
+        msg["To"] = to_email
+        msg["Subject"] = subject
+        msg.attach(MIMEText(html_body, "html"))
 
         # Try each provider in order, with retries per provider
         last_error = None
         for provider in self.providers:
-            server = provider['server']
-            port = provider.get('port', 587)
-            user = provider.get('user')
-            password = provider.get('password')
+            server = provider["server"]
+            port = provider.get("port", 587)
+            user = provider.get("user")
+            password = provider.get("password")
 
             attempt = 0
             while attempt < self.max_retries:
@@ -93,7 +98,9 @@ class EmailTools:
                 except (smtplib.SMTPException, OSError) as e:
                     last_error = e
                     backoff = self.base_backoff * (2 ** (attempt - 1))
-                    logger.warning(f"SMTP attempt {attempt} failed for provider {server}: {e}. Backing off {backoff}s")
+                    logger.warning(
+                        f"SMTP attempt {attempt} failed for provider {server}: {e}. Backing off {backoff}s"
+                    )
                     time.sleep(backoff)
                 except Exception as e:
                     logger.exception(f"Unexpected error sending email via provider {server}: {e}")

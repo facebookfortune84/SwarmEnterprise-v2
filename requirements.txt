@@ -1,28 +1,27 @@
 # SwarmOS Root Requirements
-# Pin all versions for reproducibility
+# Pinned where stability matters, relaxed where the ecosystem is volatile
 
-# Core Framework
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+# Core Framework (safe to pin)
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-# LLM & AI (UPDATED: Use langchain-ollama)
-crewai==0.25.0
-langchain==0.3.0.dev1
-langchain-community==0.3.27
-langchain-openai==1.1.14
-langchain-ollama==0.1.1
+# LLM & AI (let pip resolve around crewai/embedchain)
+crewai==0.28.8
+langchain
+langchain-community
+langchain-openai
 
-# Database
-sqlalchemy==2.0.23
+# Database (let pip pick a version compatible with langchain/embedchain)
+sqlalchemy
 aiosqlite==0.19.0
 
-# Vector DB
-chromadb==0.4.17
+# Vector DB (let pip pick a version compatible with embedchain)
+chromadb
 
 # Utilities
-python-dotenv==1.2.2
+python-dotenv==1.0.0
 requests==2.33.0
 stripe==6.7.0
 
@@ -30,22 +29,27 @@ stripe==6.7.0
 httpx==0.25.0
 aiofiles==23.2.1
 
-# Development (optional)
+# Development (safe to pin)
 pytest==9.0.3
 pytest-asyncio==0.21.1
 black==26.3.1
 ruff==0.1.7
+
 # Observability
 python-json-logger==2.0.7
-opentelemetry-sdk==1.21.0
-opentelemetry-exporter-otlp==1.21.0
+opentelemetry-sdk==1.22.0
+opentelemetry-exporter-otlp==1.22.0
+
 # Queue and async
 redis==5.0.0
 celery==5.3.1
+
 # Prometheus metrics
 prometheus-client==0.16.0
+
 # Sentry
-sentry-sdk==1.26.0
+sentry-sdk==2.8.0
+
 # Security
-pip-audit==2.3.1
+pip-audit==2.10.0
 reportlab==4.0.0

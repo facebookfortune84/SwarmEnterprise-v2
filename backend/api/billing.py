@@ -1,21 +1,35 @@
+"""
+Billing API endpoints for generating invoices, recording usage events,
+and marking invoices as paid. This module handles PDF generation,
+email notifications, and usage tracking for billing reconciliation.
+"""
+
+import logging
+import os
+import uuid
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.db.linear_engine import get_swarm_db
-from agents.outreach.email_engine import EmailTools
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from pathlib import Path
-import uuid
-import os
-import logging
+
+from backend.db.linear_engine import get_swarm_db
+from agents.outreach.email_engine import EmailTools
 
 router = APIRouter(prefix="/api/billing", tags=["Billing"])
 logger = logging.getLogger("Billing")
 
-OUT_DIR = Path(os.getenv("SWARM_OUTPUT_DIR", "/mnt/c/SwarmEnterprise_v2/output")) / "invoices"
+# Output directory for invoice PDFs
+_DEFAULT_OUT = Path(__file__).resolve().parents[2] / "output"
+_out_env = os.getenv("SWARM_OUTPUT_DIR", "").strip()
+OUT_DIR = (Path(_out_env) if _out_env else _DEFAULT_OUT) / "invoices"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+
 class InvoicePayload(BaseModel):
+    """Payload for invoice creation."""
+
     project_id: str
     customer_email: str
     amount_cents: int
@@ -24,61 +38,102 @@ class InvoicePayload(BaseModel):
 
 @router.post("/invoice")
 async def create_invoice(payload: InvoicePayload):
-    """Create an invoice PDF for a project and record a usage event. This is an offline, self-hosted billing flow (FOSS).
+    """
+    Create an invoice PDF, record a usage event, and optionally email the invoice.
 
-    The resulting PDF is stored in the repo output directory and (optionally) emailed using configured SMTP.
+    Args:
+        payload (InvoicePayload): Invoice metadata and billing details.
+
+    Returns:
+        dict: Invoice ID and file path.
     """
     db = get_swarm_db()
     invoice_id = uuid.uuid4().hex[:12].upper()
     filename = OUT_DIR / f"invoice_{invoice_id}.pdf"
 
-    # Generate a simple PDF invoice
+    # Generate PDF invoice
     try:
-        c = canvas.Canvas(str(filename), pagesize=letter)
-        width, height = letter
-        c.setFont("Helvetica-Bold", 16)
-        c.drawString(72, height - 72, "SwarmOS Invoice")
-        c.setFont("Helvetica", 12)
-        c.drawString(72, height - 100, f"Invoice ID: {invoice_id}")
-        c.drawString(72, height - 120, f"Project ID: {payload.project_id}")
-        c.drawString(72, height - 140, f"Customer: {payload.customer_email}")
-        c.drawString(72, height - 160, f"Amount: ${payload.amount_cents / 100:.2f}")
+        pdf = canvas.Canvas(str(filename), pagesize=letter)
+        _, height = letter
+
+        pdf.setFont("Helvetica-Bold", 16)
+        pdf.drawString(72, height - 72, "SwarmOS Invoice")
+
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(72, height - 100, f"Invoice ID: {invoice_id}")
+        pdf.drawString(72, height - 120, f"Project ID: {payload.project_id}")
+        pdf.drawString(72, height - 140, f"Customer: {payload.customer_email}")
+        pdf.drawString(
+            72,
+            height - 160,
+            f"Amount: ${payload.amount_cents / 100:.2f}",
+        )
+
         if payload.description:
-            c.drawString(72, height - 180, f"Description: {payload.description}")
-        c.drawString(72, height - 220, "Thank you for using SwarmOS.")
-        c.showPage()
-        c.save()
-    except Exception as e:
+            pdf.drawString(72, height - 180, f"Description: {payload.description}")
+
+        pdf.drawString(72, height - 220, "Thank you for using SwarmOS.")
+        pdf.showPage()
+        pdf.save()
+
+    except Exception as exc:
         logger.exception("Failed to create invoice PDF")
-        raise HTTPException(status_code=500, detail="Invoice generation failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Invoice generation failed",
+        ) from exc
 
-    # Record usage event for billing reconciliation
+    # Record usage event
     try:
-        db.record_usage(payload.project_id, event_type="invoice_created", amount=str(payload.amount_cents), metadata={"invoice_id": invoice_id, "description": payload.description})
-    except Exception:
-        logger.exception("Failed to record usage event")
+        db.record_usage(
+            payload.project_id,
+            event_type="invoice_created",
+            amount=str(payload.amount_cents),
+            metadata={
+                "invoice_id": invoice_id,
+                "description": payload.description,
+            },
+        )
+    except Exception as exc:
+        logger.exception("Failed to record usage event: %s", exc)
 
-    # Email invoice if SMTP configured
+    # Email invoice (best effort)
     try:
         emailer = EmailTools()
         subject = f"Invoice {invoice_id} from SwarmOS"
-        body = f"<p>Please find your invoice attached: {filename.name}</p>"
-        # EmailTools currently sends HTML body only; attach link to output directory
+        body = f"<p>Your invoice is ready: {filename.name}</p>"
         emailer.send_email(payload.customer_email, subject, body)
-    except Exception:
-        logger.exception("Failed to send invoice email (best-effort)")
+    except Exception as exc:
+        logger.exception("Failed to send invoice email: %s", exc)
 
     return {"invoice_id": invoice_id, "path": str(filename)}
 
 
 @router.post("/mark_paid/{invoice_id}")
 async def mark_invoice_paid(invoice_id: str):
-    # Find usage events with invoice_id metadata and mark as paid
+    """
+    Mark an invoice as paid by recording a usage event.
+
+    Args:
+        invoice_id (str): The invoice identifier.
+
+    Returns:
+        dict: Status and invoice ID.
+    """
     db = get_swarm_db()
-    # This is a simple implementation: record a usage event marking payment
+
     try:
-        db.record_usage(None, event_type="invoice_paid", amount=None, metadata={"invoice_id": invoice_id})
-    except Exception:
-        logger.exception("Failed to record invoice paid event")
-        raise HTTPException(status_code=500, detail="Failed to mark invoice paid")
+        db.record_usage(
+            None,
+            event_type="invoice_paid",
+            amount=None,
+            metadata={"invoice_id": invoice_id},
+        )
+    except Exception as exc:
+        logger.exception("Failed to record invoice paid event: %s", exc)
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to mark invoice paid",
+        ) from exc
+
     return {"status": "ok", "invoice_id": invoice_id}

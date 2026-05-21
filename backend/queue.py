@@ -9,6 +9,7 @@ REDIS_URL = os.getenv("REDIS_URL")
 if REDIS_URL:
     try:
         import redis
+
         _redis = redis.from_url(REDIS_URL)
         QUEUE_KEY = os.getenv("REDIS_QUEUE_KEY", "swarm_outreach_queue")
         logger.info("Using Redis queue at %s", REDIS_URL)
@@ -22,6 +23,7 @@ if REDIS_URL:
                 return None
             _, data = item
             return json.loads(data)
+
     except Exception as e:
         logger.warning(f"Redis not available, falling back to in-process queue: {e}")
         REDIS_URL = None
@@ -29,6 +31,7 @@ if REDIS_URL:
 if not REDIS_URL:
     # In-process fallback
     from queue import Queue, Empty
+
     _q = Queue()
 
     def enqueue_task(payload: dict):
