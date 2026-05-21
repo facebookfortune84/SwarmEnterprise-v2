@@ -28,10 +28,22 @@ docker-build:
 	docker-compose build
 
 docker-up:
-	docker-compose up -d
+	docker compose -f docker-compose.yml -f docker-compose.local-laptop-ollama.yml up -d
+
+docker-up-wsl:
+	docker compose -f docker-compose.yml -f docker-compose.wsl-docker.yml up -d
+
+docker-up-prod:
+	docker compose -f docker-compose.yml -f docker-compose.wsl-docker.yml -f docker-compose.production-realms2riches.yml --profile proxy up -d
 
 docker-down:
-	docker-compose down
+	docker compose down
+
+verify:
+	python scripts/verify_secrets.py
+
+heal:
+	python -c "from agents.ops.self_heal import run_heal_cycle; run_heal_cycle()"
 
 docker-logs:
 	docker-compose logs -f backend

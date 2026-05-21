@@ -1,4 +1,7 @@
-version: '3.8'
+# SwarmOS base stack — use profiles/overrides for environment-specific networking
+#   local laptop Ollama:  docker compose -f docker-compose.yml -f docker-compose.local-laptop-ollama.yml up -d
+#   WSL Docker:           docker compose -f docker-compose.yml -f docker-compose.wsl-docker.yml up -d
+#   production:           docker compose -f docker-compose.yml -f docker-compose.production-realms2riches.yml up -d
 
 services:
   backend:
@@ -6,73 +9,131 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: swarmOS-backend
+    env_file:
+      - .env
     ports:
-      - "8000:8000"
-    
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
-      # Code mount (hot reload in dev)
-      - .:/mnt/c/SwarmEnterprise_v2
-      # Persist database
-      - ./pg_data:/mnt/c/SwarmEnterprise_v2/pg_data
-      # Persist output artifacts
-      - ./output:/mnt/c/SwarmEnterprise_v2/output
-    
+      - ./pg_data:/app/pg_data
+      - ./output:/app/output
     environment:
-      # From .env file
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - OLLAMA_MODEL=llama3.2:3b
-      - OLLAMA_TEMPERATURE=0.1
-      - EMBEDDING_MODEL=nomic-embed-text:latest
-      - BACKEND_HOST=0.0.0.0
-      - BACKEND_PORT=8000
-      - PYTHONPATH=.
-      - LOG_LEVEL=INFO
-      - CREWAI_DISABLE_TELEMETRY=true
-      - OTEL_SDK_DISABLED=true
-      # Stripe (if configured)
-      - STRIPE_API_KEY=${STRIPE_API_KEY:-sk_test_placeholder}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_placeholder}
-      # SMTP (if configured)
-      - SMTP_SERVER=${SMTP_SERVER:-smtp.realms2riches.com}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_USER=${SMTP_USER:-sales@realms2riches.com}
-      - SMTP_PASS=${SMTP_PASS:-}
-      # Redis for queueing (optional)
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-    
-    # Enable host.docker.internal (Docker Desktop feature)
+      - SWARM_REPO_ROOT=/app
+      - SWARM_OUTPUT_DIR=/app/output
+      - SWARM_PG_DIR=/app/pg_data
+      - PYTHONPATH=/app
+      - DEPLOY_PROFILE=${DEPLOY_PROFILE:-local}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-    # Health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
+      interval: 15s
       timeout: 5s
       retries: 3
-      start_period: 20s
-    
+      start_period: 30s
+    depends_on:
+      redis:
+        condition: service_started
     restart: unless-stopped
     networks:
       - swarmnet
 
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: swarmOS-worker
+    env_file:
+      - .env
+    command: ["python", "-c", "from agents.outreach.worker import start_worker; import time; start_worker(); time.sleep(86400)"]
+    environment:
+      - SWARM_REPO_ROOT=/app
+      - PYTHONPATH=/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    profiles:
+      - workers
+
+  ops-heal:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: swarmOS-ops-heal
+    env_file:
+      - .env
+    command: ["python", "-m", "agents.ops.scheduler"]
+    environment:
+      - SWARM_REPO_ROOT=/app
+      - OPS_HEAL_INTERVAL_SEC=${OPS_HEAL_INTERVAL_SEC:-300}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    profiles:
+      - ops
+
   redis:
-    image: redis:7.0-alpine
+    image: redis:7-alpine
     container_name: swarmOS-redis
     restart: unless-stopped
     networks:
       - swarmnet
-    
-    # Resource limits (optional but recommended)
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 4G
-        reservations:
-          cpus: '1'
-          memory: 2G
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: swarmOS-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-swarm}
+      POSTGRES_USER: ${POSTGRES_USER:-swarm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-swarm}
+    volumes:
+      - pg_data_pg:/var/lib/postgresql/data
+    networks:
+      - swarmnet
+    profiles:
+      - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-swarm}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: swarmOS-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+    networks:
+      - swarmnet
+    profiles:
+      - proxy
 
 networks:
   swarmnet:
     driver: bridge
+
+volumes:
+  pg_data_pg:
+  caddy_data:
+  caddy_config:

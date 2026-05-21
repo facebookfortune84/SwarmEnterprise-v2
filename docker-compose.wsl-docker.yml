@@ -1,0 +1,19 @@
+# Profile: WSL2 Docker on Hyper-V VM — Ollama on physical Windows laptop
+# Set LAPTOP_OLLAMA_HOST to your laptop LAN IP (ipconfig on Windows host).
+# Example: LAPTOP_OLLAMA_HOST=192.168.1.50  ->  OLLAMA_URL=http://192.168.1.50:11434
+services:
+  backend:
+    environment:
+      - OLLAMA_URL=${OLLAMA_URL:-http://${LAPTOP_OLLAMA_HOST:-172.29.192.1}:11434}
+      - LAPTOP_OLLAMA_HOST=${LAPTOP_OLLAMA_HOST:-172.29.192.1}
+      - DEPLOY_PROFILE=wsl-docker
+      - BACKEND_URL=${BACKEND_URL:-http://backend:8000}
+    # WSL often cannot resolve host.docker.internal to laptop; use explicit IP in .env
+
+  worker:
+    environment:
+      - OLLAMA_URL=${OLLAMA_URL:-http://${LAPTOP_OLLAMA_HOST:-172.29.192.1}:11434}
+
+  ops-heal:
+    environment:
+      - OLLAMA_URL=${OLLAMA_URL:-http://${LAPTOP_OLLAMA_HOST:-172.29.192.1}:11434}

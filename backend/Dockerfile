@@ -1,29 +1,29 @@
-# Multi-stage build for optimal image size
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /build
-COPY backend/requirements.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Final stage
 FROM python:3.11-slim
 
-WORKDIR /mnt/c/SwarmEnterprise_v2
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
-# Copy Python dependencies from builder
 COPY --from=builder /root/.local /root/.local
-
-# Copy application code
 COPY . .
 
-# Set environment
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH=/app
+ENV SWARM_REPO_ROOT=/app
+ENV SWARM_OUTPUT_DIR=/app/output
 
-# Health check
-HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=20s \
-  CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=2)"
+HEALTHCHECK --interval=15s --timeout=5s --retries=3 --start-period=30s \
+  CMD curl -f http://localhost:8000/health || exit 1
 
-# Run
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

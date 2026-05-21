@@ -1,0 +1,36 @@
+# Reverse proxy for Realms2Riches production
+# DNS A records required for each host -> WSL/VM public IP
+
+{
+	email {$ACME_EMAIL:ops@realms2riches.com}
+}
+
+# Main app + API
+realms2riches.com, www.realms2riches.com {
+	root * /srv/frontend
+	try_files {path} /index.html
+	reverse_proxy /api/* backend:8000
+	reverse_proxy /health backend:8000
+	reverse_proxy /metrics backend:8000
+	file_server
+}
+
+api.realms2riches.com {
+	reverse_proxy backend:8000
+}
+
+# Corporate static site
+corp.realms2riches.com {
+	root * /srv/frontend/corp
+	try_files {path} /corp.html
+	file_server
+}
+
+# Tenant boxes on tech domain (wildcard — per-tenant containers behind Caddy or Traefik labels)
+*.realms2riches.tech {
+	reverse_proxy backend:8000
+}
+
+realms2riches.tech {
+	reverse_proxy backend:8000
+}

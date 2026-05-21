@@ -1,73 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>SwarmOS | Sovereign Factory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #020617; color: #38bdf8; font-family: monospace; }
-        .glow { text-shadow: 0 0 10px #38bdf8; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SwarmOS | Deployment Command</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/dashboard/config.js"></script>
+  <style>
+    body { background: #030712; color: #e2e8f0; font-family: system-ui, sans-serif; }
+    .node { border: 1px solid #1e3a5f; background: #0f172a; border-radius: 8px; padding: 12px; }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .ok { color: #4ade80; } .bad { color: #f87171; }
+  </style>
 </head>
-<body class="p-10">
-    <header class="border-b border-sky-900 pb-5 flex justify-between items-center">
-        <h1 class="text-4xl font-black glow">SWARM_OS v2.0 <span class="text-xs text-white uppercase tracking-widest bg-sky-900 px-2 py-1 rounded">Enterprise Edition</span></h1>
-        <button onclick="downloadBuild()" class="bg-emerald-600 px-6 py-2 rounded font-bold hover:bg-emerald-500 text-white transition-all">REPLICATE & DOWNLOAD BOX</button>
-    </header>
+<body class="p-6 max-w-7xl mx-auto">
+  <header class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-sky-400">SwarmOS Deployment Command</h1>
+      <p class="text-sm text-slate-500">realms2riches.com · corp · api · realms2riches.tech boxes</p>
+    </div>
+    <nav class="flex gap-3 text-sm">
+      <a href="/dashboard/" class="text-sky-400 font-semibold">Main</a>
+      <a href="/corp/corp.html" class="text-slate-400 hover:text-white">Corp</a>
+      <button id="healBtn" class="bg-amber-700 hover:bg-amber-600 px-4 py-2 rounded font-semibold">Run self-heal</button>
+    </nav>
+  </header>
 
-    <main class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <section class="space-y-6">
-            <div>
-                <h2 class="text-xl font-bold mb-2 text-white">1. DEFINE PROJECT VIBE</h2>
-                <textarea id="prompt" class="w-full h-40 bg-slate-900 border border-slate-700 p-4 rounded text-white" placeholder="Describe the enterprise application..."></textarea>
-            </div>
-            <div>
-                <h2 class="text-xl font-bold mb-3 text-white">2. SELECT SOVEREIGN STACK</h2>
-                <select id="stack" class="w-full bg-slate-900 border border-slate-700 p-4 rounded text-white font-bold">
-                    <option value="FastAPI + React + PostgreSQL">FastAPI + React + PostgreSQL</option>
-                    <option value="Node.js + Tailwind + MongoDB">Node.js + Tailwind + MongoDB</option>
-                </select>
-            </div>
-            <button onclick="startSprint()" id="btn" class="w-full bg-sky-600 text-white py-4 rounded font-black text-xl hover:bg-sky-500 transition-colors">INITIATE AUTONOMOUS SPRINT</button>
-        </section>
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold mb-3 text-white">Architecture</h2>
+    <div class="grid md:grid-cols-3 gap-4 text-sm">
+      <div class="node text-center">
+        <div class="text-sky-300 font-bold mb-1">💻 Laptop</div>
+        <div>ollama serve :11434</div>
+        <div id="ollamaStatus" class="mt-2 text-xs">checking…</div>
+      </div>
+      <div class="node text-center">
+        <div class="text-violet-300 font-bold mb-1">🖥 Hyper-V → WSL2 Docker</div>
+        <div>backend · redis · caddy</div>
+        <div id="dockerHint" class="mt-2 text-xs text-slate-500">OLLAMA_URL → laptop LAN IP</div>
+      </div>
+      <div class="node text-center">
+        <div class="text-emerald-300 font-bold mb-1">🌐 Domains</div>
+        <div id="domainList" class="text-left text-xs space-y-1 mt-2"></div>
+      </div>
+    </div>
+  </section>
 
-        <section class="bg-black border border-sky-900 p-6 rounded flex flex-col h-[600px]">
-            <h2 class="text-xs text-sky-800 uppercase font-black mb-4">Live Swarm Telemetry</h2>
-            <div id="logs" class="text-sm space-y-2 overflow-y-auto flex-grow text-sky-400">
-                <div>> System Online. Waiting for directives...</div>
-            </div>
-        </section>
-    </main>
+  <div class="grid lg:grid-cols-2 gap-6">
+    <section class="node">
+      <h2 class="font-semibold text-white mb-3">Deployment status</h2>
+      <pre id="statusPanel" class="text-xs overflow-auto max-h-64 text-slate-400">Loading…</pre>
+    </section>
 
-    <script>
-        async function startSprint() {
-            const btn = document.getElementById('btn');
-            const log = document.getElementById('logs');
-            btn.innerText = "SPRINT IN PROGRESS..."; 
-            btn.disabled = true;
-            
-            const vibe = document.getElementById('prompt').value;
-            const stack = document.getElementById('stack').value;
-            log.innerHTML += `<div class="text-yellow-500">> Board of Directors convened for new project...</div>`;
+    <section class="node">
+      <h2 class="font-semibold text-white mb-3">Tenant boxes (realms2riches.tech)</h2>
+      <form id="tenantForm" class="flex gap-2 mb-3">
+        <input id="tenantName" class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm" placeholder="Company name" required />
+        <button type="submit" class="bg-sky-700 hover:bg-sky-600 px-4 py-2 rounded text-sm font-semibold">Register</button>
+      </form>
+      <ul id="tenantList" class="text-sm space-y-2 max-h-48 overflow-auto"></ul>
+    </section>
 
-            try {
-                const res = await fetch('http://localhost:8000/api/build', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ name: "AutoProject", description: vibe, stack: stack })
-                });
-                const data = await res.json();
-                if(res.ok) {
-                    log.innerHTML += `<div class="text-green-500">> [SUCCESS] Project ID ${data.project_id} initialized. Supervisors dispatched.</div>`;
-                }
-            } catch (err) {
-                log.innerHTML += `<div class="text-red-500">> [ERROR] API Unreachable. Check Docker containers.</div>`;
-            }
+    <section class="node lg:col-span-2">
+      <h2 class="font-semibold text-white mb-3">Build sprint</h2>
+      <textarea id="prompt" class="w-full h-24 bg-slate-900 border border-slate-700 rounded p-3 text-sm mb-2" placeholder="Project vibe…"></textarea>
+      <div class="flex gap-2">
+        <select id="stack" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm">
+          <option>FastAPI + React + PostgreSQL</option>
+          <option>Node.js + Tailwind + MongoDB</option>
+        </select>
+        <button id="buildBtn" class="bg-emerald-700 hover:bg-emerald-600 px-6 py-2 rounded font-semibold text-sm">Initiate sprint</button>
+      </div>
+      <div id="logs" class="mt-3 text-xs text-sky-500/80 max-h-32 overflow-auto"></div>
+    </section>
+  </div>
+
+  <script>
+    const API = () => window.SWARM_API_BASE || "";
+
+    async function api(path, opts = {}) {
+      const r = await fetch(API() + path, { headers: { "Content-Type": "application/json" }, ...opts });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.detail || r.statusText);
+      return data;
+    }
+
+    function log(msg, cls = "") {
+      const el = document.getElementById("logs");
+      el.innerHTML += `<div class="${cls}">> ${msg}</div>`;
+    }
+
+    async function refreshStatus() {
+      try {
+        const s = await api("/api/ops/status");
+        document.getElementById("statusPanel").textContent = JSON.stringify(s, null, 2);
+        const domains = s.domains || {};
+        document.getElementById("domainList").innerHTML = Object.entries(domains)
+          .map(([k, v]) => `<div><span class="text-slate-500">${k}:</span> ${v}</div>`).join("");
+        const o = s.ollama || {};
+        document.getElementById("ollamaStatus").innerHTML = o.reachable
+          ? `<span class="ok">● Ollama OK</span> (${o.models || 0} models)`
+          : `<span class="bad">● Ollama unreachable</span>`;
+        if (s.laptop_ollama_host) {
+          document.getElementById("dockerHint").textContent = `LAPTOP_OLLAMA_HOST=${s.laptop_ollama_host}`;
         }
+        renderTenants(s.tenants?.items || []);
+      } catch (e) {
+        document.getElementById("statusPanel").textContent = "API unreachable: " + e.message;
+      }
+    }
 
-        function downloadBuild() {
-            alert("Delivery via Webhook triggered. Check your email!");
-        }
-    </script>
+    function renderTenants(items) {
+      const ul = document.getElementById("tenantList");
+      if (!items.length) { ul.innerHTML = "<li class='text-slate-500'>No tenants yet</li>"; return; }
+      ul.innerHTML = items.map(t => `
+        <li class="flex justify-between items-center border-b border-slate-800 py-1">
+          <span>${t.name} <span class="text-slate-500 text-xs">${t.slug}</span></span>
+          <span class="text-xs ${t.status === 'running' ? 'ok' : 'text-amber-400'}">${t.status}</span>
+          <button data-id="${t.id}" class="provision text-xs bg-slate-700 px-2 py-1 rounded">Deploy box</button>
+        </li>`).join("");
+      ul.querySelectorAll(".provision").forEach(btn => {
+        btn.onclick = async () => {
+          await api(`/api/tenants/${btn.dataset.id}/provision`, { method: "POST", body: JSON.stringify({ use_vm: false }) });
+          refreshStatus();
+        };
+      });
+    }
+
+    document.getElementById("tenantForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("tenantName").value;
+      await api("/api/tenants/register", { method: "POST", body: JSON.stringify({ name }) });
+      document.getElementById("tenantName").value = "";
+      const list = await api("/api/tenants");
+      renderTenants(list.tenants || []);
+    };
+
+    document.getElementById("buildBtn").onclick = async () => {
+      const vibe = document.getElementById("prompt").value;
+      const stack = document.getElementById("stack").value;
+      log("Board convened…");
+      const data = await api("/api/build", {
+        method: "POST",
+        body: JSON.stringify({ name: "AutoProject", description: vibe, stack }),
+      });
+      log(`Project ${data.project_id} started`, "text-green-400");
+    };
+
+    document.getElementById("healBtn").onclick = async () => {
+      log("Self-heal triggered…", "text-amber-300");
+      await api("/api/ops/heal", { method: "POST" });
+      log("Heal cycle queued", "text-green-400");
+    };
+
+    refreshStatus();
+    setInterval(refreshStatus, 30000);
+  </script>
 </body>
 </html>

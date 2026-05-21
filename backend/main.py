@@ -1,7 +1,10 @@
 import logging
 import os
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from backend.api.webhooks import router as webhook_router
 from backend.api.routes import router as core_router
 from backend.api.payments import router as payments_router
@@ -48,9 +51,13 @@ try:
 except Exception:
     logger.debug("Prometheus metrics not available")
 
+_cors_origins = os.getenv(
+    "CORS_ORIGINS",
+    "https://realms2riches.com,https://www.realms2riches.com,https://corp.realms2riches.com,http://localhost:8000",
+).split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict in production to specific domains
+    allow_origins=[o.strip() for o in _cors_origins if o.strip()] or ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -86,6 +93,20 @@ try:
 except Exception:
     logger.debug("Outreach router not available")
 
+try:
+    from backend.api.tenants import router as tenants_router
+
+    app.include_router(tenants_router)
+except Exception:
+    logger.debug("Tenants router not available")
+
+try:
+    from backend.api.ops import router as ops_router
+
+    app.include_router(ops_router)
+except Exception:
+    logger.debug("Ops router not available")
+
 # Ensure output directory exists for static files (use env override)
 OUTPUT_DIR = os.getenv(
     "SWARM_OUTPUT_DIR",
@@ -103,6 +124,28 @@ except Exception:
     logger.debug("Outreach worker not started")
 
 
+_FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend" / "public"
+if _FRONTEND_DIR.is_dir():
+    app.mount("/dashboard", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="dashboard")
+    app.mount("/corp", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="corp")
+
+
 @app.get("/health")
 def health_check():
-    return {"status": "ONLINE", "version": "2.0.0", "engine": "SwarmOS"}
+    ollama_ok = False
+    try:
+        import requests
+
+        url = os.getenv("OLLAMA_URL", "").rstrip("/")
+        if url:
+            r = requests.get(f"{url}/api/tags", timeout=3)
+            ollama_ok = r.status_code == 200
+    except Exception:
+        pass
+    return {
+        "status": "ONLINE",
+        "version": "2.0.0",
+        "engine": "SwarmOS",
+        "deploy_profile": os.getenv("DEPLOY_PROFILE", "local"),
+        "ollama_reachable": ollama_ok,
+    }

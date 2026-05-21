@@ -1,0 +1,27 @@
+# Profile: production on realms2riches.com / api / corp / realms2riches.tech tenants
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/realms2riches/swarmenterprise-backend:latest}
+    restart: always
+    environment:
+      - ENV=production
+      - DEPLOY_PROFILE=production-realms2riches
+      - PRIMARY_DOMAIN=realms2riches.com
+      - CORP_DOMAIN=corp.realms2riches.com
+      - API_DOMAIN=api.realms2riches.com
+      - TECH_DOMAIN=realms2riches.tech
+      - FRONTEND_URL=https://realms2riches.com
+      - BACKEND_URL=https://api.realms2riches.com
+      - OLLAMA_URL=${OLLAMA_URL}
+      - OTEL_SDK_DISABLED=FALSE
+    command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+    profiles: []
+
+  caddy:
+    profiles: []
+
+  ops-heal:
+    profiles: [ops]
+
+  postgres:
+    profiles: [postgres]

@@ -5,6 +5,7 @@
 *.pem
 *.key
 secrets.json
+upload_secrets.ps1
 
 # Python Virtual Environments
 venv/

@@ -1,0 +1,15 @@
+# Profile: Docker on laptop (Docker Desktop) reaching host Ollama via host.docker.internal
+services:
+  backend:
+    environment:
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+      - LAPTOP_OLLAMA_HOST=${LAPTOP_OLLAMA_HOST:-host.docker.internal}
+      - DEPLOY_PROFILE=local-laptop-ollama
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  worker:
+    environment:
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
