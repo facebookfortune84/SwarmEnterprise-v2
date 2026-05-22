@@ -1,16 +1,13 @@
 """
 Unit tests for JWT token handling
 """
-import pytest
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from backend.auth.jwt_handler import (
     create_access_token,
     create_refresh_token,
     verify_token,
     decode_token,
     refresh_access_token,
-    SECRET_KEY,
-    ALGORITHM,
 )
 
 

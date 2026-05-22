@@ -30,7 +30,7 @@ if REDIS_URL:
 
 if not REDIS_URL:
     # In-process fallback
-    from queue import Queue, Empty
+    from queue import Queue
 
     _q = Queue()
 

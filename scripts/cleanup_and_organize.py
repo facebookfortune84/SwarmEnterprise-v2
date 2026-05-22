@@ -4,7 +4,6 @@ Project Cleanup and Organization Script
 Consolidates documentation, removes duplicates, and organizes project structure.
 """
 
-import os
 import shutil
 from pathlib import Path
 
@@ -123,7 +122,7 @@ See [IMPLEMENTATION_COMPLETE.md](../IMPLEMENTATION_COMPLETE.md) for full details
     with open(index_path, 'w', encoding='utf-8') as f:
         f.write(index_content)
     
-    print(f"  Created: docs/INDEX.md")
+    print("  Created: docs/INDEX.md")
 
 def update_readme():
     """Update README with new documentation structure"""
@@ -251,7 +250,7 @@ Built with ❤️ using Claude AI
     with open(readme_path, 'w', encoding='utf-8') as f:
         f.write(readme_content)
     
-    print(f"  Updated: README.md")
+    print("  Updated: README.md")
 
 def main():
     """Main cleanup function"""

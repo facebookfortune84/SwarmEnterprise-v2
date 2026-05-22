@@ -4,7 +4,6 @@ File manager for high-level file operations
 import os
 import logging
 from typing import Optional, Dict, Any
-from pathlib import Path
 from .s3_client import S3Client
 
 

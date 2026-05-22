@@ -12,7 +12,7 @@ Performs security audits:
 
 import logging
 import re
-from typing import Dict, Any, List, Optional, Set
+from typing import List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path

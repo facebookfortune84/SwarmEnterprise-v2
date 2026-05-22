@@ -4,7 +4,6 @@ Deployment Service - Orchestrates VM provisioning and application deployment
 Manages the complete lifecycle of tenant deployments on self-hosted infrastructure.
 """
 
-import os
 import logging
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
@@ -15,7 +14,6 @@ import asyncio
 from backend.orchestration.vm_provisioner import (
     HyperVProvisioner,
     VMConfig,
-    VMState,
 )
 from backend.storage.file_manager import FileManager
 
@@ -190,49 +188,13 @@ class DeploymentService:
     ) -> None:
         """Deploy application to VM"""
         deployment = self.deployments[deployment_id]
-        vm_name = deployment["vm_name"]
+        deployment["vm_name"]
         
         # Download company package from storage
         package_path = f"/tmp/{config.company_id}.zip"
         self.file_manager.retrieve_company(config.company_id, package_path)
         
         # Copy package to VM and deploy
-        script = f"""
-        $VMName = "{vm_name}"
-        $PackagePath = "{package_path}"
-        $CompanyId = "{config.company_id}"
-        
-        # Copy package to VM
-        Copy-VMFile -Name $VMName -SourcePath $PackagePath -DestinationPath "/tmp/$CompanyId.zip" -FileSource Host
-        
-        # Deploy on VM
-        Invoke-Command -VMName $VMName -ScriptBlock {{
-            param($CompanyId)
-            
-            # Extract package
-            cd /opt
-            unzip -o /tmp/$CompanyId.zip -d $CompanyId
-            cd $CompanyId
-            
-            # Make deploy script executable
-            chmod +x deploy.sh
-            
-            # Run deployment
-            ./deploy.sh
-            
-            # Start services
-            docker-compose up -d
-            
-            # Wait for services to be ready
-            sleep 30
-            
-            # Verify services
-            docker-compose ps
-            
-        }} -ArgumentList "{config.company_id}"
-        
-        Write-Output "Application deployed on: $VMName"
-        """
         
         # This would use the VM provisioner's PowerShell execution
         # For now, simplified
@@ -247,7 +209,7 @@ class DeploymentService:
         deployment = self.deployments[deployment_id]
         
         # Add DNS record on Windows Server DNS
-        script = f"""
+        f"""
         $Zone = "realms2riches.tech"
         $Name = "{config.subdomain}"
         $IP = "{deployment['ip_address']}"
@@ -264,7 +226,7 @@ class DeploymentService:
     async def _verify_deployment(self, deployment_id: str) -> None:
         """Verify deployment is healthy"""
         deployment = self.deployments[deployment_id]
-        url = deployment["url"]
+        deployment["url"]
         
         # Check health endpoint
         max_retries = 10
@@ -469,7 +431,7 @@ class DeploymentService:
         """Remove DNS record"""
         deployment = self.deployments[deployment_id]
         
-        script = f"""
+        f"""
         $Zone = "realms2riches.tech"
         $Name = "{deployment['subdomain']}"
         

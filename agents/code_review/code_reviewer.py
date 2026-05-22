@@ -13,7 +13,7 @@ Performs comprehensive code reviews:
 import logging
 import ast
 import re
-from typing import Dict, Any, List, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path

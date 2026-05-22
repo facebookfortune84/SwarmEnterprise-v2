@@ -2,7 +2,6 @@
 Unit tests for Deployment Service
 """
 import pytest
-from datetime import datetime
 from backend.services.deployment_service import (
     DeploymentService,
     DeploymentConfig,

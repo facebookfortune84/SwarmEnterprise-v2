@@ -4,7 +4,7 @@ Companies API endpoints for managing generated companies
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from pydantic import BaseModel
 from typing import List, Optional
-from backend.auth.middleware import get_current_active_user, get_current_admin_user
+from backend.auth.middleware import get_current_active_user
 from backend.services.company_generator import (
     CompanyGenerator,
     CompanyRequest,

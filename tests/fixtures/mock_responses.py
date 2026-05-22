@@ -1,7 +1,7 @@
 """
 Mock LLM and API responses for testing
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 
 # Mock LLM responses for agent testing

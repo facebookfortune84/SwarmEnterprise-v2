@@ -14,9 +14,8 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional
 from collections import defaultdict
-import re
 
 from backend.llm.ollama_client import OllamaClient
 from agents.ticketing.ticket_prioritizer import (
@@ -131,8 +130,8 @@ class BacklogManager:
         logger.info(f"Analyzing backlog with {len(tickets)} tickets")
         
         # Create ticket lookup
-        ticket_map = {t.ticket_id: t for t in tickets}
-        score_map = {s.ticket_id: s for s in priority_scores}
+        {t.ticket_id: t for t in tickets}
+        {s.ticket_id: s for s in priority_scores}
         
         # Run all analyses concurrently
         epics_task = self.identify_epics(tickets, priority_scores)
@@ -577,7 +576,7 @@ Focus on the overall goal and value."""
     ) -> str:
         """Explain why tickets are duplicates"""
         
-        return f"Similar titles and descriptions suggest these tickets address the same issue."
+        return "Similar titles and descriptions suggest these tickets address the same issue."
     
     def _calculate_priority_distribution(
         self,

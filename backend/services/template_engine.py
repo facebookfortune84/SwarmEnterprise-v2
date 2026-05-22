@@ -6,7 +6,7 @@ import json
 import logging
 from typing import Dict, Any, List, Optional
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader, Template
+from jinja2 import Environment, FileSystemLoader
 
 
 logger = logging.getLogger(__name__)

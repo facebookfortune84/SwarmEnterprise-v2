@@ -4,7 +4,7 @@ Deployments API - REST endpoints for managing tenant deployments
 Provides endpoints for creating, managing, and monitoring VM-based deployments.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime

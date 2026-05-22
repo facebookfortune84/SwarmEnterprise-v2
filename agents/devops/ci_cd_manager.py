@@ -16,7 +16,6 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
-import subprocess
 
 from backend.llm.ollama_client import OllamaClient
 
@@ -424,13 +423,6 @@ class CICDManager:
         artifacts = []
         
         # Common artifact patterns
-        patterns = [
-            "dist/*",
-            "build/*",
-            "*.tar.gz",
-            "*.zip",
-            "*.whl",
-        ]
         
         # TODO: Implement artifact discovery
         

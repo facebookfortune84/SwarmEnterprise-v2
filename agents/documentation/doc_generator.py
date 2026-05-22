@@ -11,7 +11,6 @@ Generates comprehensive documentation:
 
 import logging
 import ast
-import re
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from pathlib import Path

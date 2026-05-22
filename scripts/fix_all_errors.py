@@ -4,7 +4,6 @@ Comprehensive Error Fix Script
 Fixes all pylint errors found in the codebase
 """
 
-import os
 import sys
 
 def fix_changelog_generator():
@@ -143,7 +142,6 @@ def fix_queue_duplicate_functions():
     # Remove the duplicate function definitions (lines 37-44)
     # Keep only the first definitions (lines 17-25)
     new_lines = []
-    skip_until = 0
     
     for i, line in enumerate(lines, 1):
         if i >= 37 and i <= 44:

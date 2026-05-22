@@ -3,7 +3,7 @@ User service for authentication and user management
 """
 import uuid
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional
 import bcrypt
 from pydantic import BaseModel, EmailStr, validator
 

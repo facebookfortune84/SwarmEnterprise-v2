@@ -4,7 +4,6 @@ S3/MinIO client for object storage
 import os
 import logging
 from typing import Optional, Dict, Any, BinaryIO
-from datetime import timedelta
 import boto3
 from botocore.exceptions import ClientError
 

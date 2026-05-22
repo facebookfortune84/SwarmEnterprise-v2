@@ -12,7 +12,7 @@ Prevents cascading failures by breaking circuits when services fail:
 import asyncio
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional, Callable, Any
 from collections import deque
@@ -544,7 +544,7 @@ if __name__ == "__main__":
         
         # Check metrics
         metrics = circuit.get_metrics()
-        print(f"\nMetrics:")
+        print("\nMetrics:")
         print(f"  Total calls: {metrics.total_calls}")
         print(f"  Successful: {metrics.successful_calls}")
         print(f"  Failed: {metrics.failed_calls}")

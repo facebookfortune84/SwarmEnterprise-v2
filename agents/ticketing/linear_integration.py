@@ -10,7 +10,6 @@ Integrates with Linear for ticket management:
 """
 
 import logging
-import asyncio
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from datetime import datetime

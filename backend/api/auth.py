@@ -1,14 +1,12 @@
 """
 Authentication API endpoints
 """
-from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from backend.auth.jwt_handler import (
     create_access_token,
     create_refresh_token,
-    refresh_access_token,
-    revoke_token
+    refresh_access_token
 )
 from backend.auth.user_service import UserService, UserCreate, UserResponse
 from backend.auth.middleware import get_current_user, get_current_active_user

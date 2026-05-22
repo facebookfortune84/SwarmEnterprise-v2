@@ -2,7 +2,6 @@
 Unit tests for Company Generator Service
 """
 import pytest
-from datetime import datetime
 from backend.services.company_generator import (
     CompanyGenerator,
     CompanyRequest,
