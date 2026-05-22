@@ -1,0 +1,327 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: swarm_backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Database
+      - DATABASE_URL=postgresql://swarm:${DB_PASSWORD}@postgres:5432/swarm
+      
+      # Redis
+      - REDIS_URL=redis://redis:6379/0
+      
+      # MinIO (S3-compatible)
+      - S3_ENDPOINT_URL=http://minio:9000
+      - S3_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - S3_SECRET_KEY=${MINIO_SECRET_KEY}
+      - S3_BUCKET_NAME=swarm-companies
+      
+      # Ollama (running on your laptop)
+      - OLLAMA_URL=${OLLAMA_URL}
+      - OLLAMA_MODEL=llama3
+      
+      # ChromaDB
+      - CHROMA_URL=http://chromadb:8000
+      
+      # JWT & Security
+      - JWT_SECRET_KEY=${JWT_SECRET}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=15
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      
+      # Application
+      - APP_ENV=production
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      
+      # Domain
+      - DOMAIN=realms2riches.com
+      - API_DOMAIN=api.realms2riches.com
+      
+      # Celery
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - chromadb
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Celery Worker for background tasks
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: swarm_celery_worker
+    command: celery -A backend.celery_app worker --loglevel=info --concurrency=4
+    environment:
+      - DATABASE_URL=postgresql://swarm:${DB_PASSWORD}@postgres:5432/swarm
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - S3_ENDPOINT_URL=http://minio:9000
+      - S3_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - S3_SECRET_KEY=${MINIO_SECRET_KEY}
+      - OLLAMA_URL=${OLLAMA_URL}
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    restart: unless-stopped
+    networks:
+      - swarmnet
+
+  # Celery Beat for scheduled tasks
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: swarm_celery_beat
+    command: celery -A backend.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://swarm:${DB_PASSWORD}@postgres:5432/swarm
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - swarmnet
+
+  # PostgreSQL Database (FREE)
+  postgres:
+    image: postgres:15-alpine
+    container_name: swarm_postgres
+    environment:
+      - POSTGRES_DB=swarm
+      - POSTGRES_USER=swarm
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swarm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue (FREE)
+  redis:
+    image: redis:7-alpine
+    container_name: swarm_redis
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO S3-Compatible Storage (FREE)
+  minio:
+    image: minio/minio:latest
+    container_name: swarm_minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+      - MINIO_BROWSER_REDIRECT_URL=https://minio.realms2riches.com
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # MinIO Client for bucket initialization
+  minio_init:
+    image: minio/mc:latest
+    container_name: swarm_minio_init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY};
+      /usr/bin/mc mb myminio/swarm-companies --ignore-existing;
+      /usr/bin/mc anonymous set download myminio/swarm-companies;
+      exit 0;
+      "
+    networks:
+      - swarmnet
+
+  # ChromaDB Vector Store (FREE)
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: swarm_chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Caddy Reverse Proxy with Auto SSL (FREE)
+  caddy:
+    image: caddy:2-alpine
+    container_name: swarm_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile
+      - ./frontend/public:/srv/frontend
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    depends_on:
+      - backend
+
+  # Prometheus Monitoring (FREE)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: swarm_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    restart: unless-stopped
+    networks:
+      - swarmnet
+
+  # Grafana Dashboards (FREE)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: swarm_grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://grafana.realms2riches.com
+      - GF_INSTALL_PLUGINS=redis-datasource
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    depends_on:
+      - prometheus
+
+  # Loki Log Aggregation (FREE)
+  loki:
+    image: grafana/loki:latest
+    container_name: swarm_loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    networks:
+      - swarmnet
+
+  # Promtail Log Shipper (FREE)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: swarm_promtail
+    volumes:
+      - ./logs:/var/log
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+    networks:
+      - swarmnet
+    depends_on:
+      - loki
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  chroma_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+
+networks:
+  swarmnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Made with Bob

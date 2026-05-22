@@ -1,0 +1,295 @@
+# SwarmEnterprise v2 - Self-Hosted Caddy Configuration
+# Free SSL certificates via Let's Encrypt (automatic)
+
+# Global options
+{
+    # Email for Let's Encrypt notifications
+    email admin@realms2riches.com
+    
+    # Use Let's Encrypt production
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+    
+    # Enable HTTP/3
+    servers {
+        protocol {
+            experimental_http3
+        }
+    }
+}
+
+# Main landing page
+realms2riches.com, www.realms2riches.com {
+    # Serve static frontend
+    root * /srv/frontend
+    file_server
+    
+    # SPA routing - try files, fallback to index.html
+    try_files {path} /index.html
+    
+    # Compress responses
+    encode gzip zstd
+    
+    # Security headers
+    header {
+        # HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        
+        # Prevent MIME sniffing
+        X-Content-Type-Options "nosniff"
+        
+        # Clickjacking protection
+        X-Frame-Options "DENY"
+        
+        # XSS protection
+        X-XSS-Protection "1; mode=block"
+        
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # Content Security Policy
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.realms2riches.com"
+        
+        # Permissions policy
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        
+        # Remove server header
+        -Server
+    }
+    
+    # Logging
+    log {
+        output file /var/log/caddy/realms2riches.log
+        format json
+    }
+}
+
+# API Backend
+api.realms2riches.com {
+    # Reverse proxy to FastAPI backend
+    reverse_proxy backend:8000 {
+        # Health check
+        health_uri /health
+        health_interval 30s
+        health_timeout 10s
+        
+        # Load balancing (for future scaling)
+        lb_policy round_robin
+        
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 30s
+        }
+    }
+    
+    # CORS headers for API
+    @cors_preflight {
+        method OPTIONS
+    }
+    
+    handle @cors_preflight {
+        header {
+            Access-Control-Allow-Origin "https://realms2riches.com"
+            Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+            Access-Control-Allow-Headers "Content-Type, Authorization"
+            Access-Control-Max-Age "3600"
+        }
+        respond 204
+    }
+    
+    header {
+        Access-Control-Allow-Origin "https://realms2riches.com"
+        Access-Control-Allow-Credentials "true"
+    }
+    
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        -Server
+    }
+    
+    # Rate limiting (100 requests per minute per IP)
+    rate_limit {
+        zone api {
+            key {remote_host}
+            events 100
+            window 1m
+        }
+    }
+    
+    # Logging
+    log {
+        output file /var/log/caddy/api.log
+        format json
+    }
+}
+
+# Corporate information page
+corp.realms2riches.com {
+    root * /srv/frontend
+    file_server
+    try_files {path} /corp.html
+    
+    encode gzip zstd
+    
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        -Server
+    }
+    
+    log {
+        output file /var/log/caddy/corp.log
+        format json
+    }
+}
+
+# MinIO Console (Admin only - restrict by IP if needed)
+minio.realms2riches.com {
+    # Uncomment to restrict to specific IPs
+    # @allowed {
+    #     remote_ip 192.168.1.0/24
+    # }
+    # handle @allowed {
+    #     reverse_proxy minio:9001
+    # }
+    # handle {
+    #     respond "Access Denied" 403
+    # }
+    
+    reverse_proxy minio:9001 {
+        health_uri /minio/health/live
+        health_interval 30s
+    }
+    
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        -Server
+    }
+    
+    # Basic auth for extra security (optional)
+    # basicauth {
+    #     admin $2a$14$...  # bcrypt hash
+    # }
+    
+    log {
+        output file /var/log/caddy/minio.log
+        format json
+    }
+}
+
+# Grafana Monitoring Dashboard
+grafana.realms2riches.com {
+    reverse_proxy grafana:3000 {
+        health_uri /api/health
+        health_interval 30s
+    }
+    
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        -Server
+    }
+    
+    log {
+        output file /var/log/caddy/grafana.log
+        format json
+    }
+}
+
+# Prometheus Metrics (Admin only - restrict by IP)
+prometheus.realms2riches.com {
+    # Restrict to local network only
+    @allowed {
+        remote_ip 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8
+    }
+    
+    handle @allowed {
+        reverse_proxy prometheus:9090
+    }
+    
+    handle {
+        respond "Access Denied" 403
+    }
+    
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        -Server
+    }
+    
+    log {
+        output file /var/log/caddy/prometheus.log
+        format json
+    }
+}
+
+# Tenant boxes - Wildcard subdomain
+*.realms2riches.tech {
+    # Extract tenant name from subdomain
+    @tenant {
+        host_regexp tenant ^([a-z0-9-]+)\.realms2riches\.tech$
+    }
+    
+    # Route to tenant-specific container
+    handle @tenant {
+        reverse_proxy tenant-{re.tenant.1}:8080 {
+            # Health check
+            health_uri /health
+            health_interval 30s
+            health_timeout 10s
+            
+            # Fail timeout
+            fail_duration 30s
+            max_fails 3
+            unhealthy_status 5xx
+            
+            # Fallback to maintenance page if tenant is down
+            @down {
+                status 502 503 504
+            }
+            handle_response @down {
+                root * /srv/maintenance
+                rewrite * /maintenance.html
+                file_server
+            }
+        }
+    }
+    
+    # Tenant-specific security headers
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        -Server
+    }
+    
+    # Rate limiting per tenant
+    rate_limit {
+        zone tenant {
+            key {remote_host}
+            events 200
+            window 1m
+        }
+    }
+    
+    encode gzip zstd
+    
+    log {
+        output file /var/log/caddy/tenants.log
+        format json
+    }
+}
+
+# Catch-all for undefined domains
+http:// {
+    respond "Not Found" 404
+}
+
+# Health check endpoint (for load balancer)
+:8080 {
+    respond /health "OK" 200
+}

@@ -1,0 +1,11 @@
+[MASTER]
+# Disable specific error codes that are false positives
+disable=
+    assignment-from-none,
+    not-callable
+
+[MESSAGES CONTROL]
+# E1128: assignment-from-none - False positive for Optional return types
+# E1102: not-callable - False positive for dynamically imported classes
+
+; Made with Bob

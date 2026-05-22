@@ -1,0 +1,88 @@
+# Promtail Configuration for SwarmEnterprise v2
+# Log shipping to Loki - completely free
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Backend application logs
+  - job_name: backend
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: backend
+          service: swarm-backend
+          __path__: /var/log/backend/*.log
+
+  # Caddy access logs
+  - job_name: caddy
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: caddy
+          service: proxy
+          __path__: /var/log/caddy/*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp: ts
+            level: level
+            request: request
+            status: status
+      - labels:
+          level:
+          status:
+
+  # Docker container logs
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'stream'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+
+  # System logs
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: system
+          __path__: /var/log/syslog
+
+  # PostgreSQL logs
+  - job_name: postgres
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: postgres
+          service: database
+          __path__: /var/log/postgresql/*.log
+
+  # Celery worker logs
+  - job_name: celery
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: celery
+          service: worker
+          __path__: /var/log/celery/*.log
+
+# Made with Bob

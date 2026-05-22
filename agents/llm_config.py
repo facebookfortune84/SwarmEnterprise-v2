@@ -81,9 +81,9 @@ def get_local_brain_instance(model_name="llama3.2:3b"):
         try:
             ollama_url = NetworkBridge.discover_ollama_url()
             logger.info(f"Initializing OllamaLLM: {model_name} @ {ollama_url}")
-            from langchain_community.llms import Ollama
+            from langchain_community.llms import Ollama  # type: ignore
 
-            _local_brain = Ollama(
+            _local_brain = Ollama(  # type: ignore
                 model=model_name,
                 base_url=ollama_url,
                 temperature=float(os.getenv("OLLAMA_TEMPERATURE", 0.1)),
