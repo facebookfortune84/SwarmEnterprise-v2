@@ -3,9 +3,11 @@ User service for authentication and user management
 """
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 import bcrypt
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
+from sqlalchemy.orm import Session
+from backend.db.models import User
 
 
 class UserCreate(BaseModel):
@@ -14,7 +16,7 @@ class UserCreate(BaseModel):
     password: str
     full_name: str
     
-    @validator('password')
+    @field_validator('password')
     @classmethod
     def validate_password(cls, v):
         if len(v) < 8:
@@ -28,19 +30,6 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
 
 
-class UserInDB(BaseModel):
-    """User model as stored in database"""
-    id: str
-    email: str
-    password_hash: str
-    full_name: str
-    role: str = "user"
-    subscription_tier: str = "free"
-    created_at: datetime
-    updated_at: datetime
-    is_active: bool = True
-
-
 class UserResponse(BaseModel):
     """User model for API responses (without password)"""
     id: str
@@ -52,18 +41,20 @@ class UserResponse(BaseModel):
     updated_at: datetime
     is_active: bool
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserService:
     """Service for user management operations"""
     
-    def __init__(self, db_session=None):
+    def __init__(self, db: Session):
         """
         Initialize user service
         
         Args:
-            db_session: Database session (optional, for testing)
+            db: Database session
         """
-        self.db = db_session
+        self.db = db
     
     @staticmethod
     def hash_password(password: str) -> str:
@@ -97,7 +88,7 @@ class UserService:
             hashed_password.encode('utf-8')
         )
     
-    def create_user(self, user_data: UserCreate) -> UserInDB:
+    def create_user(self, user_data: UserCreate) -> User:
         """
         Create a new user
         
@@ -107,26 +98,22 @@ class UserService:
         Returns:
             Created user object
         """
-        now = datetime.utcnow()
-        user = UserInDB(
-            id=str(uuid.uuid4()),
+        user = User(
             email=user_data.email,
             password_hash=self.hash_password(user_data.password),
             full_name=user_data.full_name,
             role="user",
             subscription_tier="free",
-            created_at=now,
-            updated_at=now,
             is_active=True
         )
         
-        # TODO: Save to database
-        # self.db.add(user)
-        # self.db.commit()
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
         
         return user
     
-    def get_user_by_email(self, email: str) -> Optional[UserInDB]:
+    def get_user_by_email(self, email: str) -> Optional[User]:
         """
         Get user by email address
         
@@ -136,11 +123,9 @@ class UserService:
         Returns:
             User object or None if not found
         """
-        # TODO: Query database
-        # return self.db.query(User).filter(User.email == email).first()
-        return None
+        return self.db.query(User).filter(User.email == email).first()
     
-    def get_user_by_id(self, user_id: str) -> Optional[UserInDB]:
+    def get_user_by_id(self, user_id: str) -> Optional[User]:
         """
         Get user by ID
         
@@ -150,11 +135,9 @@ class UserService:
         Returns:
             User object or None if not found
         """
-        # TODO: Query database
-        # return self.db.query(User).filter(User.id == user_id).first()
-        return None
+        return self.db.query(User).filter(User.id == user_id).first()
     
-    def authenticate_user(self, email: str, password: str) -> Optional[UserInDB]:
+    def authenticate_user(self, email: str, password: str) -> Optional[User]:
         """
         Authenticate a user with email and password
         
@@ -165,7 +148,7 @@ class UserService:
         Returns:
             User object if authentication successful, None otherwise
         """
-        user = self.get_user_by_email(email)  # type: ignore[assignment]
+        user = self.get_user_by_email(email)
         
         if not user:
             return None
@@ -178,7 +161,7 @@ class UserService:
         
         return user
     
-    def update_user(self, user_id: str, user_data: UserUpdate) -> Optional[UserInDB]:
+    def update_user(self, user_id: str, user_data: UserUpdate) -> Optional[User]:
         """
         Update user information
         
@@ -189,7 +172,7 @@ class UserService:
         Returns:
             Updated user object or None if not found
         """
-        user = self.get_user_by_id(user_id)  # type: ignore[assignment]
+        user = self.get_user_by_id(user_id)
         
         if not user:
             return None
@@ -202,8 +185,8 @@ class UserService:
         
         user.updated_at = datetime.utcnow()
         
-        # TODO: Save to database
-        # self.db.commit()
+        self.db.commit()
+        self.db.refresh(user)
         
         return user
     
@@ -217,7 +200,7 @@ class UserService:
         Returns:
             True if deleted, False if not found
         """
-        user = self.get_user_by_id(user_id)  # type: ignore[assignment]
+        user = self.get_user_by_id(user_id)
         
         if not user:
             return False
@@ -225,8 +208,7 @@ class UserService:
         user.is_active = False
         user.updated_at = datetime.utcnow()
         
-        # TODO: Save to database
-        # self.db.commit()
+        self.db.commit()
         
         return True
     
@@ -241,7 +223,7 @@ class UserService:
         Returns:
             True if successful, False if user not found
         """
-        user = self.get_user_by_id(user_id)  # type: ignore[assignment]
+        user = self.get_user_by_id(user_id)
         
         if not user:
             return False
@@ -249,14 +231,13 @@ class UserService:
         user.password_hash = self.hash_password(new_password)
         user.updated_at = datetime.utcnow()
         
-        # TODO: Save to database
-        # self.db.commit()
+        self.db.commit()
         
         return True
     
-    def to_response(self, user: UserInDB) -> UserResponse:
+    def to_response(self, user: User) -> UserResponse:
         """
-        Convert UserInDB to UserResponse (remove sensitive data)
+        Convert User (DB model) to UserResponse (Pydantic model)
         
         Args:
             user: User object from database
@@ -264,15 +245,6 @@ class UserService:
         Returns:
             User response object without password
         """
-        return UserResponse(
-            id=user.id,
-            email=user.email,
-            full_name=user.full_name,
-            role=user.role,
-            subscription_tier=user.subscription_tier,
-            created_at=user.created_at,
-            updated_at=user.updated_at,
-            is_active=user.is_active
-        )
+        return UserResponse.from_orm(user)
 
 # Made with Bob

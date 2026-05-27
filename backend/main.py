@@ -41,15 +41,26 @@ except Exception:
 app = FastAPI(title="SwarmOS Sovereign Factory", version="2.0.0")
 
 # Prometheus metrics endpoint
-try:
-    from backend.metrics import metrics_endpoint
+from backend.metrics import get_metrics_response, track_request
+import time
+from fastapi import Request
 
-    @app.get("/metrics")
-    def metrics():
-        return metrics_endpoint()
+@app.middleware("http")
+async def add_metrics(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    track_request(
+        request.method,
+        request.url.path,
+        response.status_code,
+        process_time
+    )
+    return response
 
-except Exception:
-    logger.debug("Prometheus metrics not available")
+@app.get("/metrics")
+def metrics():
+    return get_metrics_response()
 
 _cors_origins = os.getenv(
     "CORS_ORIGINS",

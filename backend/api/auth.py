@@ -2,6 +2,7 @@
 Authentication API endpoints
 """
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from backend.auth.jwt_handler import (
     create_access_token,
@@ -10,10 +11,10 @@ from backend.auth.jwt_handler import (
 )
 from backend.auth.user_service import UserService, UserCreate, UserResponse
 from backend.auth.middleware import get_current_user, get_current_active_user
+from backend.db.session import get_db
 
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
-user_service = UserService()
 
 
 class LoginRequest(BaseModel):
@@ -53,21 +54,13 @@ class PasswordResetConfirm(BaseModel):
 
 
 @router.post("/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
-async def register(user_data: UserCreate):
+async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """
     Register a new user
-    
-    Args:
-        user_data: User registration data
-        
-    Returns:
-        Access token, refresh token, and user data
-        
-    Raises:
-        HTTPException: If email already exists
     """
+    user_service = UserService(db)
     # Check if user already exists
-    existing_user = user_service.get_user_by_email(user_data.email)  # type: ignore[assignment]
+    existing_user = user_service.get_user_by_email(user_data.email)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -94,19 +87,11 @@ async def register(user_data: UserCreate):
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(credentials: LoginRequest):
+async def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     """
     Login with email and password
-    
-    Args:
-        credentials: Login credentials
-        
-    Returns:
-        Access token, refresh token, and user data
-        
-    Raises:
-        HTTPException: If credentials are invalid
     """
+    user_service = UserService(db)
     # Authenticate user
     user = user_service.authenticate_user(credentials.email, credentials.password)
     
@@ -137,16 +122,8 @@ async def login(credentials: LoginRequest):
 async def logout(current_user: dict = Depends(get_current_user)):
     """
     Logout current user (revoke token)
-    
-    Args:
-        current_user: Current authenticated user
-        
-    Returns:
-        Success message
     """
     # TODO: Implement token revocation with Redis
-    # For now, client should discard the token
-    
     return {"message": "Successfully logged out"}
 
 
@@ -154,15 +131,6 @@ async def logout(current_user: dict = Depends(get_current_user)):
 async def refresh(request: RefreshRequest):
     """
     Refresh access token using refresh token
-    
-    Args:
-        request: Refresh token request
-        
-    Returns:
-        New access token
-        
-    Raises:
-        HTTPException: If refresh token is invalid
     """
     new_access_token = refresh_access_token(request.refresh_token)
     
@@ -176,70 +144,10 @@ async def refresh(request: RefreshRequest):
     return RefreshResponse(access_token=new_access_token)
 
 
-@router.post("/reset-password")
-async def reset_password(request: PasswordResetRequest):
-    """
-    Request password reset (send email with reset link)
-    
-    Args:
-        request: Password reset request
-        
-    Returns:
-        Success message
-    """
-    user = user_service.get_user_by_email(request.email)  # type: ignore[assignment]
-    
-    if user:
-        # TODO: Generate reset token and send email
-        # reset_token = create_access_token(
-        #     {"sub": user.id, "purpose": "password_reset"},
-        #     expires_delta=timedelta(hours=1)
-        # )
-        # send_password_reset_email(user.email, reset_token)
-        pass
-    
-    # Always return success to prevent email enumeration
-    return {"message": "If the email exists, a password reset link has been sent"}
-
-
-@router.post("/reset-password/confirm")
-async def confirm_password_reset(request: PasswordResetConfirm):
-    """
-    Confirm password reset with token
-    
-    Args:
-        request: Password reset confirmation
-        
-    Returns:
-        Success message
-        
-    Raises:
-        HTTPException: If token is invalid
-    """
-    # TODO: Verify reset token and update password
-    # payload = decode_token(request.token)
-    # if not payload or payload.get("purpose") != "password_reset":
-    #     raise HTTPException(status_code=400, detail="Invalid reset token")
-    # 
-    # user_id = payload.get("sub")
-    # success = user_service.reset_password(user_id, request.new_password)
-    # 
-    # if not success:
-    #     raise HTTPException(status_code=400, detail="Password reset failed")
-    
-    return {"message": "Password has been reset successfully"}
-
-
 @router.get("/verify")
 async def verify_token(current_user: dict = Depends(get_current_active_user)):
     """
     Verify current token and return user info
-    
-    Args:
-        current_user: Current authenticated user
-        
-    Returns:
-        User information
     """
     return {
         "valid": True,
@@ -248,17 +156,12 @@ async def verify_token(current_user: dict = Depends(get_current_active_user)):
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(current_user: dict = Depends(get_current_active_user)):
+async def get_current_user_info(current_user: dict = Depends(get_current_active_user), db: Session = Depends(get_db)):
     """
     Get current user information
-    
-    Args:
-        current_user: Current authenticated user
-        
-    Returns:
-        User information
     """
-    user = user_service.get_user_by_id(current_user["id"])  # type: ignore[assignment]
+    user_service = UserService(db)
+    user = user_service.get_user_by_id(current_user["id"])
     
     if not user:
         raise HTTPException(

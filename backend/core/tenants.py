@@ -5,39 +5,28 @@ import logging
 import os
 import uuid
 from pathlib import Path
+from typing import List, Optional
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
-from backend.db.tenant_models import CompanyTenant, TenantBase
+from backend.db.models import CompanyTenant
+from backend.db.session import SessionLocal, engine
 from backend.orchestration.box_deployer import BoxDeployer, _slugify
 
 logger = logging.getLogger("tenants")
 
 
-def _db_url() -> str:
-    url = os.getenv("SWARM_DB_URL")
-    if url:
-        return url
-    db_dir = Path(os.getenv("SWARM_PG_DIR", Path(__file__).resolve().parents[2] / "pg_data"))
-    db_dir.mkdir(parents=True, exist_ok=True)
-    return f"sqlite:///{(db_dir / 'swarm_tickets.db').as_posix()}"
-
-
 class TenantService:
-    def __init__(self):
-        self.engine = create_engine(_db_url())
-        TenantBase.metadata.create_all(self.engine)
-        self.Session = sessionmaker(bind=self.engine)
+    def __init__(self, db: Optional[Session] = None):
+        self.db = db or SessionLocal()
         self.deployer = BoxDeployer()
 
     def register(self, name: str, slug: str | None = None) -> CompanyTenant:
-        session = self.Session()
         try:
             final_slug = _slugify(slug or name)
-            existing = session.query(CompanyTenant).filter_by(slug=final_slug).first()
+            existing = self.db.query(CompanyTenant).filter_by(slug=final_slug).first()
             if existing:
-                return self._to_dict(existing)  # type: ignore[return-value]
+                return existing
             tenant = CompanyTenant(
                 id=f"TEN-{uuid.uuid4().hex[:8].upper()}",
                 slug=final_slug,
@@ -46,40 +35,34 @@ class TenantService:
                 status="pending",
                 box_url=f"https://{final_slug}.{os.getenv('TECH_DOMAIN', 'realms2riches.tech')}",
             )
-            session.add(tenant)
-            session.commit()
-            session.refresh(tenant)
-            data = self._to_dict(tenant)
-            return data  # type: ignore[return-value]
+            self.db.add(tenant)
+            self.db.commit()
+            self.db.refresh(tenant)
+            return tenant
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Failed to register tenant: {e}")
+            raise
         finally:
-            session.close()
+            if not self.db: # Only close if we created it
+                 self.db.close()
 
-    def list_tenants(self) -> list[dict]:
-        session = self.Session()
+    def list_tenants(self) -> List[CompanyTenant]:
+        return self.db.query(CompanyTenant).order_by(CompanyTenant.created_at.desc()).all()
+
+    def get(self, tenant_id: str) -> Optional[CompanyTenant]:
+        return self.db.query(CompanyTenant).filter_by(id=tenant_id).first()
+
+    def provision(self, tenant_id: str, use_vm: bool = False) -> CompanyTenant:
+        tenant = self.get(tenant_id)
+        if not tenant:
+            raise ValueError("tenant not found")
+            
+        tenant.status = "provisioning"
+        self.db.commit()
+
+        vm_result = None
         try:
-            rows = session.query(CompanyTenant).order_by(CompanyTenant.created_at.desc()).all()
-            return [self._to_dict(r) for r in rows]
-        finally:
-            session.close()
-
-    def get(self, tenant_id: str) -> dict | None:
-        session = self.Session()
-        try:
-            row = session.query(CompanyTenant).filter_by(id=tenant_id).first()
-            return self._to_dict(row) if row else None
-        finally:
-            session.close()
-
-    def provision(self, tenant_id: str, use_vm: bool = False) -> dict:
-        session = self.Session()
-        try:
-            tenant = session.query(CompanyTenant).filter_by(id=tenant_id).first()
-            if not tenant:
-                return {"error": "tenant not found"}
-            tenant.status = "provisioning"
-            session.commit()
-
-            vm_result = None
             if use_vm:
                 vm_result = self.deployer.provision_hyperv_vm(tenant.id, f"r2r-{tenant.slug}")
 
@@ -95,32 +78,33 @@ class TenantService:
 
             meta = {"vm": vm_result, "docker": deploy}
             tenant.metadata_json = json.dumps(meta)
-            session.commit()
-            return self._to_dict(tenant)
-        finally:
-            session.close()
+            self.db.commit()
+            self.db.refresh(tenant)
+            return tenant
+        except Exception as e:
+            tenant.status = "failed"
+            tenant.last_error = str(e)
+            self.db.commit()
+            raise
 
-    def refresh_status(self, tenant_id: str) -> dict | None:
-        session = self.Session()
-        try:
-            tenant = session.query(CompanyTenant).filter_by(id=tenant_id).first()
-            if not tenant:
-                return None
-            docker_status = self.deployer.box_status(tenant.slug)
-            if docker_status.get("status") == "running":
-                tenant.status = "running"
-            elif docker_status.get("status") in ("exited", "dead"):
-                tenant.status = "failed"
-                tenant.last_error = f"container {docker_status.get('status')}"
-            session.commit()
-            out = self._to_dict(tenant)
-            out["docker"] = docker_status
-            return out
-        finally:
-            session.close()
+    def refresh_status(self, tenant_id: str) -> Optional[CompanyTenant]:
+        tenant = self.get(tenant_id)
+        if not tenant:
+            return None
+            
+        docker_status = self.deployer.box_status(tenant.slug)
+        if docker_status.get("status") == "running":
+            tenant.status = "running"
+        elif docker_status.get("status") in ("exited", "dead"):
+            tenant.status = "failed"
+            tenant.last_error = f"container {docker_status.get('status')}"
+            
+        self.db.commit()
+        self.db.refresh(tenant)
+        return tenant
 
-    @staticmethod
-    def _to_dict(row: CompanyTenant | None) -> dict | None:
+    def _to_dict(self, row: CompanyTenant | None) -> dict | None:
+        """Kept for backward compatibility if needed, but prefer using the model directly."""
         if not row:
             return None
         return {
@@ -138,4 +122,5 @@ class TenantService:
         }
 
 
+# Global instance (optional, but keep for compatibility)
 tenant_service = TenantService()

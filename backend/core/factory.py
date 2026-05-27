@@ -1,5 +1,6 @@
 import logging
-from backend.db.linear_engine import get_swarm_db
+from backend.db.session import SessionLocal
+from backend.db.models import Ticket
 
 logger = logging.getLogger("SwarmFactory")
 
@@ -15,17 +16,26 @@ class SwarmFactory:
 
         plan = strategic_board.convene(project_id, description)
 
-        # 2. Save Tickets to Database (get DB lazily)
-        db = get_swarm_db()
-        for task in plan:
-            db.create_ticket(
-                project_id=project_id,
-                dept=task.get("department", "Engineering"),
-                title=task.get("title", "Task"),
-                instruction=task.get("instruction", ""),
-            )
+        # 2. Save Tickets to Database
+        db = SessionLocal()
+        try:
+            for task in plan:
+                t = Ticket(
+                    project_id=project_id,
+                    department=task.get("department", "Engineering"),
+                    title=task.get("title", "Task"),
+                    instruction=task.get("instruction", ""),
+                )
+                db.add(t)
+            db.commit()
+            logger.info(f"FACTORY: {len(plan)} tickets created. Dispatching workers...")
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to save tickets: {e}")
+            raise
+        finally:
+            db.close()
 
-        logger.info(f"FACTORY: {len(plan)} tickets created. Dispatching workers...")
         # In the full loop, we would trigger execution_unit here for each ticket.
 
         return {"status": "success", "tickets_generated": len(plan)}

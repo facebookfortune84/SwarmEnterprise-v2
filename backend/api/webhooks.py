@@ -101,16 +101,32 @@ async def stripe_webhook(request: Request):
                     project_id,
                     stripe_session=session.get("id"),
                     customer_email=customer_email,
-                    product_id=(
-                        session.get("display_items", [])[0].get("price")
-                        if session.get("display_items")
-                        else None
-                    ),
+                    product_id=None,
                     price_id=None,
                     metadata=str(session.get("metadata")),
                 )
+                
+                # 100% Factory Integration: Provision the tenant autonomously
+                from backend.services.company_generator import CompanyGenerator, CompanyRequest, TechStack
+                generator = CompanyGenerator()
+                
+                # Assume default stack or extract from metadata if available
+                stack_str = session.get("metadata", {}).get("tech_stack", "fastapi-react-postgres")
+                
+                request = CompanyRequest(
+                    name=f"Company-{project_id}",
+                    description=f"Autonomously provisioned company for {customer_email}",
+                    tech_stack=TechStack(stack_str),
+                    features=["base-auth"],
+                    user_id="STRIPE_CUSTOMER"
+                )
+                
+                # Fire and forget (or await)
+                import asyncio
+                asyncio.create_task(generator.generate_company(request))
+                
             except Exception as exc:  # pylint: disable=broad-except
-                logger.exception("Failed to persist project record: %s", exc)
+                logger.exception("Failed to persist project record or provision tenant: %s", exc)
 
             # Trigger Replicator
             bundle = replicator_engine.create_company_bundle(project_id)

@@ -2,6 +2,8 @@
 JWT token handling for authentication
 """
 import os
+import redis
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 
@@ -13,6 +15,7 @@ except ImportError:
         "PyJWT is required. Install it with: pip install PyJWT"
     )
 
+logger = logging.getLogger(__name__)
 
 # Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
@@ -20,6 +23,13 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
+# Redis setup
+redis_client = redis.Redis(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    db=0,
+    decode_responses=True
+)
 
 def create_access_token(
     data: Dict[str, Any],
@@ -27,13 +37,6 @@ def create_access_token(
 ) -> str:
     """
     Create a JWT access token
-    
-    Args:
-        data: Payload data to encode in the token
-        expires_delta: Optional custom expiration time
-        
-    Returns:
-        Encoded JWT token string
     """
     to_encode = data.copy()
     
@@ -48,19 +51,12 @@ def create_access_token(
         "type": "access"
     })
     
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def create_refresh_token(data: Dict[str, Any]) -> str:
     """
-    Create a JWT refresh token with longer expiration
-    
-    Args:
-        data: Payload data to encode in the token
-        
-    Returns:
-        Encoded JWT refresh token string
+    Create a JWT refresh token
     """
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
@@ -71,20 +67,16 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
         "type": "refresh"
     })
     
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def verify_token(token: str) -> bool:
     """
-    Verify if a token is valid
-    
-    Args:
-        token: JWT token string
-        
-    Returns:
-        True if valid, False otherwise
+    Verify if a token is valid and not revoked
     """
+    if is_token_revoked(token):
+        return False
+        
     try:
         jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return True
@@ -95,69 +87,58 @@ def verify_token(token: str) -> bool:
 def decode_token(token: str) -> Optional[Dict[str, Any]]:
     """
     Decode and return token payload
-    
-    Args:
-        token: JWT token string
-        
-    Returns:
-        Decoded payload dict or None if invalid
     """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
+        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except InvalidTokenError:
         return None
 
 
 def revoke_token(token: str) -> bool:
     """
-    Revoke a token (add to blacklist)
-    
-    Note: This is a placeholder. In production, implement with Redis
-    to store revoked tokens until their expiration.
-    
-    Args:
-        token: JWT token string to revoke
-        
-    Returns:
-        True if successfully revoked
+    Revoke a token by adding to Redis blacklist
     """
-    # TODO: Implement with Redis blacklist
-    # redis_client.setex(f"revoked:{token}", ttl, "1")
-    return True
+    try:
+        payload = decode_token(token)
+        if not payload:
+            return False
+        
+        # Calculate TTL until token expiry
+        exp = payload.get("exp")
+        if not exp:
+            return False
+            
+        ttl = int(exp - datetime.now(timezone.utc).timestamp())
+        if ttl > 0:
+            redis_client.setex(f"revoked:{token}", ttl, "1")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to revoke token: {e}")
+        return False
 
 
 def is_token_revoked(token: str) -> bool:
     """
     Check if a token has been revoked
-    
-    Args:
-        token: JWT token string
-        
-    Returns:
-        True if revoked, False otherwise
     """
-    # TODO: Implement with Redis blacklist check
-    # return redis_client.exists(f"revoked:{token}")
-    return False
+    try:
+        return redis_client.exists(f"revoked:{token}") > 0
+    except Exception:
+        return False
 
 
 def refresh_access_token(refresh_token: str) -> Optional[str]:
     """
     Generate a new access token from a valid refresh token
-    
-    Args:
-        refresh_token: Valid refresh token
-        
-    Returns:
-        New access token or None if refresh token is invalid
     """
+    if is_token_revoked(refresh_token):
+        return None
+        
     payload = decode_token(refresh_token)
     
     if not payload or payload.get("type") != "refresh":
         return None
     
-    # Create new access token with user data
     user_data = {
         "sub": payload.get("sub"),
         "email": payload.get("email"),
@@ -165,5 +146,3 @@ def refresh_access_token(refresh_token: str) -> Optional[str]:
     }
     
     return create_access_token(user_data)
-
-# Made with Bob
