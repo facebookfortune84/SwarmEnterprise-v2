@@ -4,7 +4,7 @@
 # Core Framework (safe to pin)
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
-pydantic==2.5.0
+pydantic==2.13.4
 pydantic-settings==2.1.0
 
 # LLM & AI (let pip resolve around crewai/embedchain)
