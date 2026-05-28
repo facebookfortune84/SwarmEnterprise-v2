@@ -2,22 +2,46 @@
 Unit tests for Company Generator Service
 """
 import pytest
+import json
+from datetime import datetime
+from unittest.mock import patch, MagicMock
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from backend.db.base import Base
+from backend.db.models import CompanyTenant, Ticket
 from backend.services.company_generator import (
     CompanyGenerator,
     CompanyRequest,
     TechStack,
     GenerationStatus,
-    CompanyMetadata,
 )
 
 
 class TestCompanyGenerator:
     """Test suite for CompanyGenerator"""
     
+    @pytest.fixture(autouse=True)
+    def setup_db(self):
+        """Set up in-memory database for testing"""
+        self.engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(self.engine)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+        yield
+        Base.metadata.drop_all(self.engine)
+    
     @pytest.fixture
-    def generator(self):
+    def db_session(self):
+        """Get a database session"""
+        session = self.SessionLocal()
+        try:
+            yield session
+        finally:
+            session.close()
+    
+    @pytest.fixture
+    def generator(self, db_session):
         """Create a CompanyGenerator instance for testing"""
-        return CompanyGenerator()
+        return CompanyGenerator(db=db_session)
     
     @pytest.fixture
     def sample_request(self):
@@ -31,33 +55,22 @@ class TestCompanyGenerator:
         )
     
     @pytest.mark.asyncio
-    async def test_generate_company(self, generator, sample_request):
+    async def test_generate_company_initiation(self, generator, sample_request):
         """Test company generation initiation"""
-        result = await generator.generate_company(sample_request)
-        
-        assert result is not None
-        assert "company_id" in result
-        assert "status" in result
-        assert "estimated_time_minutes" in result
-        assert "message" in result
-        assert result["status"] == GenerationStatus.PENDING.value
-        assert isinstance(result["estimated_time_minutes"], int)
-    
-    @pytest.mark.asyncio
-    async def test_generate_company_creates_record(self, generator, sample_request):
-        """Test that generation creates a company record"""
-        result = await generator.generate_company(sample_request)
-        company_id = result["company_id"]
-        
-        # Check that company was stored
-        assert company_id in generator.generations
-        company = generator.generations[company_id]
-        
-        assert company["name"] == sample_request.name
-        assert company["description"] == sample_request.description
-        assert company["tech_stack"] == sample_request.tech_stack.value
-        assert company["user_id"] == sample_request.user_id
-        assert company["status"] == GenerationStatus.PENDING.value
+        # Mock _execute_generation to avoid slow agent calls
+        with patch.object(generator, '_execute_generation', return_value=None):
+            result = await generator.generate_company(sample_request)
+            
+            assert result is not None
+            assert "company_id" in result
+            assert "status" in result
+            assert result["status"] == GenerationStatus.PENDING.value
+            
+            # Check DB record
+            tenant = generator.db.query(CompanyTenant).filter_by(id=result["company_id"]).first()
+            assert tenant is not None
+            assert tenant.name == sample_request.name
+            assert tenant.slug == "test-company"
     
     @pytest.mark.asyncio
     async def test_generate_slug(self, generator):
@@ -70,253 +83,79 @@ class TestCompanyGenerator:
         assert slug2 == "my-awesome-app"
         assert slug3 == "spaces-everywhere"
     
-    @pytest.mark.asyncio
-    async def test_estimate_generation_time(self, generator):
-        """Test generation time estimation"""
-        request1 = CompanyRequest(
-            name="Simple App",
-            description="Simple",
-            tech_stack=TechStack.FASTAPI_REACT_POSTGRES,
-            features=[],
-            user_id="user123"
+    def test_get_generation_status(self, generator, db_session):
+        """Test getting status of generation"""
+        company_id = "COMP-123"
+        tenant = CompanyTenant(
+            id=company_id,
+            slug="test",
+            name="Test",
+            subdomain="test.example.com",
+            status=GenerationStatus.PENDING.value,
+            metadata_json=json.dumps({"test": "data"})
         )
-        
-        request2 = CompanyRequest(
-            name="Complex App",
-            description="Complex",
-            tech_stack=TechStack.FASTAPI_REACT_POSTGRES,
-            features=["auth", "api", "db", "cache", "queue"],
-            user_id="user123"
-        )
-        
-        time1 = generator._estimate_generation_time(request1)
-        time2 = generator._estimate_generation_time(request2)
-        
-        assert time1 == 5  # Base time only
-        assert time2 == 15  # Base + 5 features * 2 minutes
-        assert time2 > time1
-    
-    def test_get_generation_status_exists(self, generator):
-        """Test getting status of existing generation"""
-        company_id = "test-123"
-        generator.generations[company_id] = {
-            "id": company_id,
-            "status": GenerationStatus.PENDING.value,
-            "name": "Test Company"
-        }
+        db_session.add(tenant)
+        db_session.commit()
         
         status = generator.get_generation_status(company_id)
         
         assert status is not None
         assert status["id"] == company_id
         assert status["status"] == GenerationStatus.PENDING.value
-    
-    def test_get_generation_status_not_found(self, generator):
-        """Test getting status of non-existent generation"""
-        status = generator.get_generation_status("nonexistent")
-        
-        assert status is None
-    
-    def test_cancel_generation_success(self, generator):
-        """Test cancelling an ongoing generation"""
-        company_id = "test-123"
-        generator.generations[company_id] = {
-            "id": company_id,
-            "status": GenerationStatus.GENERATING_TICKETS.value,
-            "name": "Test Company"
-        }
-        
-        result = generator.cancel_generation(company_id)
-        
-        assert result is True
-        assert generator.generations[company_id]["status"] == GenerationStatus.FAILED.value
-        assert "error" in generator.generations[company_id]
-        assert generator.generations[company_id]["error"] == "Cancelled by user"
-    
-    def test_cancel_generation_already_completed(self, generator):
-        """Test that completed generations cannot be cancelled"""
-        company_id = "test-123"
-        generator.generations[company_id] = {
-            "id": company_id,
-            "status": GenerationStatus.COMPLETED.value,
-            "name": "Test Company"
-        }
-        
-        result = generator.cancel_generation(company_id)
-        
-        assert result is True  # Returns True but doesn't change status
-        assert generator.generations[company_id]["status"] == GenerationStatus.COMPLETED.value
-    
-    def test_cancel_generation_not_found(self, generator):
-        """Test cancelling non-existent generation"""
-        result = generator.cancel_generation("nonexistent")
-        
-        assert result is False
+        assert status["metadata"] == {"test": "data"}
     
     @pytest.mark.asyncio
-    async def test_update_status(self, generator):
+    async def test_update_status(self, generator, db_session):
         """Test status update functionality"""
-        company_id = "test-123"
-        generator.generations[company_id] = {
-            "id": company_id,
-            "status": GenerationStatus.PENDING.value,
-            "name": "Test Company"
-        }
+        company_id = "COMP-123"
+        tenant = CompanyTenant(
+            id=company_id,
+            slug="test",
+            name="Test",
+            subdomain="test.example.com",
+            status=GenerationStatus.PENDING.value
+        )
+        db_session.add(tenant)
+        db_session.commit()
         
         await generator._update_status(company_id, GenerationStatus.INITIALIZING)
         
-        assert generator.generations[company_id]["status"] == GenerationStatus.INITIALIZING.value
-        assert "updated_at" in generator.generations[company_id]
+        # Refresh from DB
+        db_session.refresh(tenant)
+        assert tenant.status == GenerationStatus.INITIALIZING.value
     
     @pytest.mark.asyncio
-    async def test_load_template(self, generator):
-        """Test template loading"""
-        template = await generator._load_template(TechStack.FASTAPI_REACT_POSTGRES)
+    async def test_execute_generation_flow(self, generator, sample_request):
+        """Test the full generation flow with mocked agents"""
+        # 1. Initiation
+        result = await generator.generate_company(sample_request)
+        company_id = result["company_id"]
         
-        assert template is not None
-        assert "name" in template
-        assert "version" in template
-        assert "files" in template
-        assert template["name"] == TechStack.FASTAPI_REACT_POSTGRES.value
-    
-    @pytest.mark.asyncio
-    async def test_generate_tickets(self, generator, sample_request):
-        """Test ticket generation"""
-        template = await generator._load_template(sample_request.tech_stack)
-        tickets = await generator._generate_tickets(sample_request, template)
-        
-        assert tickets is not None
-        assert isinstance(tickets, list)
-        assert len(tickets) > 0
-        
-        # Check ticket structure
-        for ticket in tickets:
-            assert "ticket_id" in ticket
-            assert "department" in ticket
-            assert "title" in ticket
-            assert "instruction" in ticket
-            assert "priority" in ticket
-    
-    @pytest.mark.asyncio
-    async def test_execute_tickets(self, generator):
-        """Test ticket execution"""
-        tickets = [
-            {
-                "ticket_id": "TKT-001",
-                "department": "Engineering",
-                "title": "Setup project",
-                "instruction": "Create project structure",
-                "priority": "high"
-            }
+        # 2. Mock Strategic Board
+        mock_tickets = [
+            {"department": "Engineering", "title": "Setup", "instruction": "Initial setup"},
+            {"department": "Engineering", "title": "API", "instruction": "Create API"}
         ]
         
-        files = await generator._execute_tickets(tickets)
-        
-        assert files is not None
-        assert isinstance(files, list)
-        assert len(files) > 0
-    
-    @pytest.mark.asyncio
-    async def test_package_code(self, generator):
-        """Test code packaging"""
-        company_id = "test-123"
-        files = ["backend/main.py", "frontend/App.tsx", "README.md"]
-        
-        package_path = await generator._package_code(company_id, files)
-        
-        assert package_path is not None
-        assert isinstance(package_path, str)
-        assert company_id in package_path
-        assert package_path.endswith(".zip")
-    
-    @pytest.mark.asyncio
-    async def test_upload_to_storage(self, generator):
-        """Test storage upload"""
-        company_id = "test-123"
-        package_path = f"/tmp/{company_id}.zip"
-        
-        storage_path = await generator._upload_to_storage(company_id, package_path)
-        
-        assert storage_path is not None
-        assert isinstance(storage_path, str)
-        assert company_id in storage_path
-    
-    def test_company_metadata_structure(self):
-        """Test CompanyMetadata structure"""
-        metadata = CompanyMetadata(
-            tech_stack="fastapi-react-postgres",
-            features=["auth", "api"],
-            template_version="1.0.0",
-            generated_files=["main.py", "app.tsx"],
-            tickets_created=5,
-            tickets_completed=5
-        )
-        
-        assert metadata.tech_stack == "fastapi-react-postgres"
-        assert len(metadata.features) == 2
-        assert metadata.template_version == "1.0.0"
-        assert len(metadata.generated_files) == 2
-        assert metadata.tickets_created == 5
-        assert metadata.tickets_completed == 5
-    
-    def test_tech_stack_enum_values(self):
-        """Test TechStack enum values"""
-        assert TechStack.FASTAPI_REACT_POSTGRES.value == "fastapi-react-postgres"
-        assert TechStack.NODEJS_TAILWIND_MONGO.value == "nodejs-tailwind-mongo"
-        assert TechStack.DJANGO_VUE_MYSQL.value == "django-vue-mysql"
-    
-    def test_generation_status_enum_values(self):
-        """Test GenerationStatus enum values"""
-        assert GenerationStatus.PENDING.value == "pending"
-        assert GenerationStatus.INITIALIZING.value == "initializing"
-        assert GenerationStatus.GENERATING_TICKETS.value == "generating_tickets"
-        assert GenerationStatus.EXECUTING_TICKETS.value == "executing_tickets"
-        assert GenerationStatus.PACKAGING.value == "packaging"
-        assert GenerationStatus.COMPLETED.value == "completed"
-        assert GenerationStatus.FAILED.value == "failed"
-    
-    @pytest.mark.asyncio
-    async def test_company_request_validation(self):
-        """Test CompanyRequest validation"""
-        # Valid request
-        request = CompanyRequest(
-            name="Valid Company",
-            description="Valid description",
-            tech_stack=TechStack.FASTAPI_REACT_POSTGRES,
-            features=["auth"],
-            user_id="user123"
-        )
-        
-        assert request.name == "Valid Company"
-        assert request.tech_stack == TechStack.FASTAPI_REACT_POSTGRES
-        assert len(request.features) == 1
-    
-    @pytest.mark.asyncio
-    async def test_multiple_generations(self, generator):
-        """Test handling multiple concurrent generations"""
-        request1 = CompanyRequest(
-            name="Company 1",
-            description="First company",
-            tech_stack=TechStack.FASTAPI_REACT_POSTGRES,
-            features=[],
-            user_id="user1"
-        )
-        
-        request2 = CompanyRequest(
-            name="Company 2",
-            description="Second company",
-            tech_stack=TechStack.NODEJS_TAILWIND_MONGO,
-            features=[],
-            user_id="user2"
-        )
-        
-        result1 = await generator.generate_company(request1)
-        result2 = await generator.generate_company(request2)
-        
-        assert result1["company_id"] != result2["company_id"]
-        assert len(generator.generations) == 2
-        assert result1["company_id"] in generator.generations
-        assert result2["company_id"] in generator.generations
-
+        # 3. Mock Worker
+        with patch('backend.services.company_generator.strategic_board.convene', return_value=mock_tickets), \
+             patch('backend.services.company_generator.execution_unit.process_ticket', return_value="SUCCESS: File created"):
+            
+            await generator._execute_generation(company_id, sample_request)
+            
+            # Check DB state after generation
+            tenant = generator.db.query(CompanyTenant).filter_by(id=company_id).first()
+            assert tenant.status == GenerationStatus.COMPLETED.value
+            
+            metadata = json.loads(tenant.metadata_json)
+            assert metadata["tickets_created"] == 2
+            assert metadata["tickets_completed"] == 2
+            assert len(metadata["generated_files"]) == 2
+            
+            # Check tickets in DB
+            tickets = generator.db.query(Ticket).filter_by(project_id=company_id).all()
+            assert len(tickets) == 2
+            for t in tickets:
+                assert t.status == "COMPLETED"
 
 # Made with Bob

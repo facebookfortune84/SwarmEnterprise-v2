@@ -6,7 +6,7 @@ to maintain the 100% FOSS / zero-cost mandate.
 import os
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Any, BinaryIO
+from typing import Optional, Dict
 
 try:
     import boto3
@@ -65,7 +65,7 @@ class S3Client:
             return
         try:
             self.client.head_bucket(Bucket=self.bucket_name)
-        except ClientError as e:
+        except ClientError:
             # Simple fallback for missing bucket
             try:
                 self.client.create_bucket(Bucket=self.bucket_name)

@@ -43,7 +43,7 @@ def deployment_status():
     ollama = _check_ollama()
     redis_status = _check_redis()
     tenants = tenant_service.list_tenants()
-    running = sum(1 for t in tenants if t.get("status") == "running")
+    running = sum(1 for t in tenants if t.status == "running")
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "domains": {

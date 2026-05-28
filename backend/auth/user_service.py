@@ -1,9 +1,8 @@
 """
 User service for authentication and user management
 """
-import uuid
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 import bcrypt
 from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
 from sqlalchemy.orm import Session
@@ -42,6 +41,11 @@ class UserResponse(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserInDB(UserResponse):
+    """User model as stored in DB (with password hash)"""
+    password_hash: str
 
 
 class UserService:

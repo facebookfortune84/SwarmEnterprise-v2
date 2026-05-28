@@ -48,3 +48,18 @@ async def get_project(project_id: str):
         raise HTTPException(status_code=404, detail="Project not found")
 
     return project
+
+
+@router.post("/mission")
+async def issue_mission(mission: str):
+    """
+    Issue a high-level mission to the Swarm Commander.
+    Triggers the autonomous decomposition and execution flow.
+    """
+    from agents.managers.commander import swarm_commander
+    
+    try:
+        result = await swarm_commander.execute_mission(mission)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

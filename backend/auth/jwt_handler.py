@@ -9,7 +9,7 @@ from typing import Optional, Dict, Any
 
 try:
     import jwt
-    from jwt import InvalidTokenError, DecodeError, ExpiredSignatureError
+    from jwt import InvalidTokenError
 except ImportError:
     raise ImportError(
         "PyJWT is required. Install it with: pip install PyJWT"

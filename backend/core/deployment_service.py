@@ -5,7 +5,6 @@ Deployment service - manages the lifecycle and persistence of application deploy
 import uuid
 import logging
 import json
-from datetime import datetime
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 

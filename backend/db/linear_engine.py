@@ -1,8 +1,4 @@
 import logging
-import os
-import uuid
-from pathlib import Path
-from datetime import datetime
 from sqlalchemy.orm import Session
 from backend.db.models import Ticket, Project, Lead, UsageEvent, ProcessedEvent
 from backend.db.session import SessionLocal

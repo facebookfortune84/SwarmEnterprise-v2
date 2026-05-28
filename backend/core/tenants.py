@@ -4,13 +4,12 @@ import json
 import logging
 import os
 import uuid
-from pathlib import Path
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
 from backend.db.models import CompanyTenant
-from backend.db.session import SessionLocal, engine
+from backend.db.session import SessionLocal
 from backend.orchestration.box_deployer import BoxDeployer, _slugify
 
 logger = logging.getLogger("tenants")

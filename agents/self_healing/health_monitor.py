@@ -317,7 +317,7 @@ class HealthMonitor:
         # Open connections
         try:
             connections = len(psutil.net_connections())
-        except:
+        except Exception:
             connections = 0
         
         return ResourceMetrics(

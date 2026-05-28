@@ -106,12 +106,13 @@ async def stripe_webhook(request: Request):
                     metadata=str(session.get("metadata")),
                 )
                 
+                # Determine delivery type (ZIP or HOSTED)
+                delivery_type = session.get("metadata", {}).get("delivery_type", "ZIP").upper()
+                stack_str = session.get("metadata", {}).get("tech_stack", "fastapi-react-postgres")
+
                 # 100% Factory Integration: Provision the tenant autonomously
                 from backend.services.company_generator import CompanyGenerator, CompanyRequest, TechStack
                 generator = CompanyGenerator()
-                
-                # Assume default stack or extract from metadata if available
-                stack_str = session.get("metadata", {}).get("tech_stack", "fastapi-react-postgres")
                 
                 request = CompanyRequest(
                     name=f"Company-{project_id}",
@@ -121,27 +122,51 @@ async def stripe_webhook(request: Request):
                     user_id="STRIPE_CUSTOMER"
                 )
                 
-                # Fire and forget (or await)
+                # Step 1: Generate Code
                 import asyncio
-                asyncio.create_task(generator.generate_company(request))
+                await generator.generate_company(request)
                 
-            except Exception as exc:  # pylint: disable=broad-except
-                logger.exception("Failed to persist project record or provision tenant: %s", exc)
+                # Step 2: Delivery Logic
+                if delivery_type == "HOSTED":
+                    logger.info("Delivery Mode: HOSTED. Provisioning VM on .tech domain...")
+                    from backend.services.deployment_service import DeploymentService, DeploymentConfig
+                    deploy_service = DeploymentService()
+                    
+                    config = DeploymentConfig(
+                        company_id=project_id,
+                        tenant_name=f"box-{project_id.lower()}",
+                        subdomain=project_id.lower()
+                    )
+                    
+                    await deploy_service.create_deployment(config)
+                    
+                    # FUTURE: Initialize Stripe Subscription for monthly hosting
+                    logger.info(f"Hosting subscription pending for {customer_email}")
+                    
+                    body = (
+                        "<h1>Your SwarmOS Box is LIVE</h1>"
+                        f"<p>Your autonomous company has been deployed to: <strong>https://{project_id.lower()}.realms2riches.tech</strong></p>"
+                        "<p>Login with your Swarm credentials.</p>"
+                    )
+                else:
+                    logger.info("Delivery Mode: ZIP. Creating bundle...")
+                    # Trigger Replicator for ZIP
+                    bundle = replicator_engine.create_company_bundle(project_id)
+                    body = (
+                        "<h1>Your SwarmOS Box is Ready</h1>"
+                        f"<p>Download your complete source code bundle: <a href='{bundle.get('download_url')}'>Here</a></p>"
+                    )
 
-            # Trigger Replicator
-            bundle = replicator_engine.create_company_bundle(project_id)
-
-            if bundle and bundle.get("status") == "success":
+                # Send Delivery Email
                 email_sender = EmailTools()
-                body = (
-                    "<h1>Your SwarmOS Box is Ready</h1>"
-                    f"<p>Download: <a href='{bundle.get('download_url')}'>Here</a></p>"
-                )
                 email_sender.send_email(
                     customer_email,
                     "Your Programmable Company Delivery",
                     body,
                 )
+                
+            except Exception as exc:  # pylint: disable=broad-except
+                logger.exception("Failed to persist project record or provision tenant: %s", exc)
 
         # Mark event processed
         if event_id:

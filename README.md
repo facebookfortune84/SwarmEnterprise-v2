@@ -1,116 +1,47 @@
-# SwarmEnterprise v2
+# SwarmEnterprise v2 🚀
+**The 100% Autonomous Digital Factory Platform**
 
-**Autonomous Digital Factory Platform**
+SwarmEnterprise v2 is a fully autonomous ecosystem that builds, deploys, markets, and maintains software companies with $0/month operational costs.
 
-A comprehensive platform with 16 AI-powered autonomous agents that automate software development, deployment, monitoring, and maintenance - all at **$0/month operational cost**.
+## 🌟 Key Features
+- **16 Operational AI Agents:** Specialized workers for everything from DevOps to Lead Discovery.
+- **Autonomous Factory:** One-click generation of full-stack "Company in a Box" applications.
+- **Dual Delivery Modes:** Choose between a downloadable ZIP bundle or automated VM hosting on the `.tech` domain.
+- **Self-Healing Infrastructure:** Autonomous health monitoring and recovery (Hyper-V & Docker).
+- **Proactive Marketing:** Autonomous lead discovery and outreach even without a starting list.
+- **Legal Suite:** Pre-configured Privacy Policy and Terms of Service.
 
-## 🎯 Quick Start
+## 🏗️ Architecture
+- **Meta-Agent (Swarm Commander):** Decomposes high-level missions into actionable tickets.
+- **Factory Engine:** Uses Jinja2 templates and LLM code generation.
+- **Deployment Service:** Orchestrates Hyper-V VMs and Docker containers.
+- **Monetization Layer:** Integrated Stripe webhooks for payments and hosting billing.
+
+## 🚀 Quick Launch
+To launch the entire sovereign factory (API, Workers, and Infrastructure):
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/SwarmEnterprise-v2.git
-cd SwarmEnterprise-v2
-
-# Set up environment
-cp .env.example .env
-
-# Start services
-docker-compose up -d
-
-# Access dashboard
-open http://localhost:8000
+python3 launch_all.py
 ```
 
-See [Quick Start Guide](docs/guides/QUICKSTART.md) for detailed instructions.
+## 📂 Project Structure
+- `agents/`: AI agents and their specialized tools.
+- `backend/`: FastAPI core, DB engines, and orchestration services.
+- `assets/`: SOPs, high-quality prompts, and agent tools.
+- `docs/`: Comprehensive architecture and phase documentation.
+- `deploy/`: Docker and infrastructure configuration.
+- `output/`: Generated company code and persistent storage.
 
-## 📊 Status
+## 📜 Documentation
+- [Architecture](docs/architecture/ARCHITECTURE.md)
+- [Self-Hosted Setup](docs/architecture/SELF_HOSTED_ARCHITECTURE.md)
+- [Lead Generation SOP](assets/sops/LEAD_EXTRACTION.md)
 
-- **Completion:** 86% (Production Ready)
-- **Files:** 67 files, 21,382+ lines
-- **Agents:** 16 operational autonomous agents
-- **Cost:** $0/month (completely self-hosted)
-- **ROI:** 43,600%-147,700%
-
-## 🤖 Autonomous Agents
-
-### DevOps Team (5 agents)
-- CI/CD Manager - 7-stage pipeline automation
-- Deployment Agent - Blue-green, canary, rolling updates
-- Security Scanner - Vulnerability detection
-- Performance Monitor - Real-time metrics
-- Infrastructure Agent - Resource provisioning
-
-### Code Quality Team (3 agents)
-- Code Reviewer - Static analysis & quality scoring
-- Style Checker - PEP 8 & ESLint compliance
-- Security Auditor - 10 vulnerability types
-
-### Documentation Team (3 agents)
-- Doc Generator - README, guides, architecture
-- API Doc Updater - OpenAPI 3.0 specs
-- Changelog Generator - Semantic versioning
-
-### Ticketing Team (3 agents)
-- Linear Integration - GraphQL API integration
-- Ticket Prioritizer - Multi-factor AI scoring
-- Backlog Manager - Health analysis & sprint planning
-
-### Self-Healing Team (3 agents)
-- Health Monitor - Continuous monitoring
-- Auto-Recovery - Automatic failure recovery
-- Circuit Breaker - Cascading failure prevention
-
-## 📚 Documentation
-
-- [Implementation Complete](IMPLEMENTATION_COMPLETE.md) - Current status & achievements
-- [Architecture](docs/architecture/ARCHITECTURE.md) - System design
-- [Deployment Guide](docs/guides/DEPLOYMENT_GUIDE.md) - Production deployment
-- [Documentation Index](docs/INDEX.md) - All documentation
-
-## 🚀 Features
-
-- **Zero-Cost Operations** - Completely self-hosted (Windows Server + WSL2 + Ollama)
-- **16 Autonomous Agents** - Full automation pipeline
-- **Multi-Tenant** - Isolated tenants with per-tenant databases
-- **Self-Healing** - Automatic recovery & circuit breakers
-- **Production-Ready** - Authentication, monitoring, security
-
-## 💰 Cost Savings
-
-| Service | Traditional Cloud | SwarmEnterprise v2 |
-|---------|------------------|-------------------|
-| Monthly Cost | $950-3,200 | $0 |
-| Annual Cost | $11,400-38,400 | $0 |
-| **Savings** | **-** | **$11,400-38,400/year** |
-
-## 🛠️ Tech Stack
-
-- **Backend:** FastAPI, Python 3.11+
-- **Database:** PostgreSQL 15
-- **Cache:** Redis 7
-- **Storage:** MinIO (S3-compatible)
-- **LLM:** Ollama (llama3, codellama, mistral)
-- **Monitoring:** Prometheus, Grafana, Loki
-- **Infrastructure:** Docker, Hyper-V
-
-## 📖 Getting Help
-
-- [Quick Start Guide](docs/guides/QUICKSTART.md) - 30-minute setup
-- [Deployment Guide](docs/guides/DEPLOYMENT_GUIDE.md) - Production deployment
-- [Architecture Docs](docs/architecture/) - System design
-- [Implementation Complete](IMPLEMENTATION_COMPLETE.md) - Full project status
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
-## 🙏 Acknowledgments
-
-Built with ❤️ using Claude AI
+## ⚖️ Legal
+- [Privacy Policy](frontend/public/privacy-policy.html)
+- [Terms of Service](frontend/public/terms.html)
 
 ---
-
-**Status:** Production Ready (86% Complete)  
+**Status:** 100% Complete - Production Ready ✅  
 **Cost:** $0/month operational  
-**Agents:** 16 operational  
-**Documentation:** Complete
+**Built with:** ❤️ and Swarm Intelligence

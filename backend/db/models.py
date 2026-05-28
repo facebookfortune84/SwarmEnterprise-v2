@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, Text, DateTime, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
 from backend.db.base import Base
 
 class User(Base):

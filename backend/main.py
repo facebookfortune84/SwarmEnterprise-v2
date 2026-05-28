@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from backend.api.webhooks import router as webhook_router
@@ -10,6 +10,8 @@ from backend.api.routes import router as core_router
 from backend.api.payments import router as payments_router
 from backend.api.admin import router as admin_router
 from backend.api.voice import router as voice_router
+from backend.metrics import get_metrics_response, track_request
+import time
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s[%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("SwarmOS")
@@ -41,9 +43,6 @@ except Exception:
 app = FastAPI(title="SwarmOS Sovereign Factory", version="2.0.0")
 
 # Prometheus metrics endpoint
-from backend.metrics import get_metrics_response, track_request
-import time
-from fastapi import Request
 
 @app.middleware("http")
 async def add_metrics(request: Request, call_next):
@@ -129,10 +128,19 @@ os.makedirs(os.path.join(OUTPUT_DIR, "src"), exist_ok=True)
 # Start outreach worker
 try:
     from agents.outreach.worker import start_worker
-
     start_worker()
+    
+    # Start Lead Discovery Cycle
+    import asyncio
+    from agents.marketing.lead_discovery import lead_discovery_agent
+    
+    @app.on_event("startup")
+    async def startup_discovery():
+        # Run one discovery cycle at startup
+        asyncio.create_task(lead_discovery_agent.run_discovery_cycle())
+        logger.info("Autonomous lead discovery cycle initiated at startup.")
 except Exception:
-    logger.debug("Outreach worker not started")
+    logger.debug("Outreach worker or discovery not started")
 
 
 _FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend" / "public"

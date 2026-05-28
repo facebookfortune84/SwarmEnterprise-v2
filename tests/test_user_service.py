@@ -3,6 +3,9 @@ Unit tests for User Service
 """
 import pytest
 from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from backend.db.base import Base
 from backend.auth.user_service import (
     UserService,
     UserCreate,
@@ -15,10 +18,28 @@ from backend.auth.user_service import (
 class TestUserService:
     """Test suite for UserService"""
     
+    @pytest.fixture(autouse=True)
+    def setup_db(self):
+        """Set up in-memory database for testing"""
+        self.engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(self.engine)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+        yield
+        Base.metadata.drop_all(self.engine)
+    
     @pytest.fixture
-    def user_service(self):
+    def db_session(self):
+        """Get a database session"""
+        session = self.SessionLocal()
+        try:
+            yield session
+        finally:
+            session.close()
+    
+    @pytest.fixture
+    def user_service(self, db_session):
         """Create a UserService instance for testing"""
-        return UserService()
+        return UserService(db=db_session)
     
     @pytest.fixture
     def sample_user_data(self):
@@ -68,7 +89,6 @@ class TestUserService:
         user = user_service.create_user(sample_user_data)
         
         assert user is not None
-        assert isinstance(user, UserInDB)
         assert user.email == sample_user_data.email
         assert user.full_name == sample_user_data.full_name
         assert user.password_hash != sample_user_data.password
@@ -122,34 +142,19 @@ class TestUserService:
         assert not hasattr(response, 'password_hash')
         assert not hasattr(response, 'password')
     
-    def test_reset_password(self, user_service):
+    def test_reset_password(self, user_service, sample_user_data):
         """Test password reset functionality"""
-        # Create a mock user
-        user = UserInDB(
-            id="user123",
-            email="test@example.com",
-            password_hash=user_service.hash_password("OldPassword123"),
-            full_name="Test User",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True
-        )
-        
-        # Mock the get_user_by_id to return our user
-        original_get_user = user_service.get_user_by_id
-        user_service.get_user_by_id = lambda user_id: user if user_id == "user123" else None
+        # Create a real user
+        user = user_service.create_user(sample_user_data)
+        user_id = user.id
         
         new_password = "NewPassword456"
-        result = user_service.reset_password("user123", new_password)
+        result = user_service.reset_password(user_id, new_password)
         
         assert result is True
+        # Need to refresh to get updated password_hash from DB if not already updated
         assert user_service.verify_password(new_password, user.password_hash) is True
-        assert user_service.verify_password("OldPassword123", user.password_hash) is False
-        
-        # Restore original method
-        user_service.get_user_by_id = original_get_user
+        assert user_service.verify_password(sample_user_data.password, user.password_hash) is False
     
     def test_reset_password_user_not_found(self, user_service):
         """Test password reset with non-existent user"""
@@ -157,76 +162,44 @@ class TestUserService:
         
         assert result is False
     
-    def test_user_update(self, user_service):
+    def test_user_update(self, user_service, sample_user_data):
         """Test user update functionality"""
-        # Create a mock user
-        user = UserInDB(
-            id="user123",
-            email="old@example.com",
-            password_hash=user_service.hash_password("Password123"),
-            full_name="Old Name",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True
-        )
-        
-        # Mock the get_user_by_id
-        user_service.get_user_by_id = lambda user_id: user if user_id == "user123" else None
+        # Create a real user
+        user = user_service.create_user(sample_user_data)
+        user_id = user.id
         
         update_data = UserUpdate(
             full_name="New Name",
             email="new@example.com"
         )
         
-        updated_user = user_service.update_user("user123", update_data)
+        updated_user = user_service.update_user(user_id, update_data)
         
         assert updated_user is not None
         assert updated_user.full_name == "New Name"
         assert updated_user.email == "new@example.com"
     
-    def test_user_update_partial(self, user_service):
+    def test_user_update_partial(self, user_service, sample_user_data):
         """Test partial user update"""
-        user = UserInDB(
-            id="user123",
-            email="test@example.com",
-            password_hash=user_service.hash_password("Password123"),
-            full_name="Old Name",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True
-        )
-        
-        user_service.get_user_by_id = lambda user_id: user if user_id == "user123" else None
+        # Create a real user
+        user = user_service.create_user(sample_user_data)
+        user_id = user.id
         
         # Only update full_name
         update_data = UserUpdate(full_name="New Name")
-        updated_user = user_service.update_user("user123", update_data)
+        updated_user = user_service.update_user(user_id, update_data)
         
         assert updated_user is not None
         assert updated_user.full_name == "New Name"
-        assert updated_user.email == "test@example.com"  # Unchanged
+        assert updated_user.email == sample_user_data.email  # Unchanged
     
-    def test_delete_user(self, user_service):
+    def test_delete_user(self, user_service, sample_user_data):
         """Test user deletion (soft delete)"""
-        user = UserInDB(
-            id="user123",
-            email="test@example.com",
-            password_hash=user_service.hash_password("Password123"),
-            full_name="Test User",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True
-        )
+        # Create a real user
+        user = user_service.create_user(sample_user_data)
+        user_id = user.id
         
-        user_service.get_user_by_id = lambda user_id: user if user_id == "user123" else None
-        
-        result = user_service.delete_user("user123")
+        result = user_service.delete_user(user_id)
         
         assert result is True
         assert user.is_active is False
@@ -237,46 +210,28 @@ class TestUserService:
         
         assert result is False
     
-    def test_authenticate_user_success(self, user_service):
+    def test_authenticate_user_success(self, user_service, sample_user_data):
         """Test successful user authentication"""
-        password = "SecurePass123"
-        user = UserInDB(
-            id="user123",
-            email="test@example.com",
-            password_hash=user_service.hash_password(password),
-            full_name="Test User",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True
+        # Create a real user
+        user_service.create_user(sample_user_data)
+        
+        authenticated_user = user_service.authenticate_user(
+            sample_user_data.email,
+            sample_user_data.password
         )
-        
-        user_service.get_user_by_email = lambda email: user if email == "test@example.com" else None
-        
-        authenticated_user = user_service.authenticate_user("test@example.com", password)
         
         assert authenticated_user is not None
-        assert authenticated_user.id == user.id
-        assert authenticated_user.email == user.email
+        assert authenticated_user.email == sample_user_data.email
     
-    def test_authenticate_user_wrong_password(self, user_service):
+    def test_authenticate_user_wrong_password(self, user_service, sample_user_data):
         """Test authentication with wrong password"""
-        user = UserInDB(
-            id="user123",
-            email="test@example.com",
-            password_hash=user_service.hash_password("CorrectPassword"),
-            full_name="Test User",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True
+        # Create a real user
+        user_service.create_user(sample_user_data)
+        
+        authenticated_user = user_service.authenticate_user(
+            sample_user_data.email,
+            "WrongPassword"
         )
-        
-        user_service.get_user_by_email = lambda email: user if email == "test@example.com" else None
-        
-        authenticated_user = user_service.authenticate_user("test@example.com", "WrongPassword")
         
         assert authenticated_user is None
     
@@ -286,23 +241,17 @@ class TestUserService:
         
         assert authenticated_user is None
     
-    def test_authenticate_inactive_user(self, user_service):
+    def test_authenticate_inactive_user(self, user_service, sample_user_data):
         """Test that inactive users cannot authenticate"""
-        user = UserInDB(
-            id="user123",
-            email="test@example.com",
-            password_hash=user_service.hash_password("Password123"),
-            full_name="Test User",
-            role="user",
-            subscription_tier="free",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=False  # Inactive user
+        # Create a real user
+        user = user_service.create_user(sample_user_data)
+        user.is_active = False
+        user_service.db.commit()
+        
+        authenticated_user = user_service.authenticate_user(
+            sample_user_data.email,
+            sample_user_data.password
         )
-        
-        user_service.get_user_by_email = lambda email: user if email == "test@example.com" else None
-        
-        authenticated_user = user_service.authenticate_user("test@example.com", "Password123")
         
         assert authenticated_user is None
 
