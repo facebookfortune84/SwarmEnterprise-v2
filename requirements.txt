@@ -55,4 +55,4 @@ sentry-sdk==2.8.0
 
 # Security
 pip-audit==2.10.0
-reportlab==4.0.0
+# reportlab==4.0.0

@@ -30,7 +30,16 @@ if REDIS_URL:
 
 if not REDIS_URL:
     # In-process fallback
-    from queue import Queue
+    from queue import Queue, Empty
 
     _q = Queue()
+
+    def enqueue_task(payload: dict):
+        _q.put(payload)
+
+    def dequeue_task(timeout: int = 1) -> Optional[dict]:
+        try:
+            return _q.get(timeout=timeout)
+        except Empty:
+            return None
 
