@@ -68,13 +68,69 @@ class DeploymentService:
             vm_provisioner: VM provisioner instance
             file_manager: File manager instance
         """
+        from backend.db.session import SessionLocal
+        
         self.vm_provisioner = vm_provisioner or HyperVProvisioner()
         self.file_manager = file_manager or FileManager()
+        self.db = SessionLocal()
         
-        # TODO: Replace with database
+        # In-memory cache for backward compatibility with tests
         self.deployments: Dict[str, Dict[str, Any]] = {}
         
-        logger.info("Initialized deployment service")
+        logger.info("Initialized deployment service with database persistence")
+    
+    def _save_deployment_to_db(self, deployment_dict: Dict[str, Any]) -> None:
+        """Save or update deployment in database and in-memory cache"""
+        from backend.db.models import Deployment
+        import json
+        
+        deployment_id = deployment_dict["id"]
+        
+        # Update in-memory cache for backward compatibility
+        self.deployments[deployment_id] = deployment_dict
+        
+        # Save to database
+        existing = self.db.query(Deployment).filter_by(id=deployment_id).first()
+        
+        if existing:
+            existing.status = deployment_dict["status"]
+            existing.metadata_json = json.dumps(deployment_dict)
+            existing.updated_at = datetime.utcnow()
+        else:
+            new_deployment = Deployment(
+                id=deployment_id,
+                tenant_id=deployment_dict["company_id"],
+                status=deployment_dict["status"],
+                strategy="rolling",
+                version="1.0.0",
+                metadata_json=json.dumps(deployment_dict)
+            )
+            self.db.add(new_deployment)
+        
+        self.db.commit()
+    
+    def _get_deployment_from_db(self, deployment_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve deployment from database"""
+        from backend.db.models import Deployment
+        import json
+        
+        deployment = self.db.query(Deployment).filter_by(id=deployment_id).first()
+        if not deployment:
+            return None
+        
+        return json.loads(deployment.metadata_json) if deployment.metadata_json else None
+    
+    def _list_deployments_from_db(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List all deployments from database"""
+        from backend.db.models import Deployment
+        import json
+        
+        query = self.db.query(Deployment)
+        if status:
+            query = query.filter_by(status=status)
+        
+        deployments = query.all()
+        return [json.loads(d.metadata_json) for d in deployments if d.metadata_json]
     
     async def create_deployment(
         self,
@@ -110,7 +166,8 @@ class DeploymentService:
                 "health_status": "unknown",
             }
             
-            self.deployments[deployment_id] = deployment
+            # Save to database
+            self._save_deployment_to_db(deployment)
             
             # Start deployment in background
             asyncio.create_task(self._execute_deployment(deployment_id, config))
@@ -129,11 +186,14 @@ class DeploymentService:
         """Execute deployment workflow"""
         deployment = None
         try:
-            deployment = self.deployments[deployment_id]
+            deployment = self._get_deployment_from_db(deployment_id)
+            if not deployment:
+                raise ValueError(f"Deployment {deployment_id} not found")
             
             # Step 1: Provision VM
             deployment["status"] = DeploymentStatus.PROVISIONING
             deployment["updated_at"] = datetime.utcnow().isoformat()
+            self._save_deployment_to_db(deployment)
             
             logger.info(f"Provisioning VM for deployment: {deployment_id}")
             
@@ -151,10 +211,12 @@ class DeploymentService:
             
             deployment["ip_address"] = vm_info["ip_address"]
             deployment["updated_at"] = datetime.utcnow().isoformat()
+            self._save_deployment_to_db(deployment)
             
             # Step 2: Deploy application
             deployment["status"] = DeploymentStatus.DEPLOYING
             deployment["updated_at"] = datetime.utcnow().isoformat()
+            self._save_deployment_to_db(deployment)
             
             logger.info(f"Deploying application for: {deployment_id}")
             
@@ -170,6 +232,7 @@ class DeploymentService:
             deployment["status"] = DeploymentStatus.RUNNING
             deployment["health_status"] = "healthy"
             deployment["updated_at"] = datetime.utcnow().isoformat()
+            self._save_deployment_to_db(deployment)
             
             logger.info(f"Deployment completed: {deployment_id}")
             
@@ -180,6 +243,7 @@ class DeploymentService:
                 deployment["status"] = DeploymentStatus.FAILED
                 deployment["error"] = str(e)
                 deployment["updated_at"] = datetime.utcnow().isoformat()
+                self._save_deployment_to_db(deployment)
     
     async def _deploy_application(
         self,
@@ -187,7 +251,7 @@ class DeploymentService:
         config: DeploymentConfig,
     ) -> None:
         """Deploy application to VM"""
-        deployment = self.deployments[deployment_id]
+        deployment = self._get_deployment_from_db(deployment_id)
         deployment["vm_name"]
         
         # Download company package from storage

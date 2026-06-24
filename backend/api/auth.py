@@ -2,6 +2,7 @@
 Authentication API endpoints
 """
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from backend.auth.jwt_handler import (
@@ -15,6 +16,7 @@ from backend.db.session import get_db
 
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
+security = HTTPBearer()
 
 
 class LoginRequest(BaseModel):
@@ -119,11 +121,24 @@ async def login(credentials: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/logout")
-async def logout(current_user: dict = Depends(get_current_user)):
+async def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    current_user: dict = Depends(get_current_user)
+):
     """
     Logout current user (revoke token)
     """
-    # TODO: Implement token revocation with Redis
+    from backend.auth.jwt_handler import revoke_token
+    
+    token = credentials.credentials
+    success = revoke_token(token)
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to revoke token"
+        )
+    
     return {"message": "Successfully logged out"}
 
 

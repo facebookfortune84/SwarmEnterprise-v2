@@ -66,13 +66,22 @@ class TestDeploymentService:
     
     @pytest.mark.asyncio
     async def test_create_deployment_stores_record(self, deployment_service, sample_config):
-        """Test that deployment is stored in service"""
+        """Test that deployment is stored in database and in-memory cache"""
         deployment = await deployment_service.create_deployment(sample_config)
         deployment_id = deployment["id"]
         
+        # Verify deployment was saved to in-memory cache
         assert deployment_id in deployment_service.deployments
         stored_deployment = deployment_service.deployments[deployment_id]
         assert stored_deployment["id"] == deployment_id
+        
+        # Verify deployment was also saved to database
+        if deployment_service.db:
+            from backend.db.models import Deployment
+            db_deployment = deployment_service.db.query(Deployment).filter_by(id=deployment_id).first()
+            assert db_deployment is not None
+            assert db_deployment.id == deployment_id
+            assert db_deployment.tenant_id == sample_config.company_id
     
     @pytest.mark.asyncio
     async def test_get_deployment_exists(self, deployment_service, sample_config):

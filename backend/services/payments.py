@@ -52,13 +52,37 @@ class PaymentService:
             logger.error(f"Failed to create subscription: {e}")
             return {"status": "error", "message": str(e)}
 
-    def cancel_hosting(self, project_id: str):
+    def cancel_hosting(self, project_id: str) -> Dict[str, Any]:
         """
         Cancels hosting subscription when a tenant is deleted.
+        
+        Args:
+            project_id: Project ID to cancel hosting for
+            
+        Returns:
+            Status dictionary with cancellation result
         """
-        # Logic to find subscription by metadata and cancel
-        logger.info(f"Canceling hosting for {project_id}...")
-        pass
+        try:
+            # Find subscription by project_id in metadata
+            subscriptions = stripe.Subscription.list(limit=100)
+            
+            for subscription in subscriptions.data:
+                if subscription.metadata.get("project_id") == project_id:
+                    # Cancel the subscription
+                    canceled_sub = stripe.Subscription.delete(subscription.id)
+                    logger.info(f"Canceled subscription {subscription.id} for project {project_id}")
+                    return {
+                        "status": "success",
+                        "subscription_id": subscription.id,
+                        "canceled_at": canceled_sub.canceled_at
+                    }
+            
+            logger.warning(f"No subscription found for project {project_id}")
+            return {"status": "not_found", "message": "No subscription found"}
+            
+        except Exception as e:
+            logger.error(f"Failed to cancel hosting for {project_id}: {e}")
+            return {"status": "error", "message": str(e)}
 
 # Global instance
 payment_service = PaymentService()

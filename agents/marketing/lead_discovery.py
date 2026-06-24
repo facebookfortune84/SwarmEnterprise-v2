@@ -72,7 +72,7 @@ class LeadDiscoveryAgent:
                     email=lead.get("email", "info@"+lead.get("company", "unknown").lower()+".com"),
                     name=lead.get("name"),
                     company=lead.get("company"),
-                    metadata_json=json.dumps(lead)
+                    metadata=lead
                 )
                 count += 1
             except Exception as e:

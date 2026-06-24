@@ -196,6 +196,26 @@ class LinearEngine:
             "created_at": r.created_at.isoformat() if r.created_at else None,
         }
 
+    def list_tickets(self, project_id: str = None, limit: int = 100):
+        """List tickets from the swarm backlog"""
+        query = self.db.query(Ticket).order_by(Ticket.created_at.desc())
+        if project_id:
+            query = query.filter(Ticket.project_id == project_id)
+        
+        rows = query.limit(limit).all()
+        return [
+            {
+                "id": r.id,
+                "project_id": r.project_id,
+                "department": r.department,
+                "title": r.title,
+                "instruction": r.instruction,
+                "status": r.status,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            }
+            for r in rows
+        ]
+
     def close(self):
         self.db.close()
 

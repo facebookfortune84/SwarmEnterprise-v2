@@ -64,7 +64,7 @@ async def get_current_active_user(
     current_user: dict = Depends(get_current_user)
 ) -> dict:
     """
-    Get current active user (can be extended to check user status in DB)
+    Get current active user and verify status in database
     
     Args:
         current_user: Current user from token
@@ -73,12 +73,26 @@ async def get_current_active_user(
         Active user data
         
     Raises:
-        HTTPException: If user is inactive
+        HTTPException: If user is inactive or not found
     """
-    # TODO: Check if user is active in database
-    # user = db.query(User).filter(User.id == current_user["id"]).first()
-    # if not user or not user.is_active:
-    #     raise HTTPException(status_code=400, detail="Inactive user")
+    from backend.db.session import SessionLocal
+    from backend.db.models import User
+    
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == current_user["id"]).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User account is inactive"
+            )
+    finally:
+        db.close()
     
     return current_user
 
@@ -204,10 +218,31 @@ def verify_api_key(api_key: str) -> bool:
     Returns:
         True if valid, False otherwise
     """
-    # TODO: Implement API key verification with database
-    # api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
-    # return api_key_record is not None and api_key_record.is_active
-    return False
+    from backend.db.session import SessionLocal
+    from backend.db.models import APIKey
+    from datetime import datetime
+    
+    db = SessionLocal()
+    try:
+        api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
+        
+        if not api_key_record:
+            return False
+        
+        if not api_key_record.is_active:
+            return False
+        
+        # Check expiration
+        if api_key_record.expires_at and api_key_record.expires_at < datetime.utcnow():
+            return False
+        
+        # Update last used timestamp
+        api_key_record.last_used_at = datetime.utcnow()
+        db.commit()
+        
+        return True
+    finally:
+        db.close()
 
 
 async def get_api_key(
@@ -241,16 +276,31 @@ async def verify_api_key_auth(
     Raises:
         HTTPException: If API key is invalid
     """
+    from backend.db.session import SessionLocal
+    from backend.db.models import APIKey
+    
     if not api_key or not verify_api_key(api_key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing API key"
         )
     
-    # TODO: Get API key owner from database
-    # api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
-    # return {"user_id": api_key_record.user_id, "scope": api_key_record.scope}
-    
-    return {"user_id": "api_user", "scope": "read:write"}
+    # Get API key owner from database
+    db = SessionLocal()
+    try:
+        api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
+        if not api_key_record:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid API key"
+            )
+        
+        return {
+            "user_id": api_key_record.user_id,
+            "scope": api_key_record.scope,
+            "api_key_id": api_key_record.id
+        }
+    finally:
+        db.close()
 
 # Made with Bob
