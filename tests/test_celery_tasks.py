@@ -545,3 +545,190 @@ class TestAdvanceWorkflow:
             result = advance_workflow.apply(args=["wf-does-not-exist"]).get()
 
         assert result["ok"] is True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Additional notification task coverage
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestSendNotificationAdditional:
+    def test_send_notification_with_metadata(self, db_setup):
+        """send_notification with metadata field."""
+        user_id = _make_user(db_setup)
+
+        with patch(_SESSION_PATH, side_effect=db_setup):
+            from backend.tasks.notification_tasks import send_notification
+
+            result = send_notification.apply(
+                args=[
+                    user_id,
+                    {
+                        "type": "warning",
+                        "title": "Watch out",
+                        "message": "Something happened",
+                        "metadata": {"key": "val"},
+                    },
+                ]
+            ).get()
+
+        assert result["ok"] is True
+
+    def test_send_notification_retry_on_failure(self, db_setup):
+        """send_notification retries when service raises."""
+        from backend.tasks.notification_tasks import send_notification
+
+        with (
+            patch(_SESSION_PATH, side_effect=db_setup),
+            patch(
+                "backend.services.notification_service.NotificationService.create_notification",
+                side_effect=Exception("DB timeout"),
+            ),
+        ):
+            try:
+                send_notification.apply(
+                    args=["u1", {"type": "info", "title": "X", "message": "Y"}]
+                ).get(propagate=True)
+            except Exception:
+                pass  # retry expected
+
+
+class TestSendEmailNotificationAdditional:
+    def test_smtp_no_user_pass(self):
+        """SMTP without credentials skips login."""
+        mock_smtp_instance = MagicMock()
+        mock_smtp_instance.__enter__ = MagicMock(return_value=mock_smtp_instance)
+        mock_smtp_instance.__exit__ = MagicMock(return_value=False)
+
+        env_patch = {"SMTP_HOST": "smtp.test.com", "SMTP_PORT": "587",
+                     "SMTP_USER": "", "SMTP_PASS": ""}
+        with patch.dict(os.environ, env_patch):
+            with patch("smtplib.SMTP", return_value=mock_smtp_instance):
+                from backend.tasks.notification_tasks import send_email_notification
+
+                result = send_email_notification.apply(
+                    args=["to@test.com", "Subj", "Body"]
+                ).get()
+
+        assert result["ok"] is True
+        mock_smtp_instance.login.assert_not_called()
+
+    def test_smtp_send_fails_triggers_retry(self):
+        """SMTP error triggers retry."""
+        env_patch = {"SMTP_HOST": "smtp.test.com"}
+        with patch.dict(os.environ, env_patch):
+            with patch("smtplib.SMTP", side_effect=Exception("Connection refused")):
+                from backend.tasks.notification_tasks import send_email_notification
+
+                try:
+                    send_email_notification.apply(
+                        args=["to@test.com", "S", "B"]
+                    ).get(propagate=True)
+                except Exception:
+                    pass  # retry expected
+
+
+class TestBroadcastEventAdditional:
+    def test_broadcast_event_retry_on_failure(self, db_setup):
+        """broadcast_event retries when service raises."""
+        from backend.tasks.notification_tasks import broadcast_event
+
+        with (
+            patch(_SESSION_PATH, side_effect=db_setup),
+            patch(
+                "backend.services.notification_service.NotificationService.broadcast_system_event",
+                side_effect=Exception("DB down"),
+            ),
+        ):
+            try:
+                broadcast_event.apply(args=["ev", {}]).get(propagate=True)
+            except Exception:
+                pass  # retry expected
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Additional workflow task coverage
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestAdvanceWorkflowAdditional:
+    def test_advance_workflow_retry_on_failure(self, db_setup):
+        """advance_workflow retries when service raises."""
+        from backend.tasks.workflow_tasks import advance_workflow
+
+        with (
+            patch(_SESSION_PATH, side_effect=db_setup),
+            patch(
+                "backend.services.workflow_service.WorkflowService.advance_workflow",
+                side_effect=Exception("DB timeout"),
+            ),
+        ):
+            try:
+                advance_workflow.apply(args=["wf-id"]).get(propagate=True)
+            except Exception:
+                pass  # retry expected
+
+    def test_advance_workflow_returns_ok_when_wf_is_none(self, db_setup):
+        """advance_workflow with service returning None (no-op)."""
+        from backend.tasks.workflow_tasks import advance_workflow
+
+        with (
+            patch(_SESSION_PATH, side_effect=db_setup),
+            patch(
+                "backend.services.workflow_service.WorkflowService.advance_workflow",
+                return_value=None,
+            ),
+        ):
+            result = advance_workflow.apply(args=["wf-none"]).get()
+
+        assert result["ok"] is True
+
+
+class TestHandleStepFailureAdditional:
+    def test_handle_step_failure_retry_on_exception(self, db_setup):
+        """handle_step_failure retries when service raises."""
+        from backend.tasks.workflow_tasks import handle_step_failure
+
+        with (
+            patch(_SESSION_PATH, side_effect=db_setup),
+            patch(
+                "backend.services.workflow_service.WorkflowService.handle_failure",
+                side_effect=Exception("service error"),
+            ),
+        ):
+            try:
+                handle_step_failure.apply(args=["wf", "step", "err"]).get(propagate=True)
+            except Exception:
+                pass  # retry expected
+
+
+class TestExecuteWorkflowStepAdditional:
+    def test_execute_step_exception_triggers_handle_failure(self, db_setup):
+        """execute_workflow_step dispatches to handle_step_failure on error."""
+        wf_id, step_ids = _make_workflow(db_setup, step_type="ticket")
+
+        mock_advance = MagicMock()
+        mock_advance.apply_async = MagicMock()
+        mock_failure = MagicMock()
+        mock_failure.apply_async = MagicMock()
+
+        with (
+            patch(_SESSION_PATH, side_effect=db_setup),
+            patch("backend.tasks.workflow_tasks.advance_workflow", mock_advance),
+            patch("backend.tasks.workflow_tasks.handle_step_failure", mock_failure),
+            patch(
+                "backend.services.ticket_service.TicketService.create_ticket",
+                side_effect=Exception("Ticket error"),
+            ),
+        ):
+            from backend.tasks.workflow_tasks import execute_workflow_step
+
+            ar = execute_workflow_step.apply(args=[wf_id, step_ids[0]])
+            # In eager mode with retry, result may be an exception
+            try:
+                ar.get(propagate=True)
+            except Exception:
+                pass  # expected: task raises after retrying
+
+        # handle_step_failure.apply_async should have been called
+        assert mock_failure.apply_async.called

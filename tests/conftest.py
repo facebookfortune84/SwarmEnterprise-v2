@@ -267,6 +267,15 @@ def reset_env():
     os.environ.update(original_env)
 
 
+@pytest.fixture(autouse=True)
+def clear_dependency_overrides():
+    """Clear FastAPI dependency_overrides after each test to prevent test pollution."""
+    yield
+    from backend.main import app
+
+    app.dependency_overrides.clear()
+
+
 # Pytest configuration
 def pytest_configure(config):
     """Configure pytest with custom markers"""

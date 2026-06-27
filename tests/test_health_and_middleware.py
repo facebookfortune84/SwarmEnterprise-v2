@@ -29,7 +29,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from backend.db.base import Base
-from backend.db.session import get_db
 from backend.main import app
 
 
@@ -129,8 +128,6 @@ class TestGlobalExceptionHandler:
     def test_unhandled_exception_returns_500_json(self):
         """Mount a route that raises to trigger the global handler."""
         from fastapi import FastAPI
-        from backend.auth.middleware import RateLimitMiddleware
-        from starlette.middleware.base import BaseHTTPMiddleware
         import contextlib
 
         @contextlib.asynccontextmanager

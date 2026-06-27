@@ -23,6 +23,9 @@ from backend.api.notifications import router as notifications_router
 from backend.api.tickets import router as tickets_router
 from backend.api.workflows import router as workflows_router
 from backend.api.ws import router as ws_router
+from backend.api.companies import router as companies_router
+from backend.api.deployments import router as deployments_router
+from backend.api.billing import router as billing_router
 from backend.metrics import get_metrics_response, track_request
 
 # ── Config validation (fail-fast on startup if required vars are missing) ──────
@@ -304,6 +307,9 @@ app.include_router(notifications_router)
 app.include_router(tickets_router)
 app.include_router(workflows_router)
 app.include_router(ws_router)
+app.include_router(companies_router)
+app.include_router(deployments_router)
+app.include_router(billing_router)
 
 # Leads API
 try:

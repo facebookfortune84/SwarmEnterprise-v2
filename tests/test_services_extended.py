@@ -29,7 +29,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from backend.db.base import Base
-from backend.db.models import Notification, Ticket, User
+from backend.db.models import Notification, User
 
 
 @pytest.fixture()
