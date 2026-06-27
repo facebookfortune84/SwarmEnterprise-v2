@@ -12,7 +12,7 @@ def create_test_company(
     user_id: Optional[str] = None,
     tech_stack: str = "fastapi-react-postgres",
     status: str = "pending",
-    **kwargs
+    **kwargs,
 ) -> Dict[str, Any]:
     """Create a test company object"""
     company_id = kwargs.get("id", str(uuid.uuid4()))
@@ -41,16 +41,13 @@ def create_completed_company(**kwargs) -> Dict[str, Any]:
         status="completed",
         generation_started_at=kwargs.get("generation_started_at", now.isoformat()),
         generation_completed_at=kwargs.get("generation_completed_at", now.isoformat()),
-        **kwargs
+        **kwargs,
     )
 
 
 def create_failed_company(**kwargs) -> Dict[str, Any]:
     """Create a test company with failed status"""
-    return create_test_company(
-        status="failed",
-        **kwargs
-    )
+    return create_test_company(status="failed", **kwargs)
 
 
 # Sample test companies

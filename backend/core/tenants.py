@@ -17,6 +17,7 @@ logger = logging.getLogger("tenants")
 
 class TenantService:
     def __init__(self, db: Optional[Session] = None):
+        self._owns_db = db is None  # track whether we created the session
         self.db = db or SessionLocal()
         self.deployer = BoxDeployer()
 
@@ -43,8 +44,8 @@ class TenantService:
             logger.error(f"Failed to register tenant: {e}")
             raise
         finally:
-            if not self.db: # Only close if we created it
-                 self.db.close()
+            if self._owns_db:  # Only close if we created the session
+                self.db.close()
 
     def list_tenants(self) -> List[CompanyTenant]:
         return self.db.query(CompanyTenant).order_by(CompanyTenant.created_at.desc()).all()
@@ -52,11 +53,73 @@ class TenantService:
     def get(self, tenant_id: str) -> Optional[CompanyTenant]:
         return self.db.query(CompanyTenant).filter_by(id=tenant_id).first()
 
+    def _deploy_docker_fallback(self, tenant: CompanyTenant) -> dict:
+        """
+        Docker-based fallback when BoxDeployer is unavailable.
+        Creates a named container for the tenant using the local Docker CLI.
+        """
+        import subprocess
+
+        container_name = f"tenant-{tenant.slug}"
+        image = os.getenv("DEPLOY_DOCKER_IMAGE", "nginx:alpine")
+        try:
+            result = subprocess.run(
+                [
+                    "docker",
+                    "run",
+                    "-d",
+                    "--name",
+                    container_name,
+                    "--restart",
+                    "unless-stopped",
+                    "-l",
+                    f"swarm.tenant_id={tenant.id}",
+                    "-l",
+                    f"swarm.slug={tenant.slug}",
+                    image,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            if result.returncode == 0:
+                container_id = result.stdout.strip()
+                logger.info(
+                    f"Fallback Docker container created: {container_name} ({container_id[:12]})"
+                )
+                return {
+                    "status": "running",
+                    "container_id": container_id[:12],
+                    "box_url": tenant.box_url,
+                }
+            # Container may already exist — try starting it
+            start = subprocess.run(
+                ["docker", "start", container_name],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if start.returncode == 0:
+                # Get the container ID
+                inspect = subprocess.run(
+                    ["docker", "inspect", "--format", "{{.Id}}", container_name],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+                cid = inspect.stdout.strip()[:12] if inspect.returncode == 0 else container_name
+                return {"status": "running", "container_id": cid, "box_url": tenant.box_url}
+            return {"status": "failed", "error": result.stderr.strip() or start.stderr.strip()}
+        except FileNotFoundError:
+            return {"status": "failed", "error": "Docker CLI not available"}
+        except subprocess.TimeoutExpired:
+            return {"status": "failed", "error": "Docker command timed out"}
+
     def provision(self, tenant_id: str, use_vm: bool = False) -> CompanyTenant:
         tenant = self.get(tenant_id)
         if not tenant:
             raise ValueError("tenant not found")
-            
+
         tenant.status = "provisioning"
         self.db.commit()
 
@@ -65,7 +128,14 @@ class TenantService:
             if use_vm:
                 vm_result = self.deployer.provision_hyperv_vm(tenant.id, f"r2r-{tenant.slug}")
 
-            deploy = self.deployer.deploy_docker_box(tenant.slug, tenant.id)
+            try:
+                deploy = self.deployer.deploy_docker_box(tenant.slug, tenant.id)
+            except Exception as deployer_exc:
+                logger.warning(
+                    f"BoxDeployer.deploy_docker_box failed ({deployer_exc}); using Docker fallback"
+                )
+                deploy = self._deploy_docker_fallback(tenant)
+
             if deploy.get("status") == "running":
                 tenant.status = "running"
                 tenant.container_id = deploy.get("container_id")
@@ -90,14 +160,14 @@ class TenantService:
         tenant = self.get(tenant_id)
         if not tenant:
             return None
-            
+
         docker_status = self.deployer.box_status(tenant.slug)
         if docker_status.get("status") == "running":
             tenant.status = "running"
         elif docker_status.get("status") in ("exited", "dead"):
             tenant.status = "failed"
             tenant.last_error = f"container {docker_status.get('status')}"
-            
+
         self.db.commit()
         self.db.refresh(tenant)
         return tenant

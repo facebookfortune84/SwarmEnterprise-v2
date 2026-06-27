@@ -15,22 +15,18 @@ DOC_MOVES = {
     # Keep in root (essential)
     "README.md": None,
     "IMPLEMENTATION_COMPLETE.md": None,  # Latest comprehensive summary
-    
     # Move to docs/architecture
     "ARCHITECTURE.md": "docs/architecture/",
     "MASTER_PLAN.md": "docs/architecture/",
     "SELF_HOSTED_ARCHITECTURE.md": "docs/architecture/",
-    
     # Move to docs/guides
     "DEPLOYMENT_GUIDE.md": "docs/guides/",
     "QUICKSTART.md": "docs/guides/",
     "IMPLEMENTATION_ROADMAP.md": "docs/guides/",
-    
     # Move to docs/phases (historical)
     "PHASE_8_COMPLETE.md": "docs/phases/",
     "PHASE_9_SELF_HEALING.md": "docs/phases/",
     "PHASE3_COMPLETION_SUMMARY.md": "docs/phases/",
-    
     # Remove (duplicates/obsolete)
     "PROJECT_STATUS_FINAL.md": "DELETE",
     "FINAL_IMPLEMENTATION_SUMMARY.md": "DELETE",
@@ -50,16 +46,17 @@ FILES_TO_REMOVE = [
     "swarm_complete.yaml",  # Old config
 ]
 
+
 def cleanup_documentation():
     """Organize and clean up documentation files"""
     print("Organizing documentation...")
-    
+
     for filename, destination in DOC_MOVES.items():
         source = PROJECT_ROOT / filename
-        
+
         if not source.exists():
             continue
-        
+
         if destination == "DELETE":
             print(f"  Removing: {filename}")
             source.unlink()
@@ -71,20 +68,22 @@ def cleanup_documentation():
         else:
             print(f"  Keeping in root: {filename}")
 
+
 def cleanup_temp_files():
     """Remove temporary and obsolete files"""
     print("\nCleaning up temporary files...")
-    
+
     for filename in FILES_TO_REMOVE:
         filepath = PROJECT_ROOT / filename
         if filepath.exists():
             print(f"  Removing: {filename}")
             filepath.unlink()
 
+
 def create_docs_index():
     """Create index file for documentation"""
     print("\nCreating documentation index...")
-    
+
     index_content = """# SwarmEnterprise v2 Documentation
 
 ## 📖 Quick Links
@@ -117,17 +116,18 @@ def create_docs_index():
 
 See [IMPLEMENTATION_COMPLETE.md](../IMPLEMENTATION_COMPLETE.md) for full details.
 """
-    
+
     index_path = PROJECT_ROOT / "docs" / "INDEX.md"
-    with open(index_path, 'w', encoding='utf-8') as f:
+    with open(index_path, "w", encoding="utf-8") as f:
         f.write(index_content)
-    
+
     print("  Created: docs/INDEX.md")
+
 
 def update_readme():
     """Update README with new documentation structure"""
     print("\nUpdating README...")
-    
+
     readme_content = """# SwarmEnterprise v2
 
 **Autonomous Digital Factory Platform**
@@ -245,22 +245,23 @@ Built with ❤️ using Claude AI
 **Agents:** 16 operational  
 **Documentation:** Complete
 """
-    
+
     readme_path = PROJECT_ROOT / "README.md"
-    with open(readme_path, 'w', encoding='utf-8') as f:
+    with open(readme_path, "w", encoding="utf-8") as f:
         f.write(readme_content)
-    
+
     print("  Updated: README.md")
+
 
 def main():
     """Main cleanup function"""
     print("Starting project cleanup and organization...\n")
-    
+
     cleanup_documentation()
     cleanup_temp_files()
     create_docs_index()
     update_readme()
-    
+
     print("\nCleanup complete!")
     print("\nNew structure:")
     print("  |- README.md (updated)")
@@ -270,6 +271,7 @@ def main():
     print("      |- architecture/ (system design)")
     print("      |- guides/ (how-to guides)")
     print("      |- phases/ (historical summaries)")
+
 
 if __name__ == "__main__":
     main()

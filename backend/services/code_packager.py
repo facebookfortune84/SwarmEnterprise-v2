@@ -16,18 +16,18 @@ logger = logging.getLogger(__name__)
 class CodePackager:
     """
     Service for packaging generated code into distributable archives
-    
+
     Creates ZIP files with:
     - Generated source code
     - README with instructions
     - Deployment scripts
     - Metadata file
     """
-    
+
     def __init__(self, output_dir: Optional[str] = None):
         """
         Initialize code packager
-        
+
         Args:
             output_dir: Directory for output packages
         """
@@ -35,66 +35,63 @@ class CodePackager:
             # Default to output directory
             base_dir = Path(__file__).parent.parent.parent
             output_dir = str(base_dir / "output")
-        
+
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
-    
+
     def create_archive(
-        self,
-        company_id: str,
-        files: Dict[str, str],
-        metadata: Dict[str, Any]
+        self, company_id: str, files: Dict[str, str], metadata: Dict[str, Any]
     ) -> str:
         """
         Create a ZIP archive of generated code
-        
+
         Args:
             company_id: Company ID
             files: Dictionary mapping file paths to content
             metadata: Company metadata
-            
+
         Returns:
             Path to created archive
         """
         archive_name = f"{company_id}.zip"
         archive_path = os.path.join(self.output_dir, archive_name)
-        
+
         try:
-            with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                 # Add all generated files
                 for file_path, content in files.items():
                     zipf.writestr(file_path, content)
-                
+
                 # Add README
                 readme = self._generate_readme(metadata)
                 zipf.writestr("README.md", readme)
-                
+
                 # Add deployment script
                 deploy_script = self._generate_deploy_script(metadata)
                 zipf.writestr("deploy.sh", deploy_script)
-                
+
                 # Add metadata file
                 metadata_json = json.dumps(metadata, indent=2)
                 zipf.writestr("metadata.json", metadata_json)
-                
+
                 # Add .env.example
                 env_example = self._generate_env_example(metadata)
                 zipf.writestr(".env.example", env_example)
-            
+
             logger.info(f"Created archive: {archive_path}")
             return archive_path
-            
+
         except Exception as e:
             logger.error(f"Failed to create archive: {str(e)}")
             raise
-    
+
     def _generate_readme(self, metadata: Dict[str, Any]) -> str:
         """
         Generate README.md content
-        
+
         Args:
             metadata: Company metadata
-            
+
         Returns:
             README content
         """
@@ -102,7 +99,7 @@ class CodePackager:
         description = metadata.get("description", "")
         tech_stack = metadata.get("tech_stack", "")
         features = metadata.get("features", [])
-        
+
         readme = f"""# {company_name}
 
 {description}
@@ -191,14 +188,14 @@ Generated on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
 For support, visit: https://realms2riches.com
 """
         return readme
-    
+
     def _generate_deploy_script(self, metadata: Dict[str, Any]) -> str:
         """
         Generate deployment script
-        
+
         Args:
             metadata: Company metadata
-            
+
         Returns:
             Deployment script content
         """
@@ -262,19 +259,19 @@ else
 fi
 """
         return script
-    
+
     def _generate_env_example(self, metadata: Dict[str, Any]) -> str:
         """
         Generate .env.example file
-        
+
         Args:
             metadata: Company metadata
-            
+
         Returns:
             Environment variables example
         """
         tech_stack = metadata.get("tech_stack", "")
-        
+
         env_vars = """# Environment Configuration
 # Copy this file to .env and update with your values
 
@@ -301,113 +298,114 @@ JWT_SECRET_KEY=your-jwt-secret-key
 # External Services
 # Add your API keys here
 """
-        
+
         # Add tech-stack specific variables
         if "postgres" in tech_stack.lower():
             env_vars += "\n# PostgreSQL specific\nPOSTGRES_VERSION=15\n"
-        
+
         if "mongo" in tech_stack.lower():
             env_vars += "\n# MongoDB specific\nMONGO_URL=mongodb://localhost:27017/mydb\n"
-        
+
         if "react" in tech_stack.lower():
             env_vars += "\n# React Frontend\nREACT_APP_API_URL=http://localhost:8000\n"
-        
+
         return env_vars
-    
+
     def extract_archive(self, archive_path: str, extract_dir: str) -> List[str]:
         """
         Extract a ZIP archive
-        
+
         Args:
             archive_path: Path to ZIP file
             extract_dir: Directory to extract to
-            
+
         Returns:
             List of extracted file paths
         """
         try:
             os.makedirs(extract_dir, exist_ok=True)
-            
-            with zipfile.ZipFile(archive_path, 'r') as zipf:
+
+            with zipfile.ZipFile(archive_path, "r") as zipf:
                 zipf.extractall(extract_dir)
                 extracted_files = zipf.namelist()
-            
+
             logger.info(f"Extracted {len(extracted_files)} files to {extract_dir}")
             return extracted_files
-            
+
         except Exception as e:
             logger.error(f"Failed to extract archive: {str(e)}")
             raise
-    
+
     def validate_archive(self, archive_path: str) -> bool:
         """
         Validate that an archive is properly formatted
-        
+
         Args:
             archive_path: Path to ZIP file
-            
+
         Returns:
             True if valid, False otherwise
         """
         try:
             required_files = ["README.md", "metadata.json"]
-            
-            with zipfile.ZipFile(archive_path, 'r') as zipf:
+
+            with zipfile.ZipFile(archive_path, "r") as zipf:
                 file_list = zipf.namelist()
-                
+
                 # Check for required files
                 for required_file in required_files:
                     if required_file not in file_list:
                         logger.error(f"Missing required file: {required_file}")
                         return False
-                
+
                 # Validate metadata
                 metadata_content = zipf.read("metadata.json")
                 metadata = json.loads(metadata_content)
-                
+
                 if "name" not in metadata:
                     logger.error("Invalid metadata: missing 'name' field")
                     return False
-            
+
             logger.info(f"Archive validation passed: {archive_path}")
             return True
-            
+
         except Exception as e:
             logger.error(f"Archive validation failed: {str(e)}")
             return False
-    
+
     def get_archive_info(self, archive_path: str) -> Dict[str, Any]:
         """
         Get information about an archive
-        
+
         Args:
             archive_path: Path to ZIP file
-            
+
         Returns:
             Archive information dictionary
         """
         try:
-            with zipfile.ZipFile(archive_path, 'r') as zipf:
+            with zipfile.ZipFile(archive_path, "r") as zipf:
                 # Get metadata
                 metadata_content = zipf.read("metadata.json")
                 metadata = json.loads(metadata_content)
-                
+
                 # Get file list
                 file_list = zipf.namelist()
-                
+
                 # Get archive size
                 archive_size = os.path.getsize(archive_path)
-                
+
                 return {
                     "metadata": metadata,
                     "file_count": len(file_list),
                     "files": file_list,
                     "size_bytes": archive_size,
-                    "size_mb": round(archive_size / (1024 * 1024), 2)
+                    "size_mb": round(archive_size / (1024 * 1024), 2),
                 }
-                
+
         except Exception as e:
             logger.error(f"Failed to get archive info: {str(e)}")
             raise
+
 
 # Made with Bob

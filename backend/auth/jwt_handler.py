@@ -11,9 +11,7 @@ try:
     import jwt
     from jwt import InvalidTokenError
 except ImportError:
-    raise ImportError(
-        "PyJWT is required. Install it with: pip install PyJWT"
-    )
+    raise ImportError("PyJWT is required. Install it with: pip install PyJWT")
 
 logger = logging.getLogger(__name__)
 
@@ -28,29 +26,23 @@ redis_client = redis.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", 6379)),
     db=0,
-    decode_responses=True
+    decode_responses=True,
 )
 
-def create_access_token(
-    data: Dict[str, Any],
-    expires_delta: Optional[timedelta] = None
-) -> str:
+
+def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """
     Create a JWT access token
     """
     to_encode = data.copy()
-    
+
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    to_encode.update({
-        "exp": expire,
-        "iat": datetime.now(timezone.utc),
-        "type": "access"
-    })
-    
+
+    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc), "type": "access"})
+
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -60,13 +52,9 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
     """
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    
-    to_encode.update({
-        "exp": expire,
-        "iat": datetime.now(timezone.utc),
-        "type": "refresh"
-    })
-    
+
+    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc), "type": "refresh"})
+
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -76,7 +64,7 @@ def verify_token(token: str) -> bool:
     """
     if is_token_revoked(token):
         return False
-        
+
     try:
         jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return True
@@ -102,12 +90,12 @@ def revoke_token(token: str) -> bool:
         payload = decode_token(token)
         if not payload:
             return False
-        
+
         # Calculate TTL until token expiry
         exp = payload.get("exp")
         if not exp:
             return False
-            
+
         ttl = int(exp - datetime.now(timezone.utc).timestamp())
         if ttl > 0:
             redis_client.setex(f"revoked:{token}", ttl, "1")
@@ -119,11 +107,18 @@ def revoke_token(token: str) -> bool:
 
 def is_token_revoked(token: str) -> bool:
     """
-    Check if a token has been revoked
+    Check if a token has been revoked.
+
+    On Redis failure, degrades gracefully by treating the token as NOT revoked
+    (fail-open), so a Redis outage does not lock out all authenticated users.
+    The error is logged so operators can detect Redis connectivity issues.
     """
     try:
         return redis_client.exists(f"revoked:{token}") > 0
-    except Exception:
+    except Exception as e:
+        logger.error(
+            "Redis unavailable while checking token revocation; treating token as valid: %s", e
+        )
         return False
 
 
@@ -133,16 +128,16 @@ def refresh_access_token(refresh_token: str) -> Optional[str]:
     """
     if is_token_revoked(refresh_token):
         return None
-        
+
     payload = decode_token(refresh_token)
-    
+
     if not payload or payload.get("type") != "refresh":
         return None
-    
+
     user_data = {
         "sub": payload.get("sub"),
         "email": payload.get("email"),
-        "role": payload.get("role")
+        "role": payload.get("role"),
     }
-    
+
     return create_access_token(user_data)

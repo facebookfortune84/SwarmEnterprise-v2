@@ -15,9 +15,8 @@ MOCK_LLM_RESPONSES = {
 3. Implement JWT authentication
 4. Set up Docker deployment
 
-I'll create tickets for the development team."""
+I'll create tickets for the development team.""",
     },
-    
     "ticket_generation": {
         "role": "assistant",
         "content": """[
@@ -35,9 +34,8 @@ I'll create tickets for the development team."""
         "title": "Set up database models",
         "instruction": "Create SQLAlchemy models for users, companies, and deployments"
     }
-]"""
+]""",
     },
-    
     "code_generation": {
         "role": "assistant",
         "content": """```python
@@ -54,9 +52,8 @@ class User(BaseModel):
 async def register(user: User):
     # Implementation here
     return {"message": "User registered successfully"}
-```"""
+```""",
     },
-    
     "code_review": {
         "role": "assistant",
         "content": """Code review feedback:
@@ -71,32 +68,26 @@ async def register(user: User):
 - Include docstrings
 - Add unit tests
 
-Overall: APPROVED with minor suggestions"""
-    }
+Overall: APPROVED with minor suggestions""",
+    },
 }
 
 
 # Mock Stripe API responses
 MOCK_STRIPE_RESPONSES = {
-    "create_customer": {
-        "id": "cus_test123",
-        "email": "test@example.com",
-        "created": 1234567890
-    },
-    
+    "create_customer": {"id": "cus_test123", "email": "test@example.com", "created": 1234567890},
     "create_subscription": {
         "id": "sub_test123",
         "customer": "cus_test123",
         "status": "active",
         "current_period_start": 1234567890,
-        "current_period_end": 1237159890
+        "current_period_end": 1237159890,
     },
-    
     "create_checkout_session": {
         "id": "cs_test123",
         "url": "https://checkout.stripe.com/test123",
-        "payment_status": "unpaid"
-    }
+        "payment_status": "unpaid",
+    },
 }
 
 
@@ -107,47 +98,31 @@ MOCK_GITHUB_RESPONSES = {
         "number": 123,
         "title": "Test Issue",
         "state": "open",
-        "html_url": "https://github.com/test/repo/issues/123"
+        "html_url": "https://github.com/test/repo/issues/123",
     },
-    
     "create_pr": {
         "id": 1,
         "number": 456,
         "title": "Test PR",
         "state": "open",
-        "html_url": "https://github.com/test/repo/pull/456"
-    }
+        "html_url": "https://github.com/test/repo/pull/456",
+    },
 }
 
 
 # Mock health check responses
 MOCK_HEALTH_RESPONSES = {
-    "healthy": {
-        "status": "healthy",
-        "checks": {
-            "database": "ok",
-            "redis": "ok",
-            "storage": "ok"
-        }
-    },
-    
+    "healthy": {"status": "healthy", "checks": {"database": "ok", "redis": "ok", "storage": "ok"}},
     "unhealthy": {
         "status": "unhealthy",
-        "checks": {
-            "database": "ok",
-            "redis": "failed",
-            "storage": "ok"
-        }
-    }
+        "checks": {"database": "ok", "redis": "failed", "storage": "ok"},
+    },
 }
 
 
 def get_mock_llm_response(prompt_type: str) -> Dict[str, Any]:
     """Get a mock LLM response for testing"""
-    return MOCK_LLM_RESPONSES.get(prompt_type, {
-        "role": "assistant",
-        "content": "Mock response"
-    })
+    return MOCK_LLM_RESPONSES.get(prompt_type, {"role": "assistant", "content": "Mock response"})
 
 
 def get_mock_api_response(service: str, endpoint: str) -> Dict[str, Any]:
@@ -155,8 +130,9 @@ def get_mock_api_response(service: str, endpoint: str) -> Dict[str, Any]:
     responses = {
         "stripe": MOCK_STRIPE_RESPONSES,
         "github": MOCK_GITHUB_RESPONSES,
-        "health": MOCK_HEALTH_RESPONSES
+        "health": MOCK_HEALTH_RESPONSES,
     }
     return responses.get(service, {}).get(endpoint, {})
+
 
 # Made with Bob

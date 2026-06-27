@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 class IssueStatus(str, Enum):
     """Linear issue status"""
+
     BACKLOG = "backlog"
     TODO = "todo"
     IN_PROGRESS = "in_progress"
@@ -34,6 +35,7 @@ class IssueStatus(str, Enum):
 
 class IssuePriority(str, Enum):
     """Linear issue priority"""
+
     URGENT = "urgent"
     HIGH = "high"
     MEDIUM = "medium"
@@ -44,6 +46,7 @@ class IssuePriority(str, Enum):
 @dataclass
 class LinearIssue:
     """Linear issue"""
+
     id: str
     title: str
     description: Optional[str]
@@ -61,7 +64,7 @@ class LinearIssue:
 class LinearIntegration:
     """
     Autonomous Linear integration agent.
-    
+
     Capabilities:
     - Issue creation and management
     - Project synchronization
@@ -71,7 +74,7 @@ class LinearIntegration:
     - AI-powered issue descriptions
     - Automated issue updates
     """
-    
+
     def __init__(
         self,
         api_key: str,
@@ -87,9 +90,9 @@ class LinearIntegration:
             },
             timeout=30.0,
         )
-        
+
         logger.info("Linear Integration initialized")
-    
+
     async def create_issue(
         self,
         team_id: str,
@@ -102,11 +105,11 @@ class LinearIntegration:
     ) -> LinearIssue:
         """Create a new Linear issue"""
         logger.info(f"Creating Linear issue: {title}")
-        
+
         # Generate description if not provided
         if not description:
             description = await self._generate_description(title)
-        
+
         # GraphQL mutation
         mutation = """
         mutation IssueCreate($input: IssueCreateInput!) {
@@ -141,7 +144,7 @@ class LinearIntegration:
             }
         }
         """
-        
+
         variables = {
             "input": {
                 "teamId": team_id,
@@ -150,22 +153,22 @@ class LinearIntegration:
                 "priority": self._priority_to_number(priority),
             }
         }
-        
+
         if assignee_id:
             variables["input"]["assigneeId"] = assignee_id
         if project_id:
             variables["input"]["projectId"] = project_id
         if labels:
             variables["input"]["labelIds"] = labels
-        
+
         response = await self._execute_query(mutation, variables)
-        
+
         if response.get("data", {}).get("issueCreate", {}).get("success"):
             issue_data = response["data"]["issueCreate"]["issue"]
             return self._parse_issue(issue_data)
         else:
             raise Exception(f"Failed to create issue: {response}")
-    
+
     async def update_issue(
         self,
         issue_id: str,
@@ -177,7 +180,7 @@ class LinearIntegration:
     ) -> LinearIssue:
         """Update an existing Linear issue"""
         logger.info(f"Updating Linear issue: {issue_id}")
-        
+
         mutation = """
         mutation IssueUpdate($id: String!, $input: IssueUpdateInput!) {
             issueUpdate(id: $id, input: $input) {
@@ -211,12 +214,9 @@ class LinearIntegration:
             }
         }
         """
-        
-        variables = {
-            "id": issue_id,
-            "input": {}
-        }
-        
+
+        variables = {"id": issue_id, "input": {}}
+
         if title:
             variables["input"]["title"] = title
         if description:
@@ -227,15 +227,15 @@ class LinearIntegration:
             variables["input"]["priority"] = self._priority_to_number(priority)
         if assignee_id:
             variables["input"]["assigneeId"] = assignee_id
-        
+
         response = await self._execute_query(mutation, variables)
-        
+
         if response.get("data", {}).get("issueUpdate", {}).get("success"):
             issue_data = response["data"]["issueUpdate"]["issue"]
             return self._parse_issue(issue_data)
         else:
             raise Exception(f"Failed to update issue: {response}")
-    
+
     async def get_issue(self, issue_id: str) -> LinearIssue:
         """Get a Linear issue by ID"""
         query = """
@@ -268,15 +268,15 @@ class LinearIntegration:
             }
         }
         """
-        
+
         response = await self._execute_query(query, {"id": issue_id})
         issue_data = response.get("data", {}).get("issue")
-        
+
         if issue_data:
             return self._parse_issue(issue_data)
         else:
             raise Exception(f"Issue not found: {issue_id}")
-    
+
     async def list_issues(
         self,
         team_id: str,
@@ -317,22 +317,19 @@ class LinearIntegration:
             }
         }
         """
-        
+
         filter_obj = {"team": {"id": {"eq": team_id}}}
-        
+
         if status:
             filter_obj["state"] = {"name": {"eq": status.value}}
         if assignee_id:
             filter_obj["assignee"] = {"id": {"eq": assignee_id}}
-        
-        response = await self._execute_query(
-            query,
-            {"filter": filter_obj, "first": limit}
-        )
-        
+
+        response = await self._execute_query(query, {"filter": filter_obj, "first": limit})
+
         issues_data = response.get("data", {}).get("issues", {}).get("nodes", [])
         return [self._parse_issue(issue) for issue in issues_data]
-    
+
     async def add_comment(
         self,
         issue_id: str,
@@ -351,17 +348,17 @@ class LinearIntegration:
             }
         }
         """
-        
+
         variables = {
             "input": {
                 "issueId": issue_id,
                 "body": body,
             }
         }
-        
+
         response = await self._execute_query(mutation, variables)
         return response.get("data", {}).get("commentCreate", {})
-    
+
     async def _execute_query(
         self,
         query: str,
@@ -370,15 +367,14 @@ class LinearIntegration:
         """Execute GraphQL query"""
         try:
             response = await self.client.post(
-                self.base_url,
-                json={"query": query, "variables": variables or {}}
+                self.base_url, json={"query": query, "variables": variables or {}}
             )
             response.raise_for_status()
             return response.json()
         except Exception as e:
             logger.error(f"Linear API error: {e}")
             raise
-    
+
     def _parse_issue(self, data: Dict[str, Any]) -> LinearIssue:
         """Parse Linear issue from API response"""
         return LinearIssue(
@@ -395,7 +391,7 @@ class LinearIntegration:
             updated_at=datetime.fromisoformat(data["updatedAt"].replace("Z", "+00:00")),
             url=data["url"],
         )
-    
+
     def _priority_to_number(self, priority: IssuePriority) -> int:
         """Convert priority enum to Linear priority number"""
         mapping = {
@@ -406,7 +402,7 @@ class LinearIntegration:
             IssuePriority.NO_PRIORITY: 0,
         }
         return mapping.get(priority, 0)
-    
+
     def _number_to_priority(self, number: int) -> IssuePriority:
         """Convert Linear priority number to priority enum"""
         mapping = {
@@ -417,12 +413,12 @@ class LinearIntegration:
             0: IssuePriority.NO_PRIORITY,
         }
         return mapping.get(number, IssuePriority.NO_PRIORITY)
-    
+
     async def _get_state_id(self, status: IssueStatus) -> str:
         """Get Linear state ID for status"""
         # TODO: Implement state ID lookup
         return "state-id"
-    
+
     async def _generate_description(self, title: str) -> str:
         """Generate AI-powered issue description"""
         prompt = f"""
@@ -438,17 +434,17 @@ class LinearIntegration:
         
         Keep it professional and actionable.
         """
-        
+
         description = await self.ollama.generate(
-            prompt,
-            system="You are a technical project manager writing issue descriptions."
+            prompt, system="You are a technical project manager writing issue descriptions."
         )
-        
+
         return description.strip()
-    
+
     async def cleanup(self) -> None:
         """Cleanup resources"""
         await self.client.aclose()
         await self.ollama.close()
+
 
 # Made with Bob

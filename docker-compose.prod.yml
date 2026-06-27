@@ -1,0 +1,311 @@
+# SwarmEnterprise v2 — docker-compose.prod.yml
+# Production-hardened overlay: resource limits, restart policies,
+# named volumes, log rotation, network isolation, health checks.
+# RWV Techsolutions LLC · robertdemottojr50@gmail.com
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#     --profile postgres --profile proxy --profile workers up -d
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Backend — FastAPI application
+  # ---------------------------------------------------------------------------
+  backend:
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DEPLOY_PROFILE=production
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    networks:
+      - frontend
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1536m
+          cpus: "1.5"
+        reservations:
+          memory: 512m
+          cpus: "0.5"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Worker — Celery task worker
+  # ---------------------------------------------------------------------------
+  worker:
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DEPLOY_PROFILE=production
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+          cpus: "1.0"
+        reservations:
+          memory: 256m
+          cpus: "0.25"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import celery; print('ok')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    profiles:
+      - workers
+
+  # ---------------------------------------------------------------------------
+  # Beat — Celery periodic-task scheduler
+  # ---------------------------------------------------------------------------
+  beat:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: swarmOS-beat
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: ["celery", "-A", "backend.celery_app", "beat", "--loglevel=info", "--scheduler=celery.beat:PersistentScheduler"]
+    environment:
+      - SWARM_REPO_ROOT=/app
+      - PYTHONPATH=/app
+      - DEPLOY_PROFILE=production
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.25"
+        reservations:
+          memory: 64m
+          cpus: "0.05"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      redis:
+        condition: service_healthy
+    profiles:
+      - workers
+
+  # ---------------------------------------------------------------------------
+  # Redis 7 — message broker + cache with AOF persistence
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: swarmOS-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 640m
+          cpus: "0.5"
+        reservations:
+          memory: 64m
+          cpus: "0.05"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ---------------------------------------------------------------------------
+  # Postgres 16 — primary relational database
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: swarmOS-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-swarm}
+      POSTGRES_USER:     ${POSTGRES_USER:-swarm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+          cpus: "1.0"
+        reservations:
+          memory: 256m
+          cpus: "0.25"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-swarm} -d ${POSTGRES_DB:-swarm}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    profiles:
+      - postgres
+
+  # ---------------------------------------------------------------------------
+  # Caddy — reverse proxy with automatic HTTPS
+  # ---------------------------------------------------------------------------
+  caddy:
+    image: caddy:2-alpine
+    container_name: swarmOS-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - PRIMARY_DOMAIN=${PRIMARY_DOMAIN:-localhost}
+      - API_DOMAIN=${API_DOMAIN:-localhost}
+      - ACME_EMAIL=${ACME_EMAIL:-ops@example.com}
+    networks:
+      - frontend
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.5"
+        reservations:
+          memory: 32m
+          cpus: "0.05"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles:
+      - proxy
+
+  # ---------------------------------------------------------------------------
+  # Flower — Celery monitoring UI
+  # ---------------------------------------------------------------------------
+  flower:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: swarmOS-flower
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - celery
+      - -A
+      - backend.celery_app
+      - flower
+      - --port=5555
+      - --url_prefix=flower
+      - --basic_auth=${FLOWER_USER:-admin}:${FLOWER_PASSWORD:-changeme}
+    ports:
+      - "5555:5555"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.25"
+        reservations:
+          memory: 64m
+          cpus: "0.05"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555/flower/healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      redis:
+        condition: service_healthy
+    profiles:
+      - workers
+
+# ---------------------------------------------------------------------------
+# Networks — frontend exposed to internet; backend internal only
+# ---------------------------------------------------------------------------
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+# ---------------------------------------------------------------------------
+# Volumes — named (no bind mounts for persistent data)
+# ---------------------------------------------------------------------------
+volumes:
+  pg_data:
+    driver: local
+  redis_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local

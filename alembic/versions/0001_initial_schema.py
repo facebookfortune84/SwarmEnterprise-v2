@@ -75,9 +75,7 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_company_tenants_slug"), "company_tenants", ["slug"], unique=True
-    )
+    op.create_index(op.f("ix_company_tenants_slug"), "company_tenants", ["slug"], unique=True)
     op.create_index(
         op.f("ix_company_tenants_subdomain"),
         "company_tenants",
@@ -99,9 +97,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["company_tenants.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_deployments_tenant_id"), "deployments", ["tenant_id"], unique=False
-    )
+    op.create_index(op.f("ix_deployments_tenant_id"), "deployments", ["tenant_id"], unique=False)
 
     # 5. tickets (no FK dependencies)
     op.create_table(
@@ -115,9 +111,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_tickets_project_id"), "tickets", ["project_id"], unique=False
-    )
+    op.create_index(op.f("ix_tickets_project_id"), "tickets", ["project_id"], unique=False)
 
     # 6. projects (no FK dependencies)
     op.create_table(

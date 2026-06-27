@@ -97,16 +97,46 @@ async def create_invoice(payload: InvoicePayload):
     except Exception as exc:
         logger.exception("Failed to record usage event: %s", exc)
 
-    # Email invoice (best effort)
+    # Email invoice (best effort) — track delivery outcome
+    email_delivered = False
+    email_error: str | None = None
     try:
         emailer = EmailTools()
         subject = f"Invoice {invoice_id} from SwarmOS"
-        body = f"<p>Your invoice is ready: {filename.name}</p>"
+        body = (
+            f"<p>Dear {payload.customer_email},</p>"
+            f"<p>Your invoice <strong>{invoice_id}</strong> for "
+            f"${payload.amount_cents / 100:.2f} is ready.</p>"
+            f"<p>{payload.description or ''}</p>"
+            "<p>Thank you for using SwarmOS.</p>"
+        )
         emailer.send_email(payload.customer_email, subject, body)
+        email_delivered = True
+        logger.info("Invoice email sent to %s for invoice %s", payload.customer_email, invoice_id)
     except Exception as exc:
+        email_error = str(exc)
         logger.exception("Failed to send invoice email: %s", exc)
 
-    return {"invoice_id": invoice_id, "path": str(filename)}
+    # Record email delivery status
+    try:
+        db.record_usage(
+            payload.project_id,
+            event_type="invoice_email_sent" if email_delivered else "invoice_email_failed",
+            amount=None,
+            metadata={
+                "invoice_id": invoice_id,
+                "recipient": payload.customer_email,
+                "error": email_error,
+            },
+        )
+    except Exception as exc:
+        logger.exception("Failed to record email delivery event: %s", exc)
+
+    return {
+        "invoice_id": invoice_id,
+        "path": str(filename),
+        "email_delivered": email_delivered,
+    }
 
 
 @router.post("/mark_paid/{invoice_id}")

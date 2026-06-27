@@ -9,7 +9,7 @@ from backend.services.company_generator import (
     CompanyGenerator,
     CompanyRequest,
     TechStack,
-    GenerationStatus
+    GenerationStatus,
 )
 from backend.storage.file_manager import FileManager
 
@@ -21,6 +21,7 @@ file_manager = FileManager()
 
 class GenerateCompanyRequest(BaseModel):
     """Request to generate a new company"""
+
     name: str
     description: str
     tech_stack: TechStack
@@ -29,6 +30,7 @@ class GenerateCompanyRequest(BaseModel):
 
 class CompanyResponse(BaseModel):
     """Company response schema"""
+
     id: str
     name: str
     slug: str
@@ -45,6 +47,7 @@ class CompanyResponse(BaseModel):
 
 class CompanyStatusResponse(BaseModel):
     """Company generation status response"""
+
     company_id: str
     status: str
     progress_percent: Optional[int] = None
@@ -56,16 +59,16 @@ class CompanyStatusResponse(BaseModel):
 async def generate_company(
     request: GenerateCompanyRequest,
     background_tasks: BackgroundTasks,
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
 ):
     """
     Generate a new company application
-    
+
     Args:
         request: Company generation request
         background_tasks: FastAPI background tasks
         current_user: Current authenticated user
-        
+
     Returns:
         Generation info with company ID and status
     """
@@ -75,12 +78,12 @@ async def generate_company(
         description=request.description,
         tech_stack=request.tech_stack,
         features=request.features,
-        user_id=current_user["id"]
+        user_id=current_user["id"],
     )
-    
+
     # Start generation (already executes in background via generator)
     result = await generator.generate_company(company_request)
-    
+
     return result
 
 
@@ -89,35 +92,35 @@ async def list_companies(
     skip: int = 0,
     limit: int = 100,
     status_filter: Optional[str] = None,
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
 ):
     """
     List all companies for current user
-    
+
     Args:
         skip: Number of records to skip
         limit: Maximum number of records to return
         status_filter: Optional status filter
         current_user: Current authenticated user
-        
+
     Returns:
         List of companies
     """
     from backend.db.session import get_db
     from backend.db.models import CompanyTenant
     from sqlalchemy.orm import Session
-    
+
     db: Session = next(get_db())
     try:
         # Query companies - note: CompanyTenant doesn't have user_id yet
         # For now, return all companies (add user_id to model in future)
         query = db.query(CompanyTenant)
-        
+
         if status_filter:
             query = query.filter(CompanyTenant.status == status_filter)
-        
+
         companies = query.offset(skip).limit(limit).all()
-        
+
         return [
             CompanyResponse(
                 id=c.id,
@@ -128,7 +131,7 @@ async def list_companies(
                 status=c.status,
                 user_id=current_user["id"],  # Assume current user
                 created_at=c.created_at.isoformat(),
-                storage_path=f"./output/src/{c.slug}"
+                storage_path=f"./output/src/{c.slug}",
             )
             for c in companies
         ]
@@ -137,72 +140,56 @@ async def list_companies(
 
 
 @router.get("/{company_id}", response_model=CompanyResponse)
-async def get_company(
-    company_id: str,
-    current_user: dict = Depends(get_current_active_user)
-):
+async def get_company(company_id: str, current_user: dict = Depends(get_current_active_user)):
     """
     Get company by ID
-    
+
     Args:
         company_id: Company ID
         current_user: Current authenticated user
-        
+
     Returns:
         Company details
-        
+
     Raises:
         HTTPException: If company not found or access denied
     """
     # Get company from generator (in-memory for now)
     company = generator.get_generation_status(company_id)
-    
+
     if not company:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+
     # Check ownership
     if company["user_id"] != current_user["id"] and current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     return company
 
 
 @router.get("/{company_id}/status", response_model=CompanyStatusResponse)
 async def get_company_status(
-    company_id: str,
-    current_user: dict = Depends(get_current_active_user)
+    company_id: str, current_user: dict = Depends(get_current_active_user)
 ):
     """
     Get company generation status
-    
+
     Args:
         company_id: Company ID
         current_user: Current authenticated user
-        
+
     Returns:
         Generation status
     """
     company = generator.get_generation_status(company_id)
-    
+
     if not company:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+
     # Check ownership
     if company["user_id"] != current_user["id"] and current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     # Calculate progress
     progress = 0
     if company["status"] == GenerationStatus.COMPLETED.value:
@@ -217,72 +204,61 @@ async def get_company_status(
         progress = 30
     elif company["status"] == GenerationStatus.INITIALIZING.value:
         progress = 10
-    
+
     return CompanyStatusResponse(
         company_id=company_id,
         status=company["status"],
         progress_percent=progress,
-        message=company.get("error") or f"Status: {company['status']}"
+        message=company.get("error") or f"Status: {company['status']}",
     )
 
 
 @router.get("/{company_id}/download")
-async def download_company(
-    company_id: str,
-    current_user: dict = Depends(get_current_active_user)
-):
+async def download_company(company_id: str, current_user: dict = Depends(get_current_active_user)):
     """
     Get download URL for company archive
-    
+
     Args:
         company_id: Company ID
         current_user: Current authenticated user
-        
+
     Returns:
         Presigned download URL
     """
     company = generator.get_generation_status(company_id)
-    
+
     if not company:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+
     # Check ownership
     if company["user_id"] != current_user["id"] and current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     # Check if generation is complete
     if company["status"] != GenerationStatus.COMPLETED.value:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Company generation not complete"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Company generation not complete"
         )
-    
+
     # Check if file exists in storage
     if not file_manager.company_exists(company_id):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company archive not found in storage"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Company archive not found in storage"
         )
-    
+
     # Generate presigned URL (valid for 1 hour)
     download_url = file_manager.get_company_download_url(company_id, expiration=3600)
-    
+
     if not download_url:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate download URL"
+            detail="Failed to generate download URL",
         )
-    
+
     # Increment download count
     from backend.db.session import get_db
     from backend.db.models import CompanyTenant
-    
+
     db = next(get_db())
     try:
         tenant = db.query(CompanyTenant).filter_by(id=company_id).first()
@@ -291,60 +267,51 @@ async def download_company(
             pass
     finally:
         db.close()
-    
+
     return {
         "download_url": download_url,
         "expires_in": 3600,
         "company_id": company_id,
-        "company_name": company["name"]
+        "company_name": company["name"],
     }
 
 
 @router.delete("/{company_id}")
-async def delete_company(
-    company_id: str,
-    current_user: dict = Depends(get_current_active_user)
-):
+async def delete_company(company_id: str, current_user: dict = Depends(get_current_active_user)):
     """
     Delete a company
-    
+
     Args:
         company_id: Company ID
         current_user: Current authenticated user
-        
+
     Returns:
         Success message
     """
     company = generator.get_generation_status(company_id)
-    
+
     if not company:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+
     # Check ownership
     if company["user_id"] != current_user["id"] and current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     # Delete from storage
     if file_manager.company_exists(company_id):
         file_manager.delete_company(company_id)
-    
+
     # Delete from database
     from backend.db.session import get_db
     from backend.db.models import CompanyTenant
-    
+
     db = next(get_db())
     try:
         db.query(CompanyTenant).filter(CompanyTenant.id == company_id).delete()
         db.commit()
     finally:
         db.close()
-    
+
     return {"message": "Company deleted successfully"}
 
 
@@ -352,83 +319,71 @@ async def delete_company(
 async def regenerate_company(
     company_id: str,
     background_tasks: BackgroundTasks,
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
 ):
     """
     Regenerate a company
-    
+
     Args:
         company_id: Company ID
         background_tasks: FastAPI background tasks
         current_user: Current authenticated user
-        
+
     Returns:
         New generation info
     """
     company = generator.get_generation_status(company_id)
-    
+
     if not company:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+
     # Check ownership
     if company["user_id"] != current_user["id"] and current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     # Create new generation request with same parameters
     company_request = CompanyRequest(
         name=company["name"],
         description=company["description"],
         tech_stack=TechStack(company["tech_stack"]),
         features=company["metadata"].get("features", []),
-        user_id=current_user["id"]
+        user_id=current_user["id"],
     )
-    
+
     # Start new generation
     result = await generator.generate_company(company_request)
-    
+
     return result
 
 
 @router.get("/{company_id}/metadata")
 async def get_company_metadata(
-    company_id: str,
-    current_user: dict = Depends(get_current_active_user)
+    company_id: str, current_user: dict = Depends(get_current_active_user)
 ):
     """
     Get company metadata
-    
+
     Args:
         company_id: Company ID
         current_user: Current authenticated user
-        
+
     Returns:
         Company metadata
     """
     company = generator.get_generation_status(company_id)
-    
+
     if not company:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Company not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+
     # Check ownership
     if company["user_id"] != current_user["id"] and current_user["role"] != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     return {
         "company_id": company_id,
         "metadata": company.get("metadata", {}),
-        "storage_metadata": file_manager.get_company_metadata(company_id)
+        "storage_metadata": file_manager.get_company_metadata(company_id),
     }
+
 
 # Made with Bob

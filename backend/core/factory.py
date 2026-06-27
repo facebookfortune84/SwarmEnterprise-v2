@@ -18,6 +18,7 @@ class SwarmFactory:
 
         # 2. Save Tickets to Database
         db = SessionLocal()
+        saved_tickets = []
         try:
             for task in plan:
                 t = Ticket(
@@ -27,7 +28,11 @@ class SwarmFactory:
                     instruction=task.get("instruction", ""),
                 )
                 db.add(t)
+                saved_tickets.append(t)
             db.commit()
+            # Refresh to get assigned IDs
+            for t in saved_tickets:
+                db.refresh(t)
             logger.info(f"FACTORY: {len(plan)} tickets created. Dispatching workers...")
         except Exception as e:
             db.rollback()
@@ -36,9 +41,28 @@ class SwarmFactory:
         finally:
             db.close()
 
-        # In the full loop, we would trigger execution_unit here for each ticket.
+        # 3. Enqueue each ticket for async execution
+        from backend.queue import enqueue_task
 
-        return {"status": "success", "tickets_generated": len(plan)}
+        enqueued = 0
+        for ticket in saved_tickets:
+            try:
+                enqueue_task(
+                    {
+                        "type": "execute_ticket",
+                        "ticket_id": ticket.id,
+                        "project_id": project_id,
+                        "department": ticket.department,
+                        "title": ticket.title,
+                        "instruction": ticket.instruction,
+                    }
+                )
+                enqueued += 1
+            except Exception as e:
+                logger.error(f"Failed to enqueue ticket {ticket.id}: {e}")
+
+        logger.info(f"FACTORY: {enqueued}/{len(saved_tickets)} tickets enqueued for execution.")
+        return {"status": "success", "tickets_generated": len(plan), "tickets_enqueued": enqueued}
 
 
 swarm_factory = SwarmFactory()

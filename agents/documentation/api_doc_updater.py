@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class APIEndpoint:
     """API endpoint information"""
+
     path: str
     method: str
     function_name: str
@@ -36,6 +37,7 @@ class APIEndpoint:
 @dataclass
 class APIDocResult:
     """API documentation update result"""
+
     doc_id: str
     endpoints_documented: int
     spec_version: str
@@ -46,7 +48,7 @@ class APIDocResult:
 class APIDocUpdater:
     """
     Autonomous API documentation updater agent.
-    
+
     Capabilities:
     - OpenAPI/Swagger spec generation
     - Endpoint documentation extraction
@@ -55,13 +57,13 @@ class APIDocUpdater:
     - API versioning support
     - AI-powered descriptions
     """
-    
+
     def __init__(self, ollama_client: Optional[OllamaClient] = None):
         self.ollama = ollama_client or OllamaClient()
         self.endpoints: List[APIEndpoint] = []
-        
+
         logger.info("API Documentation Updater initialized")
-    
+
     async def update_openapi_spec(
         self,
         api_path: str,
@@ -70,13 +72,13 @@ class APIDocUpdater:
     ) -> APIDocResult:
         """Generate/update OpenAPI specification"""
         logger.info(f"Updating OpenAPI spec for {title}")
-        
+
         # Extract endpoints
         await self._extract_endpoints(Path(api_path))
-        
+
         # Generate OpenAPI spec
         spec = await self._generate_openapi_spec(title, version)
-        
+
         return APIDocResult(
             doc_id=f"openapi-{title.lower().replace(' ', '-')}",
             endpoints_documented=len(self.endpoints),
@@ -84,20 +86,20 @@ class APIDocUpdater:
             content=json.dumps(spec, indent=2),
             format="openapi",
         )
-    
+
     async def generate_endpoint_docs(
         self,
         api_path: str,
     ) -> APIDocResult:
         """Generate markdown documentation for endpoints"""
         logger.info(f"Generating endpoint documentation: {api_path}")
-        
+
         # Extract endpoints
         await self._extract_endpoints(Path(api_path))
-        
+
         # Generate markdown
         content = await self._generate_endpoint_markdown()
-        
+
         return APIDocResult(
             doc_id=f"endpoints-{datetime.utcnow().strftime('%Y%m%d')}",
             endpoints_documented=len(self.endpoints),
@@ -105,60 +107,62 @@ class APIDocUpdater:
             content=content,
             format="markdown",
         )
-    
+
     async def _extract_endpoints(self, api_path: Path) -> None:
         """Extract API endpoints from code"""
         self.endpoints = []
-        
+
         for py_file in api_path.rglob("*.py"):
             try:
                 content = py_file.read_text(encoding="utf-8")
-                
+
                 # Find FastAPI route decorators
                 routes = re.findall(
                     r'@(?:router|app)\.(get|post|put|delete|patch)\(["\']([^"\']+)["\'].*?\)\s*(?:async\s+)?def\s+(\w+)',
                     content,
-                    re.DOTALL
+                    re.DOTALL,
                 )
-                
+
                 for method, path, func_name in routes:
                     # Extract function details
                     func_match = re.search(
-                        rf'def\s+{func_name}\s*\([^)]*\).*?(?=\n(?:@|def|class|\Z))',
+                        rf"def\s+{func_name}\s*\([^)]*\).*?(?=\n(?:@|def|class|\Z))",
                         content,
-                        re.DOTALL
+                        re.DOTALL,
                     )
-                    
+
                     if func_match:
                         func_code = func_match.group(0)
-                        
+
                         # Extract docstring
                         doc_match = re.search(r'"""(.*?)"""', func_code, re.DOTALL)
                         description = doc_match.group(1).strip() if doc_match else None
-                        
+
                         # Check for auth
-                        auth_required = 'Depends(' in func_code or 'auth' in func_code.lower()
-                        
-                        self.endpoints.append(APIEndpoint(
-                            path=path,
-                            method=method.upper(),
-                            function_name=func_name,
-                            description=description,
-                            parameters=[],  # TODO: Extract from function signature
-                            responses=[],  # TODO: Extract from code
-                            auth_required=auth_required,
-                        ))
-            
+                        auth_required = "Depends(" in func_code or "auth" in func_code.lower()
+
+                        self.endpoints.append(
+                            APIEndpoint(
+                                path=path,
+                                method=method.upper(),
+                                function_name=func_name,
+                                description=description,
+                                parameters=[],  # TODO: Extract from function signature
+                                responses=[],  # TODO: Extract from code
+                                auth_required=auth_required,
+                            )
+                        )
+
             except Exception as e:
                 logger.error(f"Error extracting from {py_file}: {e}")
-    
+
     async def _generate_openapi_spec(
         self,
         title: str,
         version: str,
     ) -> Dict[str, Any]:
         """Generate OpenAPI 3.0 specification"""
-        
+
         spec = {
             "openapi": "3.0.0",
             "info": {
@@ -181,82 +185,78 @@ class APIDocUpdater:
                 }
             },
         }
-        
+
         # Add endpoints
         for endpoint in self.endpoints:
             if endpoint.path not in spec["paths"]:
                 spec["paths"][endpoint.path] = {}
-            
+
             # Generate description if missing
             if not endpoint.description:
                 endpoint.description = await self._generate_endpoint_description(endpoint)
-            
+
             operation = {
                 "summary": endpoint.description or f"{endpoint.method} {endpoint.path}",
                 "operationId": endpoint.function_name,
                 "responses": {
                     "200": {
                         "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {"type": "object"}
-                            }
-                        }
+                        "content": {"application/json": {"schema": {"type": "object"}}},
                     }
-                }
+                },
             }
-            
+
             if endpoint.auth_required:
                 operation["security"] = [{"bearerAuth": []}]
-            
+
             spec["paths"][endpoint.path][endpoint.method.lower()] = operation
-        
+
         return spec
-    
+
     async def _generate_endpoint_markdown(self) -> str:
         """Generate markdown documentation for endpoints"""
-        
+
         content = "# API Endpoints\n\n"
         content += f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
         content += f"Total Endpoints: {len(self.endpoints)}\n\n"
-        
+
         # Group by path prefix
         by_prefix: Dict[str, List[APIEndpoint]] = {}
         for endpoint in self.endpoints:
-            prefix = endpoint.path.split('/')[1] if '/' in endpoint.path else 'root'
+            prefix = endpoint.path.split("/")[1] if "/" in endpoint.path else "root"
             if prefix not in by_prefix:
                 by_prefix[prefix] = []
             by_prefix[prefix].append(endpoint)
-        
+
         for prefix, endpoints in sorted(by_prefix.items()):
             content += f"## {prefix.capitalize()}\n\n"
-            
+
             for endpoint in sorted(endpoints, key=lambda e: e.path):
                 # Generate description if missing
                 if not endpoint.description:
                     endpoint.description = await self._generate_endpoint_description(endpoint)
-                
+
                 content += f"### `{endpoint.method} {endpoint.path}`\n\n"
                 content += f"{endpoint.description}\n\n"
-                
+
                 if endpoint.auth_required:
                     content += "**Authentication:** Required\n\n"
-                
+
                 content += "**Request:**\n```http\n"
                 content += f"{endpoint.method} {endpoint.path} HTTP/1.1\n"
                 if endpoint.auth_required:
                     content += "Authorization: Bearer <token>\n"
                 content += "```\n\n"
-                
+
                 content += "**Response:**\n```json\n"
-                content += "{\n  \"status\": \"success\",\n  \"data\": {}\n}\n"
+                content += '{\n  "status": "success",\n  "data": {}\n}\n'
                 content += "```\n\n"
-        
+
         return content
-    
+
     async def _generate_endpoint_description(self, endpoint: APIEndpoint) -> str:
         """Generate AI-powered endpoint description"""
-        
+
         prompt = f"""
         Generate a clear, concise description for this API endpoint:
         
@@ -267,14 +267,13 @@ class APIDocUpdater:
         
         Provide a 1-2 sentence description of what this endpoint does.
         """
-        
+
         description = await self.ollama.generate(
-            prompt,
-            system="You are an API documentation expert."
+            prompt, system="You are an API documentation expert."
         )
-        
+
         return description.strip()
-    
+
     async def generate_postman_collection(
         self,
         api_path: str,
@@ -282,10 +281,10 @@ class APIDocUpdater:
     ) -> Dict[str, Any]:
         """Generate Postman collection"""
         logger.info(f"Generating Postman collection: {collection_name}")
-        
+
         # Extract endpoints
         await self._extract_endpoints(Path(api_path))
-        
+
         collection = {
             "info": {
                 "name": collection_name,
@@ -293,7 +292,7 @@ class APIDocUpdater:
             },
             "item": [],
         }
-        
+
         for endpoint in self.endpoints:
             item = {
                 "name": f"{endpoint.method} {endpoint.path}",
@@ -303,23 +302,26 @@ class APIDocUpdater:
                     "url": {
                         "raw": f"{{{{base_url}}}}{endpoint.path}",
                         "host": ["{{base_url}}"],
-                        "path": endpoint.path.split('/')[1:],
+                        "path": endpoint.path.split("/")[1:],
                     },
                 },
             }
-            
+
             if endpoint.auth_required:
-                item["request"]["header"].append({
-                    "key": "Authorization",
-                    "value": "Bearer {{token}}",
-                })
-            
+                item["request"]["header"].append(
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}",
+                    }
+                )
+
             collection["item"].append(item)
-        
+
         return collection
-    
+
     async def cleanup(self) -> None:
         """Cleanup resources"""
         await self.ollama.close()
+
 
 # Made with Bob

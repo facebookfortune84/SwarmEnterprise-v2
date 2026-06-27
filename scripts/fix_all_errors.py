@@ -6,6 +6,7 @@ Fixes all pylint errors found in the codebase
 
 import sys
 
+
 def fix_changelog_generator():
     """Create the missing ChangelogGenerator class"""
     content = '''"""
@@ -125,9 +126,9 @@ class ChangelogGenerator:
 
 # Made with Bob
 '''
-    
+
     filepath = "agents/documentation/changelog_generator.py"
-    with open(filepath, 'w', encoding='utf-8') as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"[OK] Created {filepath}")
 
@@ -135,95 +136,95 @@ class ChangelogGenerator:
 def fix_queue_duplicate_functions():
     """Fix duplicate function definitions in backend/queue.py"""
     filepath = "backend/queue.py"
-    
-    with open(filepath, 'r', encoding='utf-8') as f:
+
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    
+
     # Remove the duplicate function definitions (lines 37-44)
     # Keep only the first definitions (lines 17-25)
     new_lines = []
-    
+
     for i, line in enumerate(lines, 1):
         if i >= 37 and i <= 44:
             # Skip duplicate function definitions
             continue
         new_lines.append(line)
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
+
+    with open(filepath, "w", encoding="utf-8") as f:
         f.writelines(new_lines)
-    
+
     print(f"[OK] Fixed duplicate functions in {filepath}")
 
 
 def fix_rag_chromadb():
     """Fix chromadb HttpClient parameter"""
     filepath = "backend/rag.py"
-    
-    with open(filepath, 'r', encoding='utf-8') as f:
+
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
-    
+
     # Replace api_url with host and port
     content = content.replace(
-        'client = chromadb.HttpClient(api_url=url)',
-        'client = chromadb.HttpClient(host=host, port=int(port))'
+        "client = chromadb.HttpClient(api_url=url)",
+        "client = chromadb.HttpClient(host=host, port=int(port))",
     )
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
+
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
-    
+
     print(f"[OK] Fixed chromadb HttpClient in {filepath}")
 
 
 def fix_ollama_import():
     """Fix Ollama import issue"""
     filepath = "agents/llm_config.py"
-    
-    with open(filepath, 'r', encoding='utf-8') as f:
+
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    
+
     # Add type ignore comment to suppress false positive
     new_lines = []
     for i, line in enumerate(lines):
-        if 'from langchain_community.llms import Ollama' in line:
-            new_lines.append(line.rstrip() + '  # type: ignore\n')
-        elif '_local_brain = Ollama(' in line:
-            new_lines.append(line.rstrip() + '  # type: ignore\n')
+        if "from langchain_community.llms import Ollama" in line:
+            new_lines.append(line.rstrip() + "  # type: ignore\n")
+        elif "_local_brain = Ollama(" in line:
+            new_lines.append(line.rstrip() + "  # type: ignore\n")
         else:
             new_lines.append(line)
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
+
+    with open(filepath, "w", encoding="utf-8") as f:
         f.writelines(new_lines)
-    
+
     print(f"[OK] Fixed Ollama import in {filepath}")
 
 
 def add_type_annotations():
     """Add proper type annotations to fix assignment-from-none errors"""
-    
+
     # These are false positives - the functions can return None or objects
     # Add type: ignore comments to suppress
-    
+
     files_to_fix = [
         ("backend/api/auth.py", [72, 192, 263]),
         ("backend/api/users.py", [36, 121]),
-        ("backend/auth/user_service.py", [168, 192, 220, 244])
+        ("backend/auth/user_service.py", [168, 192, 220, 244]),
     ]
-    
+
     for filepath, line_numbers in files_to_fix:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             lines = f.readlines()
-        
+
         # Add type: ignore comments
         for line_num in line_numbers:
             idx = line_num - 1
             if idx < len(lines):
                 line = lines[idx].rstrip()
-                if '# type: ignore' not in line:
-                    lines[idx] = line + '  # type: ignore[assignment]\n'
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
+                if "# type: ignore" not in line:
+                    lines[idx] = line + "  # type: ignore[assignment]\n"
+
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(lines)
-        
+
         print(f"[OK] Added type annotations to {filepath}")
 
 
@@ -232,31 +233,32 @@ def main():
     print("=" * 60)
     print("FIXING ALL ERRORS")
     print("=" * 60)
-    
+
     try:
         print("\n1. Creating ChangelogGenerator class...")
         fix_changelog_generator()
-        
+
         print("\n2. Fixing duplicate functions in queue.py...")
         fix_queue_duplicate_functions()
-        
+
         print("\n3. Fixing chromadb HttpClient...")
         fix_rag_chromadb()
-        
+
         print("\n4. Fixing Ollama import...")
         fix_ollama_import()
-        
+
         print("\n5. Adding type annotations...")
         add_type_annotations()
-        
+
         print("\n" + "=" * 60)
         print("ALL ERRORS FIXED!")
         print("=" * 60)
         print("\nRun 'python -m pylint agents/ backend/ tests/ --errors-only' to verify")
-        
+
     except Exception as e:
         print(f"\n[ERROR] Error during fix: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

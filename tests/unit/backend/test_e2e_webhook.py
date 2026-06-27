@@ -28,12 +28,12 @@ def test_stripe_webhook_end_to_end(client, monkeypatch):
     import backend.api.webhooks as wh
 
     monkeypatch.setattr(wh, "replicator_engine", DummyReplicator())
-    
+
     # Mock CompanyGenerator to avoid DB/Agent issues in this test
     class MockGenerator:
         async def generate_company(self, request):
             pass
-    
+
     monkeypatch.setattr("backend.services.company_generator.CompanyGenerator", MockGenerator)
 
     # Ensure DB is fresh for this test to avoid processed event leakage
@@ -42,13 +42,10 @@ def test_stripe_webhook_end_to_end(client, monkeypatch):
     from sqlalchemy.orm import sessionmaker
     from sqlalchemy.pool import StaticPool
     from backend.db.base import Base
-    from backend.db.models import ProcessedEvent, Project  # Ensure models are imported
     from backend.db.linear_engine import LinearEngine
 
     engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool
+        "sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool
     )
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)

@@ -24,6 +24,7 @@ logger = logging.getLogger("SwarmOS.gdpr")
 # GET /api/user/export
 # ---------------------------------------------------------------------------
 
+
 @router.get(
     "/export",
     summary="Export all personal data (GDPR Art. 20 — portability)",
@@ -51,11 +52,10 @@ def export_user_data(
     if user is None:
         # Should be unreachable — get_current_active_user already verifies existence.
         from fastapi import HTTPException
+
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    api_keys: List[APIKey] = (
-        db.query(APIKey).filter(APIKey.user_id == user_id).all()
-    )
+    api_keys: List[APIKey] = db.query(APIKey).filter(APIKey.user_id == user_id).all()
     usage_events: List[UsageEvent] = (
         db.query(UsageEvent).filter(UsageEvent.project_id == user_id).all()
     )
@@ -99,6 +99,7 @@ def export_user_data(
 # ---------------------------------------------------------------------------
 # DELETE /api/user/account
 # ---------------------------------------------------------------------------
+
 
 @router.delete(
     "/account",

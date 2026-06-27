@@ -42,4 +42,3 @@ if not REDIS_URL:
             return _q.get(timeout=timeout)
         except Empty:
             return None
-

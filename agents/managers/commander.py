@@ -4,15 +4,15 @@ Accepts high-level goals and translates them into actionable autonomous workflow
 """
 
 import logging
-import json
 import uuid
-from typing import Dict, Any, List
+from typing import Dict, Any
 from agents.llm_config import get_local_brain_instance
 from agents.asset_manager import asset_manager
 from agents.managers.board import strategic_board
 from backend.db.linear_engine import get_swarm_db
 
 logger = logging.getLogger("SwarmCommander")
+
 
 class SwarmCommander:
     """
@@ -29,11 +29,11 @@ class SwarmCommander:
             return
 
         brain = get_local_brain_instance()
-        
+
         # Load the core system identity from assets
         system_identity = asset_manager.get_prompt("System Prompt")
         enterprise_logic = asset_manager.get_prompt("Enterprise Prompt")
-        
+
         self.agent = Agent(
             role="Commander-in-Chief",
             goal="Oversee the autonomous expansion of the SwarmEnterprise ecosystem and fulfill complex user missions.",
@@ -43,7 +43,7 @@ class SwarmCommander:
             You do not perform small tasks; you delegate to the Strategic Board and specialized workers.""",
             llm=brain,
             verbose=True,
-            allow_delegation=True
+            allow_delegation=True,
         )
         self.db = get_swarm_db()
 
@@ -53,21 +53,21 @@ class SwarmCommander:
         Mission -> Decomposition -> Strategic Board -> Tickets -> Execution.
         """
         logger.info(f"Commander received mission: {mission_statement}")
-        
+
         mission_id = f"MIS-{uuid.uuid4().hex[:6].upper()}"
-        
+
         # 1. Strategic Decomposition (Simulated for 100% logic completeness)
         # In a real setup, the Commander uses the Strategic Board to generate a 'Master Plan'
         vibe = f"MISSION: {mission_statement}"
         plan_tickets = strategic_board.convene(mission_id, vibe)
-        
+
         if not plan_tickets:
             # Fallback if board fails
             plan_tickets = [
                 {
                     "department": "Engineering",
                     "title": "Mission Initialization",
-                    "instruction": f"Research and initialize the architecture for: {mission_statement}"
+                    "instruction": f"Research and initialize the architecture for: {mission_statement}",
                 }
             ]
 
@@ -78,18 +78,19 @@ class SwarmCommander:
                 project_id=mission_id,
                 dept=t_data.get("department", "Strategy"),
                 title=t_data.get("title", "Command Task"),
-                instruction=t_data.get("instruction", "")
+                instruction=t_data.get("instruction", ""),
             )
             created_tickets.append(ticket.id)
-            
+
         logger.info(f"Mission {mission_id} decomposed into {len(created_tickets)} tickets.")
-        
+
         return {
             "mission_id": mission_id,
             "status": "IN_PROGRESS",
             "tickets_enqueued": len(created_tickets),
-            "message": "Swarm is now executing your command autonomously."
+            "message": "Swarm is now executing your command autonomously.",
         }
+
 
 # Global instance
 swarm_commander = SwarmCommander()

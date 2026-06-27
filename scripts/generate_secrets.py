@@ -20,16 +20,16 @@ All values are generated with Python's `secrets` module (CSPRNG-backed).
 from __future__ import annotations
 
 import secrets
-import sys
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------------------
 # Generation helpers
 # ---------------------------------------------------------------------------
 
+
 def hex64() -> str:
     """64-character hex string -- 256 bits of entropy. Used for JWT/session keys."""
-    return secrets.token_hex(32)      # 32 bytes -> 64 hex chars
+    return secrets.token_hex(32)  # 32 bytes -> 64 hex chars
 
 
 def urlsafe32() -> str:
@@ -42,26 +42,26 @@ def urlsafe32() -> str:
 # ---------------------------------------------------------------------------
 SECRETS: list[dict] = [
     {
-        "key":         "JWT_SECRET_KEY",
-        "generator":   hex64,
+        "key": "JWT_SECRET_KEY",
+        "generator": hex64,
         "description": "64-char hex -- signs and verifies JWT access/refresh tokens",
         "rotate_days": 90,
     },
     {
-        "key":         "SECRET_KEY",
-        "generator":   hex64,
+        "key": "SECRET_KEY",
+        "generator": hex64,
         "description": "64-char hex -- signs session cookies, CSRF tokens, and encrypted fields",
         "rotate_days": 90,
     },
     {
-        "key":         "POSTGRES_PASSWORD",
-        "generator":   urlsafe32,
+        "key": "POSTGRES_PASSWORD",
+        "generator": urlsafe32,
         "description": "32-byte URL-safe -- Postgres superuser / application password",
         "rotate_days": 180,
     },
     {
-        "key":         "ENCRYPTION_KEY",
-        "generator":   urlsafe32,
+        "key": "ENCRYPTION_KEY",
+        "generator": urlsafe32,
         "description": "32-byte URL-safe -- symmetric encryption key for PII / stored secrets",
         "rotate_days": 365,
     },

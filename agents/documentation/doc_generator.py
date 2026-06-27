@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CodeElement:
     """Code element for documentation"""
+
     name: str
     type: str  # function, class, module
     docstring: Optional[str]
@@ -35,6 +36,7 @@ class CodeElement:
 @dataclass
 class DocumentationResult:
     """Documentation generation result"""
+
     doc_id: str
     files_processed: int
     elements_documented: int
@@ -45,7 +47,7 @@ class DocumentationResult:
 class DocGenerator:
     """
     Autonomous documentation generation agent.
-    
+
     Capabilities:
     - README generation
     - API documentation
@@ -54,13 +56,13 @@ class DocGenerator:
     - Architecture documentation
     - AI-powered content generation
     """
-    
+
     def __init__(self, ollama_client: Optional[OllamaClient] = None):
         self.ollama = ollama_client or OllamaClient()
         self.elements: List[CodeElement] = []
-        
+
         logger.info("Documentation Generator initialized")
-    
+
     async def generate_readme(
         self,
         project_path: str,
@@ -69,23 +71,20 @@ class DocGenerator:
     ) -> DocumentationResult:
         """Generate comprehensive README.md"""
         logger.info(f"Generating README for {project_name}")
-        
+
         project_path_obj = Path(project_path)
-        
+
         # Analyze project structure
         structure = self._analyze_structure(project_path_obj)
-        
+
         # Extract code elements
         await self._extract_elements(project_path_obj)
-        
+
         # Generate README content
         content = await self._generate_readme_content(
-            project_name,
-            description or "A Python project",
-            structure,
-            self.elements
+            project_name, description or "A Python project", structure, self.elements
         )
-        
+
         return DocumentationResult(
             doc_id=f"readme-{project_name}",
             files_processed=len(list(project_path_obj.rglob("*.py"))),
@@ -93,7 +92,7 @@ class DocGenerator:
             content=content,
             format="markdown",
         )
-    
+
     async def generate_api_docs(
         self,
         project_path: str,
@@ -101,15 +100,15 @@ class DocGenerator:
     ) -> DocumentationResult:
         """Generate API documentation"""
         logger.info(f"Generating API documentation: {project_path}")
-        
+
         project_path_obj = Path(project_path)
-        
+
         # Extract API elements
         await self._extract_elements(project_path_obj)
-        
+
         # Generate API documentation
         content = await self._generate_api_content(self.elements, output_format)
-        
+
         return DocumentationResult(
             doc_id=f"api-docs-{datetime.utcnow().strftime('%Y%m%d')}",
             files_processed=len(list(project_path_obj.rglob("*.py"))),
@@ -117,7 +116,7 @@ class DocGenerator:
             content=content,
             format=output_format,
         )
-    
+
     async def generate_user_guide(
         self,
         project_name: str,
@@ -126,13 +125,9 @@ class DocGenerator:
     ) -> DocumentationResult:
         """Generate user guide"""
         logger.info(f"Generating user guide for {project_name}")
-        
-        content = await self._generate_user_guide_content(
-            project_name,
-            features,
-            examples or []
-        )
-        
+
+        content = await self._generate_user_guide_content(project_name, features, examples or [])
+
         return DocumentationResult(
             doc_id=f"user-guide-{project_name}",
             files_processed=0,
@@ -140,7 +135,7 @@ class DocGenerator:
             content=content,
             format="markdown",
         )
-    
+
     def _analyze_structure(self, project_path: Path) -> Dict[str, Any]:
         """Analyze project structure"""
         structure = {
@@ -149,9 +144,9 @@ class DocGenerator:
             "config_files": [],
             "test_files": [],
         }
-        
+
         for item in project_path.rglob("*"):
-            if item.is_dir() and not item.name.startswith('.'):
+            if item.is_dir() and not item.name.startswith("."):
                 structure["directories"].append(str(item.relative_to(project_path)))
             elif item.suffix == ".py":
                 if "test" in item.name.lower():
@@ -160,47 +155,51 @@ class DocGenerator:
                     structure["python_files"].append(str(item.relative_to(project_path)))
             elif item.name in ["setup.py", "pyproject.toml", "requirements.txt", "Dockerfile"]:
                 structure["config_files"].append(str(item.relative_to(project_path)))
-        
+
         return structure
-    
+
     async def _extract_elements(self, project_path: Path) -> None:
         """Extract code elements for documentation"""
         self.elements = []
-        
+
         for py_file in project_path.rglob("*.py"):
             try:
                 content = py_file.read_text(encoding="utf-8")
                 tree = ast.parse(content)
-                
+
                 for node in ast.walk(tree):
                     if isinstance(node, ast.FunctionDef):
-                        self.elements.append(CodeElement(
-                            name=node.name,
-                            type="function",
-                            docstring=ast.get_docstring(node),
-                            signature=self._get_function_signature(node),
-                            file_path=str(py_file.relative_to(project_path)),
-                            line_number=node.lineno,
-                        ))
+                        self.elements.append(
+                            CodeElement(
+                                name=node.name,
+                                type="function",
+                                docstring=ast.get_docstring(node),
+                                signature=self._get_function_signature(node),
+                                file_path=str(py_file.relative_to(project_path)),
+                                line_number=node.lineno,
+                            )
+                        )
                     elif isinstance(node, ast.ClassDef):
-                        self.elements.append(CodeElement(
-                            name=node.name,
-                            type="class",
-                            docstring=ast.get_docstring(node),
-                            signature=None,
-                            file_path=str(py_file.relative_to(project_path)),
-                            line_number=node.lineno,
-                        ))
+                        self.elements.append(
+                            CodeElement(
+                                name=node.name,
+                                type="class",
+                                docstring=ast.get_docstring(node),
+                                signature=None,
+                                file_path=str(py_file.relative_to(project_path)),
+                                line_number=node.lineno,
+                            )
+                        )
             except Exception as e:
                 logger.error(f"Error extracting from {py_file}: {e}")
-    
+
     def _get_function_signature(self, node: ast.FunctionDef) -> str:
         """Get function signature"""
         args = []
         for arg in node.args.args:
             args.append(arg.arg)
         return f"{node.name}({', '.join(args)})"
-    
+
     async def _generate_readme_content(
         self,
         project_name: str,
@@ -209,11 +208,11 @@ class DocGenerator:
         elements: List[CodeElement],
     ) -> str:
         """Generate README content using AI"""
-        
+
         # Get key classes and functions
         classes = [e for e in elements if e.type == "class"][:10]
         functions = [e for e in elements if e.type == "function"][:10]
-        
+
         prompt = f"""
         Generate a comprehensive README.md for a project called "{project_name}".
         
@@ -240,35 +239,34 @@ class DocGenerator:
         
         Use markdown format with proper headings, code blocks, and formatting.
         """
-        
+
         content = await self.ollama.generate(
-            prompt,
-            system="You are a technical writer creating clear, comprehensive documentation."
+            prompt, system="You are a technical writer creating clear, comprehensive documentation."
         )
-        
+
         return content
-    
+
     async def _generate_api_content(
         self,
         elements: List[CodeElement],
         output_format: str,
     ) -> str:
         """Generate API documentation content"""
-        
+
         # Group by file
         by_file: Dict[str, List[CodeElement]] = {}
         for element in elements:
             if element.file_path not in by_file:
                 by_file[element.file_path] = []
             by_file[element.file_path].append(element)
-        
+
         if output_format == "markdown":
             content = "# API Documentation\n\n"
             content += f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
-            
+
             for file_path, file_elements in sorted(by_file.items()):
                 content += f"## {file_path}\n\n"
-                
+
                 # Classes
                 classes = [e for e in file_elements if e.type == "class"]
                 if classes:
@@ -279,7 +277,7 @@ class DocGenerator:
                             content += f"{cls.docstring}\n\n"
                         else:
                             content += "*No documentation available*\n\n"
-                
+
                 # Functions
                 functions = [e for e in file_elements if e.type == "function"]
                 if functions:
@@ -290,11 +288,11 @@ class DocGenerator:
                             content += f"{func.docstring}\n\n"
                         else:
                             content += "*No documentation available*\n\n"
-            
+
             return content
-        
+
         return "Unsupported format"
-    
+
     async def _generate_user_guide_content(
         self,
         project_name: str,
@@ -302,7 +300,7 @@ class DocGenerator:
         examples: List[Dict[str, str]],
     ) -> str:
         """Generate user guide content"""
-        
+
         prompt = f"""
         Create a comprehensive user guide for "{project_name}".
         
@@ -320,12 +318,11 @@ class DocGenerator:
         Make it beginner-friendly with clear explanations and examples.
         Use markdown format.
         """
-        
+
         content = await self.ollama.generate(
-            prompt,
-            system="You are a technical writer creating user-friendly documentation."
+            prompt, system="You are a technical writer creating user-friendly documentation."
         )
-        
+
         # Add examples if provided
         if examples:
             content += "\n\n## Examples\n\n"
@@ -333,9 +330,9 @@ class DocGenerator:
                 content += f"### Example {i}: {example.get('title', 'Usage')}\n\n"
                 content += f"{example.get('description', '')}\n\n"
                 content += f"```python\n{example.get('code', '')}\n```\n\n"
-        
+
         return content
-    
+
     async def generate_architecture_doc(
         self,
         project_name: str,
@@ -343,7 +340,7 @@ class DocGenerator:
     ) -> DocumentationResult:
         """Generate architecture documentation"""
         logger.info(f"Generating architecture documentation for {project_name}")
-        
+
         prompt = f"""
         Create architecture documentation for "{project_name}".
         
@@ -362,12 +359,11 @@ class DocGenerator:
         
         Use markdown format with clear sections.
         """
-        
+
         content = await self.ollama.generate(
-            prompt,
-            system="You are a software architect documenting system architecture."
+            prompt, system="You are a software architect documenting system architecture."
         )
-        
+
         return DocumentationResult(
             doc_id=f"architecture-{project_name}",
             files_processed=0,
@@ -375,52 +371,54 @@ class DocGenerator:
             content=content,
             format="markdown",
         )
-    
+
     async def update_docstrings(
         self,
         file_path: str,
     ) -> Dict[str, Any]:
         """Generate missing docstrings for a file"""
         logger.info(f"Updating docstrings: {file_path}")
-        
+
         path = Path(file_path)
         content = path.read_text(encoding="utf-8")
         tree = ast.parse(content)
-        
+
         updates = []
-        
+
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
                 if not ast.get_docstring(node):
                     # Generate docstring
                     docstring = await self._generate_docstring(node, content)
-                    updates.append({
-                        "name": node.name,
-                        "type": node.__class__.__name__,
-                        "line": node.lineno,
-                        "docstring": docstring,
-                    })
-        
+                    updates.append(
+                        {
+                            "name": node.name,
+                            "type": node.__class__.__name__,
+                            "line": node.lineno,
+                            "docstring": docstring,
+                        }
+                    )
+
         return {
             "file": file_path,
             "updates": updates,
             "count": len(updates),
         }
-    
+
     async def _generate_docstring(
         self,
         node: ast.FunctionDef | ast.ClassDef,
         file_content: str,
     ) -> str:
         """Generate docstring for a code element"""
-        
-        lines = file_content.split('\n')
+
+        lines = file_content.split("\n")
         if isinstance(node, ast.FunctionDef):
             # Get function code
             start = node.lineno - 1
             end = node.end_lineno if node.end_lineno else start + 10
-            code = '\n'.join(lines[start:end])
-            
+            code = "\n".join(lines[start:end])
+
             prompt = f"""
             Generate a clear, concise docstring for this Python function:
             
@@ -433,8 +431,8 @@ class DocGenerator:
             """
         else:  # isinstance(node, ast.ClassDef)
             # Class
-            code = '\n'.join(lines[node.lineno - 1:min(node.lineno + 20, len(lines))])
-            
+            code = "\n".join(lines[node.lineno - 1 : min(node.lineno + 20, len(lines))])
+
             prompt = f"""
             Generate a clear, concise docstring for this Python class:
             
@@ -445,16 +443,16 @@ class DocGenerator:
             Follow Google style docstring format.
             Include: brief description, Attributes (if applicable).
             """
-        
+
         docstring = await self.ollama.generate(
-            prompt,
-            system="You are a Python documentation expert."
+            prompt, system="You are a Python documentation expert."
         )
-        
+
         return docstring.strip()
-    
+
     async def cleanup(self) -> None:
         """Cleanup resources"""
         await self.ollama.close()
+
 
 # Made with Bob

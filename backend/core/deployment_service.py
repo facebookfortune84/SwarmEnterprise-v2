@@ -20,15 +20,12 @@ class DeploymentService:
     Manages application deployments for tenants.
     Connects InfrastructureAgent actions with Database persistence.
     """
-    
+
     def __init__(self, db: Optional[Session] = None):
         self.db = db or SessionLocal()
 
     async def deploy_tenant_application(
-        self, 
-        tenant_id: str, 
-        version: str = "1.0.0", 
-        strategy: str = "rolling"
+        self, tenant_id: str, version: str = "1.0.0", strategy: str = "rolling"
     ) -> Dict[str, Any]:
         """
         Executes a deployment for a specific tenant.
@@ -43,7 +40,7 @@ class DeploymentService:
             tenant_id=tenant_id,
             status="in_progress",
             strategy=strategy,
-            version=version
+            version=version,
         )
         self.db.add(deployment)
         self.db.commit()
@@ -53,11 +50,9 @@ class DeploymentService:
             # Trigger Infrastructure Agent
             # For 100% logic, we assume custom code is already generated in the tenant's slug dir
             app_source = f"./output/src/{tenant.slug}"
-            
+
             result = await infra_agent.deploy_custom_app(
-                tenant_id=tenant_id,
-                slug=tenant.slug,
-                app_source_path=app_source
+                tenant_id=tenant_id, slug=tenant.slug, app_source_path=app_source
             )
 
             if result.get("status") == "success" or result.get("status") == "running":
@@ -68,7 +63,7 @@ class DeploymentService:
                 deployment.status = "failed"
                 deployment.metadata_json = json.dumps(result)
                 tenant.last_error = result.get("error", "Deployment failed")
-            
+
             self.db.commit()
             return result
 
@@ -81,7 +76,12 @@ class DeploymentService:
 
     def get_deployment_history(self, tenant_id: str) -> List[Dict[str, Any]]:
         """Returns deployment history for a tenant."""
-        deployments = self.db.query(Deployment).filter_by(tenant_id=tenant_id).order_by(Deployment.created_at.desc()).all()
+        deployments = (
+            self.db.query(Deployment)
+            .filter_by(tenant_id=tenant_id)
+            .order_by(Deployment.created_at.desc())
+            .all()
+        )
         return [
             {
                 "id": d.id,
@@ -89,10 +89,11 @@ class DeploymentService:
                 "strategy": d.strategy,
                 "version": d.version,
                 "created_at": d.created_at.isoformat(),
-                "details": json.loads(d.metadata_json) if d.metadata_json else {}
+                "details": json.loads(d.metadata_json) if d.metadata_json else {},
             }
             for d in deployments
         ]
+
 
 # Global instance
 deployment_service = DeploymentService()

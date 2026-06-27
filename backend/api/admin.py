@@ -57,7 +57,7 @@ async def issue_mission(mission: str):
     Triggers the autonomous decomposition and execution flow.
     """
     from agents.managers.commander import swarm_commander
-    
+
     try:
         result = await swarm_commander.execute_mission(mission)
         return result

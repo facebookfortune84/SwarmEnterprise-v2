@@ -6,6 +6,7 @@ ensures idempotency, persists project records, triggers the Replicator
 engine, and sends delivery emails when appropriate.
 """
 
+import asyncio
 import logging
 import os
 import uuid
@@ -95,66 +96,115 @@ async def stripe_webhook(request: Request):
                 project_id,
             )
 
-            # Persist project record
-            try:
-                DB.create_project(
-                    project_id,
-                    stripe_session=session.get("id"),
-                    customer_email=customer_email,
-                    product_id=None,
-                    price_id=None,
-                    metadata=str(session.get("metadata")),
+            # Persist project record with retry (exponential backoff, max 3 attempts)
+            project_created = False
+            last_exc = None
+            for attempt in range(1, 4):
+                try:
+                    DB.create_project(
+                        project_id,
+                        stripe_session=session.get("id"),
+                        customer_email=customer_email,
+                        product_id=None,
+                        price_id=None,
+                        metadata=str(session.get("metadata")),
+                    )
+                    project_created = True
+                    break
+                except Exception as exc:  # pylint: disable=broad-except
+                    last_exc = exc
+                    logger.warning(
+                        "create_project attempt %d/3 failed for %s: %s",
+                        attempt,
+                        project_id,
+                        exc,
+                    )
+                    if attempt < 3:
+                        await asyncio.sleep(2**attempt)
+
+            if not project_created:
+                logger.error(
+                    "All retries exhausted for create_project(%s): %s", project_id, last_exc
                 )
-                
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Failed to persist project record after 3 attempts: {last_exc}",
+                )
+
+            try:
                 # Determine delivery type (ZIP or HOSTED)
                 delivery_type = session.get("metadata", {}).get("delivery_type", "ZIP").upper()
                 stack_str = session.get("metadata", {}).get("tech_stack", "fastapi-react-postgres")
 
-                # 100% Factory Integration: Provision the tenant autonomously
-                from backend.services.company_generator import CompanyGenerator, CompanyRequest, TechStack
+                # Factory Integration: Provision the tenant autonomously, with retry
+                from backend.services.company_generator import (
+                    CompanyGenerator,
+                    CompanyRequest,
+                    TechStack,
+                )
+
                 generator = CompanyGenerator()
-                
-                request = CompanyRequest(
+
+                company_request = CompanyRequest(
                     name=f"Company-{project_id}",
                     description=f"Autonomously provisioned company for {customer_email}",
                     tech_stack=TechStack(stack_str),
                     features=["base-auth"],
-                    user_id="STRIPE_CUSTOMER"
+                    user_id="STRIPE_CUSTOMER",
                 )
-                
-                # Step 1: Generate Code
-                import asyncio
-                await generator.generate_company(request)
-                
+
+                # Step 1: Generate Code (retry up to 3 times)
+                gen_exc = None
+                for attempt in range(1, 4):
+                    try:
+                        await generator.generate_company(company_request)
+                        gen_exc = None
+                        break
+                    except Exception as exc:  # pylint: disable=broad-except
+                        gen_exc = exc
+                        logger.warning(
+                            "generate_company attempt %d/3 failed for %s: %s",
+                            attempt,
+                            project_id,
+                            exc,
+                        )
+                        if attempt < 3:
+                            await asyncio.sleep(2**attempt)
+                if gen_exc:
+                    raise gen_exc
+
                 # Step 2: Delivery Logic
                 if delivery_type == "HOSTED":
                     logger.info("Delivery Mode: HOSTED. Provisioning VM on .tech domain...")
-                    from backend.services.deployment_service import DeploymentService, DeploymentConfig
+                    from backend.services.deployment_service import (
+                        DeploymentService,
+                        DeploymentConfig,
+                    )
+
                     deploy_service = DeploymentService()
-                    
+
                     config = DeploymentConfig(
                         company_id=project_id,
                         tenant_name=f"box-{project_id.lower()}",
-                        subdomain=project_id.lower()
+                        subdomain=project_id.lower(),
                     )
-                    
+
                     await deploy_service.create_deployment(config)
-                    
-                    # FUTURE: Initialize Stripe Subscription for monthly hosting
-                    logger.info(f"Hosting subscription pending for {customer_email}")
-                    
+                    logger.info("Hosting subscription pending for %s", customer_email)
+
                     body = (
                         "<h1>Your SwarmOS Box is LIVE</h1>"
-                        f"<p>Your autonomous company has been deployed to: <strong>https://{project_id.lower()}.realms2riches.tech</strong></p>"
+                        f"<p>Your autonomous company has been deployed to: "
+                        f"<strong>https://{project_id.lower()}.realms2riches.tech</strong></p>"
                         "<p>Login with your Swarm credentials.</p>"
                     )
                 else:
                     logger.info("Delivery Mode: ZIP. Creating bundle...")
-                    # Trigger Replicator for ZIP
                     bundle = replicator_engine.create_company_bundle(project_id)
                     body = (
                         "<h1>Your SwarmOS Box is Ready</h1>"
-                        f"<p>Download your complete source code bundle: <a href='{bundle.get('download_url')}'>Here</a></p>"
+                        f"<p>Download your complete source code bundle: "
+                        f"<a href='{bundle.get('download_url')}'>Here</a></p>"
                     )
 
                 # Send Delivery Email
@@ -164,11 +214,16 @@ async def stripe_webhook(request: Request):
                     "Your Programmable Company Delivery",
                     body,
                 )
-                
-            except Exception as exc:  # pylint: disable=broad-except
-                logger.exception("Failed to persist project record or provision tenant: %s", exc)
 
-        # Mark event processed
+            except Exception as exc:  # pylint: disable=broad-except
+                logger.exception(
+                    "Failed to provision tenant or send email for project %s: %s",
+                    project_id,
+                    exc,
+                )
+                # Do not re-raise — project record was already persisted; delivery can be retried.
+
+        # Mark event processed (idempotency guard)
         if event_id:
             try:
                 DB.mark_event_processed(event_id)
@@ -179,6 +234,8 @@ async def stripe_webhook(request: Request):
                     exc,
                 )
 
+    except HTTPException:
+        raise
     except Exception as exc:  # pylint: disable=broad-except
         logger.exception("Failed to process Stripe webhook: %s", exc)
         raise HTTPException(

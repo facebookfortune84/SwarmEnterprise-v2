@@ -37,6 +37,7 @@ os.environ.setdefault("OTEL_SDK_DISABLED", "TRUE")
 # Client abstraction
 # ---------------------------------------------------------------------------
 
+
 class _HttpClient:
     """Thin wrapper so tests are identical for in-process and live modes."""
 
@@ -46,9 +47,10 @@ class _HttpClient:
         if not self._live:
             from fastapi.testclient import TestClient
             from backend.main import app
+
             self._client: Any = TestClient(app, raise_server_exceptions=False)
         else:
-            import urllib.request  # stdlib only — no extra deps
+
             self._client = None
 
     # ------------------------------------------------------------------
@@ -93,7 +95,9 @@ class _HttpClient:
         resp = self._client.get(path, headers=headers or {})
         return resp.status_code, _safe_json(resp)
 
-    def post(self, path: str, json: dict | None = None, headers: dict | None = None) -> tuple[int, Any]:
+    def post(
+        self, path: str, json: dict | None = None, headers: dict | None = None
+    ) -> tuple[int, Any]:
         if self._live:
             return self._live_request("POST", path, json=json, headers=headers)
         resp = self._client.post(path, json=json, headers=headers or {})
@@ -135,6 +139,7 @@ def _assert(label: str, condition: bool, detail: str = "") -> bool:
 # ---------------------------------------------------------------------------
 # Individual test functions
 # ---------------------------------------------------------------------------
+
 
 def test_health(client: _HttpClient) -> None:
     """GET /health — expect 200 and status == ONLINE."""
@@ -260,6 +265,7 @@ def test_stripe_checkout_route_exists(client: _HttpClient) -> None:
 # Orchestrator
 # ---------------------------------------------------------------------------
 
+
 def main(argv: list[str] | None = None) -> int:
     global _VERBOSE
 
@@ -278,7 +284,8 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="store_true",
         help="Print full response bodies for each test.",
     )

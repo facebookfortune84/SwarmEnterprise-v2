@@ -82,7 +82,6 @@ class SecurityScanner:
         project_path: str,
         scan_types: list[ScanType] | None = None,
     ) -> dict[ScanType, ScanResult]:
-
         if scan_types is None:
             scan_types = list(ScanType)
 

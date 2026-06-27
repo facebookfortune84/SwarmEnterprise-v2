@@ -157,9 +157,7 @@ class LinearEngine:
         return bool(r)
 
     def mark_event_processed(self, event_id: str):
-        exists = (
-            self.db.query(ProcessedEvent).filter(ProcessedEvent.event_id == event_id).first()
-        )
+        exists = self.db.query(ProcessedEvent).filter(ProcessedEvent.event_id == event_id).first()
         if not exists:
             e = ProcessedEvent(event_id=event_id)
             self.db.add(e)
@@ -201,7 +199,7 @@ class LinearEngine:
         query = self.db.query(Ticket).order_by(Ticket.created_at.desc())
         if project_id:
             query = query.filter(Ticket.project_id == project_id)
-        
+
         rows = query.limit(limit).all()
         return [
             {

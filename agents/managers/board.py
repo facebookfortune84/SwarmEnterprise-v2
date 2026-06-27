@@ -79,8 +79,83 @@ class StrategicBoard:
 
         return agents
 
+    @staticmethod
+    def _default_tickets(project_id: str, description: str) -> List[Dict[str, Any]]:
+        """Minimal default ticket set returned when the Board completely fails."""
+        departments = [
+            ("Engineering", "Set up project scaffolding and CI/CD pipeline"),
+            ("Engineering", "Implement core business logic and API endpoints"),
+            ("Engineering", "Write unit and integration tests"),
+            ("DevOps", "Configure Docker and deployment infrastructure"),
+            ("Security", "Perform security audit and add authentication"),
+            ("QA", "Define acceptance criteria and test plan"),
+        ]
+        return [
+            {
+                "ticket_id": f"{project_id}-DEFAULT-{i + 1:02d}",
+                "department": dept,
+                "title": title,
+                "instruction": f"{title}. Project: {project_id}. Context: {description[:200]}",
+            }
+            for i, (dept, title) in enumerate(departments)
+        ]
+
+    @staticmethod
+    def _extract_json_array(raw: str) -> List[Dict[str, Any]] | None:
+        """
+        Try multiple strategies to extract a JSON array from a raw LLM string.
+        Returns the parsed list or None if all strategies fail.
+        """
+        raw = raw.strip()
+
+        # Strategy 1: direct parse
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # Strategy 2: strip markdown code fences
+        fence_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", raw)
+        if fence_match:
+            try:
+                parsed = json.loads(fence_match.group(1).strip())
+                if isinstance(parsed, list):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        # Strategy 3: greedy bracket scan — first '[' to last ']'
+        start = raw.find("[")
+        end = raw.rfind("]")
+        if start != -1 and end > start:
+            try:
+                parsed = json.loads(raw[start : end + 1])
+                if isinstance(parsed, list):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        # Strategy 4: non-greedy regex array
+        match = re.search(r"(\[\s*\{.*?\}\s*\])", raw, re.DOTALL)
+        if match:
+            try:
+                parsed = json.loads(match.group(1))
+                if isinstance(parsed, list):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        return None
+
     def convene(self, project_id: str, description: str) -> List[Dict[str, Any]]:
-        agents = self._get_agents()
+        try:
+            agents = self._get_agents()
+        except Exception as e:
+            logger.error("Board failed to create agents: %s", e)
+            return self._default_tickets(project_id, description)
+
         # Lazy import of crewai constructs
         try:
             from crewai import Task, Crew, Process
@@ -88,7 +163,10 @@ class StrategicBoard:
             raise RuntimeError("crewai package required for convene; install or mock for tests.")
 
         task = Task(
-            description=f"PROJECT: {project_id}\nDESC: {description}\nCreate 36 atomic tickets (3 per department). Return strict JSON array.",
+            description=(
+                f"PROJECT: {project_id}\nDESC: {description}\n"
+                "Create 36 atomic tickets (3 per department). Return strict JSON array."
+            ),
             agent=agents[0],
             expected_output="JSON array of tickets with keys: ticket_id, department, title, instruction.",
         )
@@ -96,21 +174,22 @@ class StrategicBoard:
             agents=agents, tasks=[task], process=Process.sequential, embedder=get_embedder_config()
         )
 
-        raw_result = str(crew.kickoff())
         try:
-            # First try direct JSON parsing
-            try:
-                return json.loads(raw_result)
-            except Exception:
-                # Fallback: find first JSON array in text
-                match = re.search(r"(\[\s*\{.*?\}\s*\])", raw_result, re.DOTALL)
-                if match:
-                    return json.loads(match.group(1))
-                logger.error("Board returned non-JSON output: %s", raw_result[:2000])
-                return []
+            raw_result = str(crew.kickoff())
         except Exception as e:
-            logger.exception("JSON Parsing failed in Board Output: %s", e)
-            return []
+            logger.exception("Board crew.kickoff() failed: %s", e)
+            return self._default_tickets(project_id, description)
+
+        parsed = self._extract_json_array(raw_result)
+        if parsed is not None:
+            return parsed
+
+        logger.error(
+            "Board returned non-JSON output after all extraction strategies; "
+            "using default tickets. Raw (first 2000 chars): %s",
+            raw_result[:2000],
+        )
+        return self._default_tickets(project_id, description)
 
 
 strategic_board = StrategicBoard()

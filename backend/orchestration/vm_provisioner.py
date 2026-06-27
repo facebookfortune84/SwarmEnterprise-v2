@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class VMState(str, Enum):
     """VM states"""
+
     CREATING = "creating"
     RUNNING = "running"
     STOPPED = "stopped"
@@ -29,6 +30,7 @@ class VMState(str, Enum):
 @dataclass
 class VMConfig:
     """VM configuration"""
+
     name: str
     memory_mb: int = 4096
     cpu_cores: int = 2
@@ -41,6 +43,7 @@ class VMConfig:
 @dataclass
 class VMInfo:
     """VM information"""
+
     name: str
     state: VMState
     ip_address: Optional[str]
@@ -54,11 +57,11 @@ class VMInfo:
 class HyperVProvisioner:
     """
     Hyper-V VM provisioner for Windows Server 2025.
-    
+
     Manages VMs for tenant isolation using PowerShell commands.
     Completely free - runs on your own hardware!
     """
-    
+
     def __init__(
         self,
         hyperv_host: str = "localhost",
@@ -67,7 +70,7 @@ class HyperVProvisioner:
     ):
         """
         Initialize Hyper-V provisioner.
-        
+
         Args:
             hyperv_host: Hyper-V host (localhost for local, or remote host)
             scripts_path: Path to PowerShell scripts
@@ -80,45 +83,45 @@ class HyperVProvisioner:
         self.templates_path = templates_path or os.path.join(
             os.path.dirname(__file__), "..", "..", "templates", "vms"
         )
-        
+
         logger.info(f"Initialized Hyper-V provisioner: {hyperv_host}")
-    
+
     async def provision_vm(self, config: VMConfig) -> Dict[str, Any]:
         """
         Provision a new VM.
-        
+
         Args:
             config: VM configuration
-            
+
         Returns:
             VM information dict
         """
         try:
             logger.info(f"Provisioning VM: {config.name}")
-            
+
             # Step 1: Create VM
             await self._create_vm(config)
-            
+
             # Step 2: Configure networking
             await self._configure_network(config)
-            
+
             # Step 3: Install OS
             await self._install_os(config)
-            
+
             # Step 4: Configure OS
             await self._configure_os(config)
-            
+
             # Step 5: Install Docker
             await self._install_docker(config)
-            
+
             # Step 6: Start VM
             await self._start_vm(config.name)
-            
+
             # Step 7: Get VM info
             vm_info = await self.get_vm_info(config.name)
-            
+
             logger.info(f"VM provisioned successfully: {config.name}")
-            
+
             return {
                 "name": config.name,
                 "state": vm_info.state,
@@ -128,13 +131,13 @@ class HyperVProvisioner:
                 "cpu_cores": config.cpu_cores,
                 "disk_size_gb": config.disk_size_gb,
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to provision VM {config.name}: {e}")
             # Cleanup on failure
             await self._cleanup_failed_vm(config.name)
             raise
-    
+
     async def _create_vm(self, config: VMConfig) -> None:
         """Create VM using PowerShell"""
         script = f"""
@@ -168,9 +171,9 @@ class HyperVProvisioner:
         
         Write-Output "VM created: $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def _configure_network(self, config: VMConfig) -> None:
         """Configure VM networking"""
         script = f"""
@@ -187,9 +190,9 @@ class HyperVProvisioner:
         
         Write-Output "Network configured for: $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def _install_os(self, config: VMConfig) -> None:
         """Install OS on VM"""
         # For automated installation, use cloud-init or unattended install
@@ -210,13 +213,13 @@ class HyperVProvisioner:
         # Wait for installation (this is simplified - real implementation would monitor)
         Write-Output "OS installation started for: $VMName"
         """
-        
+
         await self._run_powershell(script)
-        
+
         # Wait for OS installation to complete
         # In production, this would monitor the installation progress
         await asyncio.sleep(300)  # 5 minutes - adjust based on your setup
-    
+
     async def _configure_os(self, config: VMConfig) -> None:
         """Configure OS after installation"""
         # This would typically use SSH or PowerShell Direct
@@ -248,9 +251,9 @@ class HyperVProvisioner:
         
         Write-Output "OS configured for: $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def _install_docker(self, config: VMConfig) -> None:
         """Install Docker on VM"""
         script = f"""
@@ -279,9 +282,9 @@ class HyperVProvisioner:
         
         Write-Output "Docker installed on: $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def _start_vm(self, vm_name: str) -> None:
         """Start VM"""
         script = f"""
@@ -294,19 +297,19 @@ class HyperVProvisioner:
             Write-Output "VM already running: $VMName"
         }}
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def stop_vm(self, vm_name: str, force: bool = False) -> None:
         """
         Stop VM.
-        
+
         Args:
             vm_name: VM name
             force: Force shutdown if True, graceful if False
         """
         action = "Stop-VM -Force" if force else "Stop-VM"
-        
+
         script = f"""
         $VMName = "{vm_name}"
         
@@ -317,9 +320,9 @@ class HyperVProvisioner:
             Write-Output "VM not running: $VMName"
         }}
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def restart_vm(self, vm_name: str) -> None:
         """Restart VM"""
         script = f"""
@@ -327,13 +330,13 @@ class HyperVProvisioner:
         Restart-VM -Name $VMName -Force
         Write-Output "VM restarted: $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def delete_vm(self, vm_name: str, delete_disks: bool = True) -> None:
         """
         Delete VM.
-        
+
         Args:
             vm_name: VM name
             delete_disks: Delete virtual disks if True
@@ -364,16 +367,16 @@ class HyperVProvisioner:
         
         Write-Output "VM deleted: $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def get_vm_info(self, vm_name: str) -> VMInfo:
         """
         Get VM information.
-        
+
         Args:
             vm_name: VM name
-            
+
         Returns:
             VM information
         """
@@ -398,10 +401,10 @@ class HyperVProvisioner:
             uptime_seconds = [int]$Uptime.TotalSeconds
         }} | ConvertTo-Json
         """
-        
+
         result = await self._run_powershell(script)
         data = json.loads(result)
-        
+
         return VMInfo(
             name=data["name"],
             state=VMState(data["state"]),
@@ -412,11 +415,11 @@ class HyperVProvisioner:
             created_at=data["created_at"],
             uptime_seconds=data["uptime_seconds"],
         )
-    
+
     async def list_vms(self) -> List[VMInfo]:
         """
         List all VMs.
-        
+
         Returns:
             List of VM information
         """
@@ -436,14 +439,14 @@ class HyperVProvisioner:
             }
         } | ConvertTo-Json
         """
-        
+
         result = await self._run_powershell(script)
         data = json.loads(result)
-        
+
         # Handle single VM (not array)
         if isinstance(data, dict):
             data = [data]
-        
+
         return [
             VMInfo(
                 name=vm["name"],
@@ -457,14 +460,14 @@ class HyperVProvisioner:
             )
             for vm in data
         ]
-    
+
     async def get_vm_metrics(self, vm_name: str) -> Dict[str, Any]:
         """
         Get VM performance metrics.
-        
+
         Args:
             vm_name: VM name
-            
+
         Returns:
             Metrics dict
         """
@@ -483,10 +486,10 @@ class HyperVProvisioner:
             disk_write_iops = [int]$Metrics.AggregatedAverageNormalizedIOPS
         }} | ConvertTo-Json
         """
-        
+
         result = await self._run_powershell(script)
         return json.loads(result)
-    
+
     async def create_snapshot(self, vm_name: str, snapshot_name: str) -> None:
         """Create VM snapshot"""
         script = f"""
@@ -496,9 +499,9 @@ class HyperVProvisioner:
         Checkpoint-VM -Name $VMName -SnapshotName $SnapshotName
         Write-Output "Snapshot created: $SnapshotName for $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def restore_snapshot(self, vm_name: str, snapshot_name: str) -> None:
         """Restore VM from snapshot"""
         script = f"""
@@ -508,9 +511,9 @@ class HyperVProvisioner:
         Restore-VMSnapshot -VMName $VMName -Name $SnapshotName -Confirm:$false
         Write-Output "Snapshot restored: $SnapshotName for $VMName"
         """
-        
+
         await self._run_powershell(script)
-    
+
     async def _cleanup_failed_vm(self, vm_name: str) -> None:
         """Cleanup failed VM"""
         try:
@@ -518,14 +521,14 @@ class HyperVProvisioner:
             logger.info(f"Cleaned up failed VM: {vm_name}")
         except Exception as e:
             logger.error(f"Failed to cleanup VM {vm_name}: {e}")
-    
+
     async def _run_powershell(self, script: str) -> str:
         """
         Run PowerShell script.
-        
+
         Args:
             script: PowerShell script
-            
+
         Returns:
             Script output
         """
@@ -540,15 +543,15 @@ class HyperVProvisioner:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-            
+
             stdout, stderr = await process.communicate()
-            
+
             if process.returncode != 0:
                 error_msg = stderr.decode().strip()
                 raise Exception(f"PowerShell error: {error_msg}")
-            
+
             return stdout.decode().strip()
-            
+
         except Exception as e:
             logger.error(f"PowerShell execution failed: {e}")
             raise
@@ -556,9 +559,10 @@ class HyperVProvisioner:
 
 # Example usage
 if __name__ == "__main__":
+
     async def main():
         provisioner = HyperVProvisioner()
-        
+
         # Create VM config
         config = VMConfig(
             name="tenant-demo",
@@ -569,23 +573,23 @@ if __name__ == "__main__":
             os_template="ubuntu-22.04",
             domain="realms2riches.tech",
         )
-        
+
         # Provision VM
         vm_info = await provisioner.provision_vm(config)
         print(f"VM provisioned: {vm_info}")
-        
+
         # Get VM info
         info = await provisioner.get_vm_info(config.name)
         print(f"VM info: {info}")
-        
+
         # Get metrics
         metrics = await provisioner.get_vm_metrics(config.name)
         print(f"VM metrics: {metrics}")
-        
+
         # List all VMs
         vms = await provisioner.list_vms()
         print(f"All VMs: {vms}")
-    
+
     asyncio.run(main())
 
 # Made with Bob

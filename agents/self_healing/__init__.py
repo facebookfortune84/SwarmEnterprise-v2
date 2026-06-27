@@ -10,7 +10,7 @@ from agents.self_healing.health_monitor import (
     HealthCheck,
     HealthReport,
     ComponentType,
-    HealthThresholds
+    HealthThresholds,
 )
 
 from agents.self_healing.auto_recovery import (
@@ -19,7 +19,7 @@ from agents.self_healing.auto_recovery import (
     RecoveryStatus,
     RecoveryStrategy,
     RecoveryAttempt,
-    RecoveryReport
+    RecoveryReport,
 )
 
 from agents.self_healing.circuit_breaker import (
@@ -30,7 +30,7 @@ from agents.self_healing.circuit_breaker import (
     CircuitMetrics,
     CircuitEvent,
     CircuitBreakerError,
-    circuit_breaker
+    circuit_breaker,
 )
 
 __all__ = [
@@ -41,7 +41,6 @@ __all__ = [
     "HealthReport",
     "ComponentType",
     "HealthThresholds",
-    
     # Auto Recovery
     "AutoRecoveryAgent",
     "RecoveryAction",
@@ -49,7 +48,6 @@ __all__ = [
     "RecoveryStrategy",
     "RecoveryAttempt",
     "RecoveryReport",
-    
     # Circuit Breaker
     "CircuitBreaker",
     "CircuitBreakerManager",
