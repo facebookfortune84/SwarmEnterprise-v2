@@ -11,6 +11,8 @@ from fastapi.responses import JSONResponse as _JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from backend.auth.middleware import RateLimitMiddleware
+from backend.api.auth import router as auth_router
+from backend.api.users import router as users_router
 from backend.api.webhooks import router as webhook_router
 from backend.api.routes import router as core_router
 from backend.api.payments import router as payments_router
@@ -288,6 +290,8 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # Routers
 # ---------------------------------------------------------------------------
+app.include_router(auth_router)
+app.include_router(users_router)
 app.include_router(core_router)
 app.include_router(webhook_router)
 app.include_router(payments_router)
