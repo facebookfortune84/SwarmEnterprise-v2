@@ -174,39 +174,47 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return response
 
 
-def verify_api_key(api_key: str) -> bool:
+def verify_api_key_in_db(api_key: str, db) -> bool:
     """
-    Verify API key for programmatic access
+    Verify API key for programmatic access using an injected session.
 
     Args:
         api_key: API key to verify
+        db: SQLAlchemy Session (injected by caller)
 
     Returns:
         True if valid, False otherwise
     """
-    from backend.db.session import SessionLocal
     from backend.db.models import APIKey
     from datetime import datetime
 
+    api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
+
+    if not api_key_record:
+        return False
+
+    if not api_key_record.is_active:
+        return False
+
+    # Check expiration
+    if api_key_record.expires_at and api_key_record.expires_at < datetime.utcnow():
+        return False
+
+    # Update last used timestamp
+    api_key_record.last_used_at = datetime.utcnow()
+    db.commit()
+
+    return True
+
+
+# Keep backward-compatible alias (used in non-request contexts only, e.g. scripts)
+def verify_api_key(api_key: str) -> bool:
+    """Verify API key — opens its own short-lived session. Use verify_api_key_in_db in FastAPI routes."""
+    from backend.db.session import SessionLocal
+
     db = SessionLocal()
     try:
-        api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
-
-        if not api_key_record:
-            return False
-
-        if not api_key_record.is_active:
-            return False
-
-        # Check expiration
-        if api_key_record.expires_at and api_key_record.expires_at < datetime.utcnow():
-            return False
-
-        # Update last used timestamp
-        api_key_record.last_used_at = datetime.utcnow()
-        db.commit()
-
-        return True
+        return verify_api_key_in_db(api_key, db)
     finally:
         db.close()
 
@@ -225,12 +233,16 @@ async def get_api_key(request: Request) -> Optional[str]:
     return api_key
 
 
-async def verify_api_key_auth(api_key: Optional[str] = Depends(get_api_key)) -> dict:
+async def verify_api_key_auth(
+    api_key: Optional[str] = Depends(get_api_key),
+    db=Depends(_get_db),
+) -> dict:
     """
-    Verify API key authentication
+    Verify API key authentication using injected DB session.
 
     Args:
         api_key: API key from headers
+        db: DB session from dependency injection
 
     Returns:
         API key owner data
@@ -238,28 +250,22 @@ async def verify_api_key_auth(api_key: Optional[str] = Depends(get_api_key)) -> 
     Raises:
         HTTPException: If API key is invalid
     """
-    from backend.db.session import SessionLocal
     from backend.db.models import APIKey
 
-    if not api_key or not verify_api_key(api_key):
+    if not api_key or not verify_api_key_in_db(api_key, db):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key"
         )
 
-    # Get API key owner from database
-    db = SessionLocal()
-    try:
-        api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
-        if not api_key_record:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
+    api_key_record = db.query(APIKey).filter(APIKey.key == api_key).first()
+    if not api_key_record:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
 
-        return {
-            "user_id": api_key_record.user_id,
-            "scope": api_key_record.scope,
-            "api_key_id": api_key_record.id,
-        }
-    finally:
-        db.close()
+    return {
+        "user_id": api_key_record.user_id,
+        "scope": api_key_record.scope,
+        "api_key_id": api_key_record.id,
+    }
 
 
 # Made with Bob

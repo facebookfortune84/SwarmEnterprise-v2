@@ -1,4 +1,4 @@
-"""
+"""  # noqa: E501
 Workflows API — create, inspect, and control multi-step workflows.
 """
 from typing import Optional, List
@@ -45,7 +45,7 @@ async def create_workflow(
     svc = WorkflowService(db)
     wf = svc.create_workflow(
         name=body.name,
-        steps=[s.dict() for s in body.steps],
+        steps=[s.model_dump() for s in body.steps],
         company_id=body.company_id,
     )
     return svc.get_status(wf.id)

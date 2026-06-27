@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import os
 import time
@@ -96,9 +97,96 @@ except Exception:
     logger.debug("Telemetry not initialized")
 
 # ---------------------------------------------------------------------------
+# Lifespan (replaces deprecated on_event)
+# ---------------------------------------------------------------------------
+
+
+@contextlib.asynccontextmanager
+async def _lifespan(app: FastAPI):  # noqa: ARG001
+    # ── STARTUP ──────────────────────────────────────────────────────────────
+    # 1. Validate critical config
+    _missing = []
+    for var in ("JWT_SECRET_KEY", "SECRET_KEY"):
+        if not os.getenv(var):
+            _missing.append(var)
+    if _missing:
+        logger.warning(
+            "Startup: missing environment variable(s): %s — "
+            "some auth features will not work correctly.",
+            ", ".join(_missing),
+        )
+
+    # 2. Quick DB connectivity check (non-fatal: app still starts)
+    try:
+        db_url = os.getenv("DATABASE_URL", "")
+        if db_url and (db_url.startswith("postgresql") or db_url.startswith("postgres")):
+            from sqlalchemy import create_engine, text as _text
+
+            _chk_url = db_url.replace("+asyncpg", "").replace("postgresql+psycopg2", "postgresql")
+            _eng = create_engine(_chk_url, pool_pre_ping=True, pool_size=1, max_overflow=0)
+            with _eng.connect() as conn:
+                conn.execute(_text("SELECT 1"))
+            _eng.dispose()
+            logger.info("Startup: database connectivity OK")
+        else:
+            logger.debug("Startup: DATABASE_URL not set or SQLite — skipping connectivity check")
+    except Exception as exc:
+        logger.warning("Startup: database connectivity check failed: %s", exc)
+
+    # 3. Outreach worker + lead discovery (existing behaviour, kept intact)
+    try:
+        from agents.outreach.worker import start_worker
+
+        start_worker()
+
+        import asyncio
+        from agents.marketing.lead_discovery import lead_discovery_agent
+
+        asyncio.create_task(lead_discovery_agent.run_discovery_cycle())
+        logger.info("Autonomous lead discovery cycle initiated at startup.")
+    except Exception:
+        logger.debug("Outreach worker or discovery not started")
+
+    # 4. Phase 2 — initialise new DB tables and event bus subscriptions
+    try:
+        from backend.db.session import init_db
+
+        init_db()
+        logger.info("Phase 2 DB tables initialised.")
+    except Exception:
+        logger.warning("Phase 2 DB init skipped — tables may already exist.")
+
+    try:
+        from backend.services.event_bus import event_bus  # noqa: F401
+
+        logger.info("Phase 2 event bus subscriptions registered.")
+    except Exception:
+        logger.warning("Phase 2 event bus could not be initialised.")
+
+    logger.info(
+        "SwarmOS v2.0.0 started | env=%s | log_level=%s | cors_origins=%s",
+        _ENV,
+        _LOG_LEVEL_NAME,
+        _cors_origins,
+    )
+
+    yield  # ── application runs here ─────────────────────────────────────────
+
+    # ── SHUTDOWN ─────────────────────────────────────────────────────────────
+    logger.info("Shutdown signal received — draining connections …")
+    try:
+        import asyncio
+
+        await asyncio.sleep(0.5)
+    except Exception:
+        pass
+    logger.info("SwarmOS shutdown complete.")
+
+
+# ---------------------------------------------------------------------------
 # Application
 # ---------------------------------------------------------------------------
-app = FastAPI(title="SwarmOS Sovereign Factory", version="2.0.0")
+app = FastAPI(title="SwarmOS Sovereign Factory", version="2.0.0", lifespan=_lifespan)
 
 
 # ---------------------------------------------------------------------------
@@ -128,6 +216,7 @@ async def _global_exception_handler(_request: Request, exc: Exception) -> _JSONR
 # ---------------------------------------------------------------------------
 _RATE_LIMIT = int(os.getenv("RATE_LIMIT_RPM", "120"))
 app.add_middleware(RateLimitMiddleware, requests_per_minute=_RATE_LIMIT)
+
 
 # ---------------------------------------------------------------------------
 # Middleware 1 — Request correlation ID (X-Request-ID on every response)
@@ -264,95 +353,6 @@ _FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend" / "public"
 if _FRONTEND_DIR.is_dir():
     app.mount("/dashboard", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="dashboard")
     app.mount("/corp", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="corp")
-
-
-# ---------------------------------------------------------------------------
-# Startup event — config validation + DB connectivity check
-# ---------------------------------------------------------------------------
-@app.on_event("startup")
-async def on_startup():
-    # 1. Validate critical config
-    _missing = []
-    for var in ("JWT_SECRET_KEY", "SECRET_KEY"):
-        if not os.getenv(var):
-            _missing.append(var)
-    if _missing:
-        logger.warning(
-            "Startup: missing environment variable(s): %s — "
-            "some auth features will not work correctly.",
-            ", ".join(_missing),
-        )
-
-    # 2. Quick DB connectivity check (non-fatal: app still starts)
-    try:
-        db_url = os.getenv("DATABASE_URL", "")
-        if db_url:
-            import asyncio
-            from sqlalchemy.ext.asyncio import create_async_engine
-            from sqlalchemy import text
-
-            _engine = create_async_engine(db_url, pool_pre_ping=True, pool_size=1)
-            async with _engine.connect() as conn:
-                await conn.execute(text("SELECT 1"))
-            await _engine.dispose()
-            logger.info("Startup: database connectivity OK")
-        else:
-            logger.debug("Startup: DATABASE_URL not set — skipping DB connectivity check")
-    except Exception as exc:
-        logger.warning("Startup: database connectivity check failed: %s", exc)
-
-    # 3. Outreach worker + lead discovery (existing behaviour, kept intact)
-    try:
-        from agents.outreach.worker import start_worker
-
-        start_worker()
-
-        import asyncio
-        from agents.marketing.lead_discovery import lead_discovery_agent
-
-        asyncio.create_task(lead_discovery_agent.run_discovery_cycle())
-        logger.info("Autonomous lead discovery cycle initiated at startup.")
-    except Exception:
-        logger.debug("Outreach worker or discovery not started")
-
-    # 4. Phase 2 — initialise new DB tables and event bus subscriptions
-    try:
-        from backend.db.session import init_db
-
-        init_db()
-        logger.info("Phase 2 DB tables initialised.")
-    except Exception:
-        logger.warning("Phase 2 DB init skipped — tables may already exist.")
-
-    try:
-        from backend.services.event_bus import event_bus  # noqa: F401
-
-        logger.info("Phase 2 event bus subscriptions registered.")
-    except Exception:
-        logger.warning("Phase 2 event bus could not be initialised.")
-
-    logger.info(
-        "SwarmOS v2.0.0 started | env=%s | log_level=%s | cors_origins=%s",
-        _ENV,
-        _LOG_LEVEL_NAME,
-        _cors_origins,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Shutdown event — drain connections
-# ---------------------------------------------------------------------------
-@app.on_event("shutdown")
-async def on_shutdown():
-    logger.info("Shutdown signal received — draining connections …")
-    try:
-        # Give in-flight requests a moment to complete
-        import asyncio
-
-        await asyncio.sleep(0.5)
-    except Exception:
-        pass
-    logger.info("SwarmOS shutdown complete.")
 
 
 # ---------------------------------------------------------------------------

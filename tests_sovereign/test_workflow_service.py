@@ -136,11 +136,7 @@ class TestWorkflowService:
         svc = WorkflowService(db_session)
         wf = svc.create_workflow(name="Steps Check", steps=_steps_payload(3))
 
-        steps = (
-            db_session.query(WorkflowStep)
-            .filter(WorkflowStep.workflow_id == wf.id)
-            .all()
-        )
+        steps = db_session.query(WorkflowStep).filter(WorkflowStep.workflow_id == wf.id).all()
         assert len(steps) == 3
         for step in steps:
             assert step.status == "pending"
@@ -399,11 +395,7 @@ class TestWorkflowService:
         wf = svc.create_workflow(name="Failure Test", steps=_steps_payload(2))
 
         # Get a real step ID
-        step = (
-            db_session.query(WorkflowStep)
-            .filter(WorkflowStep.workflow_id == wf.id)
-            .first()
-        )
+        step = db_session.query(WorkflowStep).filter(WorkflowStep.workflow_id == wf.id).first()
         result = svc.handle_failure(wf.id, step.id, "test error")
 
         assert result is not None
@@ -415,11 +407,7 @@ class TestWorkflowService:
 
         svc = WorkflowService(db_session)
         wf = svc.create_workflow(name="Step Fail", steps=_steps_payload(2))
-        step = (
-            db_session.query(WorkflowStep)
-            .filter(WorkflowStep.workflow_id == wf.id)
-            .first()
-        )
+        step = db_session.query(WorkflowStep).filter(WorkflowStep.workflow_id == wf.id).first()
         svc.handle_failure(wf.id, step.id, "boom")
 
         db_session.refresh(step)
@@ -431,11 +419,7 @@ class TestWorkflowService:
 
         svc = WorkflowService(db_session)
         wf = svc.create_workflow(name="Retry Count", steps=_steps_payload(1))
-        step = (
-            db_session.query(WorkflowStep)
-            .filter(WorkflowStep.workflow_id == wf.id)
-            .first()
-        )
+        step = db_session.query(WorkflowStep).filter(WorkflowStep.workflow_id == wf.id).first()
         svc.handle_failure(wf.id, step.id, "err")
 
         db_session.refresh(step)
@@ -472,8 +456,16 @@ class TestWorkflowService:
         result = svc.get_status(wf.id)
 
         for field in (
-            "id", "name", "status", "current_step", "total_steps",
-            "error_message", "created_at", "updated_at", "completed_at", "steps",
+            "id",
+            "name",
+            "status",
+            "current_step",
+            "total_steps",
+            "error_message",
+            "created_at",
+            "updated_at",
+            "completed_at",
+            "steps",
         ):
             assert field in result, f"Missing field in get_status(): {field}"
 
@@ -498,8 +490,16 @@ class TestWorkflowService:
         result = svc.get_status(wf.id)
 
         step = result["steps"][0]
-        for field in ("id", "step_name", "step_type", "status", "retry_count",
-                      "error_message", "started_at", "completed_at"):
+        for field in (
+            "id",
+            "step_name",
+            "step_type",
+            "status",
+            "retry_count",
+            "error_message",
+            "started_at",
+            "completed_at",
+        ):
             assert field in step, f"Missing step field: {field}"
 
     def test_get_status_unknown_id_returns_none(self, db_session, mock_redis):

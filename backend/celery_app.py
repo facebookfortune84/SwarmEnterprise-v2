@@ -22,7 +22,9 @@ from kombu import Exchange, Queue
 
 _TEST_MODE = os.getenv("TEST_MODE", "").lower() in ("true", "1", "yes")
 _CELERY_BROKER = os.getenv("CELERY_BROKER_URL", os.getenv("REDIS_URL", "redis://localhost:6379/0"))
-_CELERY_BACKEND = os.getenv("CELERY_RESULT_BACKEND", os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+_CELERY_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND", os.getenv("REDIS_URL", "redis://localhost:6379/0")
+)
 
 # In test mode use in-memory transport so no Redis connection is attempted
 if _TEST_MODE:

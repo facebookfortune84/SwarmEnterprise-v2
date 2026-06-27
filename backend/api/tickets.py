@@ -186,7 +186,7 @@ async def update_ticket(
 ):
     """Update ticket fields."""
     svc = TicketService(db)
-    fields = body.dict(exclude_unset=True, exclude_none=True)
+    fields = body.model_dump(exclude_unset=True, exclude_none=True)
     ticket = svc.update_ticket(ticket_id, user_id=current_user["id"], **fields)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")

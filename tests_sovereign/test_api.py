@@ -154,7 +154,11 @@ class TestNotificationsAPI:
         self.headers = {"Authorization": f"Bearer {self.token}"}
 
         # Current user dict that the override will return
-        self.current_user_dict = {"id": self.user_id, "email": "notif_user@example.com", "role": "user"}
+        self.current_user_dict = {
+            "id": self.user_id,
+            "email": "notif_user@example.com",
+            "role": "user",
+        }
 
         def override_get_db():
             db = self.factory()
@@ -250,25 +254,19 @@ class TestNotificationsAPI:
     # ── mark single read ──────────────────────────────────────────────────────
 
     def test_mark_read_returns_ok(self):
-        resp = self.client.post(
-            f"/api/notifications/read/{self.notif1_id}", headers=self.headers
-        )
+        resp = self.client.post(f"/api/notifications/read/{self.notif1_id}", headers=self.headers)
         assert resp.status_code == 200
         assert resp.json() == {"ok": True}
 
     def test_mark_read_persists(self):
-        self.client.post(
-            f"/api/notifications/read/{self.notif1_id}", headers=self.headers
-        )
+        self.client.post(f"/api/notifications/read/{self.notif1_id}", headers=self.headers)
         db = self.factory()
         notif = db.query(Notification).filter(Notification.id == self.notif1_id).first()
         assert notif.is_read is True
         db.close()
 
     def test_mark_read_not_found(self):
-        resp = self.client.post(
-            f"/api/notifications/read/{uuid.uuid4()}", headers=self.headers
-        )
+        resp = self.client.post(f"/api/notifications/read/{uuid.uuid4()}", headers=self.headers)
         assert resp.status_code == 404
 
     # ── mark all read ─────────────────────────────────────────────────────────
@@ -292,9 +290,7 @@ class TestNotificationsAPI:
     # ── delete ────────────────────────────────────────────────────────────────
 
     def test_delete_notification_returns_ok(self):
-        resp = self.client.delete(
-            f"/api/notifications/{self.notif2_id}", headers=self.headers
-        )
+        resp = self.client.delete(f"/api/notifications/{self.notif2_id}", headers=self.headers)
         assert resp.status_code == 200
         assert resp.json() == {"ok": True}
 
@@ -306,9 +302,7 @@ class TestNotificationsAPI:
         db.close()
 
     def test_delete_notification_not_found(self):
-        resp = self.client.delete(
-            f"/api/notifications/{uuid.uuid4()}", headers=self.headers
-        )
+        resp = self.client.delete(f"/api/notifications/{uuid.uuid4()}", headers=self.headers)
         assert resp.status_code == 404
 
 
@@ -351,7 +345,11 @@ class TestWorkflowsAPI:
 
         self.token = _make_token(self.user_id, "wf_user@example.com", "admin")
         self.headers = {"Authorization": f"Bearer {self.token}"}
-        self.current_user_dict = {"id": self.user_id, "email": "wf_user@example.com", "role": "admin"}
+        self.current_user_dict = {
+            "id": self.user_id,
+            "email": "wf_user@example.com",
+            "role": "admin",
+        }
 
         def override_get_db():
             db = self.factory()

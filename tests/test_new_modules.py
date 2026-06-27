@@ -98,6 +98,7 @@ class TestConfig:
         monkeypatch.setenv("DEPLOY_PROFILE", "local")
         monkeypatch.setenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
         import backend.config as cfg_mod
+
         # Bypass cache by instantiating directly
         s = cfg_mod.JwtSettings()  # should not raise
         assert s.secret_key is not None
@@ -107,6 +108,7 @@ class TestConfig:
         monkeypatch.setenv("DEPLOY_PROFILE", "production")
         # Call the validator function directly, bypassing the cached Settings object
         from backend.config import JwtSettings
+
         validator = JwtSettings.secret_key_must_not_be_default_in_production
         with pytest.raises(ValueError, match="JWT_SECRET_KEY must be set"):
             validator("your-secret-key-change-in-production")
@@ -351,7 +353,11 @@ class TestTicketsAPI:
         headers = _make_auth_headers(db)
         resp = client.post(
             "/api/tickets",
-            json={"title": "Fix login bug", "instruction": "Debug the OAuth2 flow", "priority": "high"},
+            json={
+                "title": "Fix login bug",
+                "instruction": "Debug the OAuth2 flow",
+                "priority": "high",
+            },
             headers=headers,
         )
         assert resp.status_code == 201
@@ -371,7 +377,9 @@ class TestTicketsAPI:
         client, db = app_client_with_db
         headers = _make_auth_headers(db)
         for i in range(2):
-            client.post("/api/tickets", json={"title": f"T{i}", "instruction": f"I{i}"}, headers=headers)
+            client.post(
+                "/api/tickets", json={"title": f"T{i}", "instruction": f"I{i}"}, headers=headers
+            )
         resp = client.get("/api/tickets", headers=headers)
         assert resp.status_code == 200
         body = resp.json()
@@ -393,7 +401,9 @@ class TestTicketsAPI:
             "/api/tickets", json={"title": "Old", "instruction": "Old"}, headers=headers
         ).json()
         tid = created["id"]
-        resp = client.put(f"/api/tickets/{tid}", json={"title": "New", "priority": "critical"}, headers=headers)
+        resp = client.put(
+            f"/api/tickets/{tid}", json={"title": "New", "priority": "critical"}, headers=headers
+        )
         assert resp.status_code == 200
         assert resp.json()["title"] == "New"
 
@@ -417,7 +427,9 @@ class TestTicketsAPI:
             "/api/tickets", json={"title": "Ticket", "instruction": "..."}, headers=headers
         ).json()
         tid = created["id"]
-        resp = client.post(f"/api/tickets/{tid}/comment", json={"content": "A comment"}, headers=headers)
+        resp = client.post(
+            f"/api/tickets/{tid}/comment", json={"content": "A comment"}, headers=headers
+        )
         assert resp.status_code == 201
 
     def test_ticket_history(self, app_client_with_db):
@@ -452,9 +464,7 @@ class TestNotificationsAPI:
         from backend.auth.jwt_handler import create_access_token
 
         svc = UserService(db)
-        u = svc.create_user(
-            UserCreate(email="notif@test.com", password="Pass123!", full_name="N")
-        )
+        u = svc.create_user(UserCreate(email="notif@test.com", password="Pass123!", full_name="N"))
         token = create_access_token({"sub": u.id, "role": u.role})
         return u, {"Authorization": f"Bearer {token}"}
 
@@ -577,9 +587,7 @@ class TestWorkflowsAPI:
         from backend.auth.jwt_handler import create_access_token
 
         svc = UserService(db)
-        u = svc.create_user(
-            UserCreate(email="wf@test.com", password="Pass123!", full_name="WF")
-        )
+        u = svc.create_user(UserCreate(email="wf@test.com", password="Pass123!", full_name="WF"))
         token = create_access_token({"sub": u.id, "role": u.role})
         return {"Authorization": f"Bearer {token}"}
 
@@ -686,7 +694,9 @@ class TestTicketHistory:
         """record_change writes a row; get_history retrieves it."""
         from backend.db.ticket_history import record_change, get_history
 
-        record_change(db, ticket_id="T-1", action="status_changed", old_value="OPEN", new_value="RESOLVED")
+        record_change(
+            db, ticket_id="T-1", action="status_changed", old_value="OPEN", new_value="RESOLVED"
+        )
         history = get_history(db, ticket_id="T-1")
         assert len(history) == 1
         assert history[0]["action"] == "status_changed"
@@ -844,7 +854,14 @@ class TestNotificationService:
     def _make_user(self, db, email="ns@test.com", role="user"):
         from backend.db.models import User
 
-        u = User(id=f"u-{email}", email=email, password_hash="x", full_name="N", role=role, is_active=True)
+        u = User(
+            id=f"u-{email}",
+            email=email,
+            password_hash="x",
+            full_name="N",
+            role=role,
+            is_active=True,
+        )
         db.add(u)
         db.commit()
         return u
@@ -856,9 +873,7 @@ class TestNotificationService:
 
         u = self._make_user(db)
         svc = NotificationService(db)
-        n = svc.create_notification(
-            user_id=u.id, type="info", title="Hello", message="World"
-        )
+        n = svc.create_notification(user_id=u.id, type="info", title="Hello", message="World")
         assert n.id is not None
         assert db.query(Notification).filter_by(id=n.id).first() is not None
 

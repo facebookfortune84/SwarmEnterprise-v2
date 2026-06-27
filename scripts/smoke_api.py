@@ -50,7 +50,6 @@ class _HttpClient:
 
             self._client: Any = TestClient(app, raise_server_exceptions=False)
         else:
-
             self._client = None
 
     # ------------------------------------------------------------------

@@ -103,9 +103,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        "ix_ticket_comments_ticket_id", "ticket_comments", ["ticket_id"], unique=False
-    )
+    op.create_index("ix_ticket_comments_ticket_id", "ticket_comments", ["ticket_id"], unique=False)
 
     # ── workflows ─────────────────────────────────────────────────────────────
     op.create_table(

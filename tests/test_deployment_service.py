@@ -263,6 +263,7 @@ class TestDeploymentService:
     @pytest.mark.asyncio
     async def test_create_backup(self, deployment_service):
         """Test creating a deployment backup"""
+
         # Pre-mock all VM/docker operations so no real subprocesses are spawned
         async def mock_provision_vm(config):
             return {"vm_name": config.tenant_name, "ip": "127.0.0.1", "status": "running"}

@@ -48,7 +48,7 @@ async def update_my_profile(
     Update current user's profile
     """
     user_service = UserService(db)
-    update_data = UserUpdate(**user_data.dict(exclude_unset=True))
+    update_data = UserUpdate(**user_data.model_dump(exclude_unset=True))
     updated_user = user_service.update_user(current_user["id"], update_data)
 
     if not updated_user:
@@ -123,7 +123,7 @@ async def update_user(
     Update user by ID (admin only)
     """
     user_service = UserService(db)
-    update_data = UserUpdate(**user_data.dict(exclude_unset=True))
+    update_data = UserUpdate(**user_data.model_dump(exclude_unset=True))
     updated_user = user_service.update_user(user_id, update_data)
 
     if not updated_user:
