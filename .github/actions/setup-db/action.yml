@@ -1,0 +1,33 @@
+name: "Setup DB + run migrations"
+description: "Composite action: boot SQLite (or Postgres service) and run Alembic migrations"
+
+inputs:
+  database-url:
+    description: "DATABASE_URL to use for migrations"
+    required: false
+    default: "sqlite:///./ci_test.db"
+  pythonpath:
+    description: "PYTHONPATH for Alembic"
+    required: false
+    default: "."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Alembic migrations
+      shell: bash
+      env:
+        DATABASE_URL: ${{ inputs.database-url }}
+        PYTHONPATH: ${{ inputs.pythonpath }}
+      run: |
+        alembic upgrade head
+        echo "[OK] Alembic upgrade head completed"
+
+    - name: Verify schema version
+      shell: bash
+      env:
+        DATABASE_URL: ${{ inputs.database-url }}
+        PYTHONPATH: ${{ inputs.pythonpath }}
+      run: |
+        CURRENT=$(alembic current 2>&1 || echo "unknown")
+        echo "Alembic current revision: ${CURRENT}"

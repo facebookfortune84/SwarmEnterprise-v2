@@ -1,0 +1,70 @@
+# .github/labeler.yml — path-based PR label rules
+# Used by actions/labeler@v5 in pr-labels.yml
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/**"
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "frontend/**"
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile"
+          - "backend/Dockerfile"
+          - "docker-compose*.yml"
+          - "deploy/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+database:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "alembic/**"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "requirements*.txt"
+          - "pyproject.toml"
+          - "package.json"
+          - "package-lock.json"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+          - "tests_sovereign/**"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "docs/**"
+
+configuration:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.yml"
+          - "*.yaml"
+          - "*.toml"
+          - "*.ini"
+          - ".env*"
+
+scripts:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "scripts/**"
+          - "Makefile"
+
+monitoring:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "monitoring/**"

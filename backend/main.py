@@ -6,8 +6,10 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse as _JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
+from backend.auth.middleware import RateLimitMiddleware
 from backend.api.webhooks import router as webhook_router
 from backend.api.routes import router as core_router
 from backend.api.payments import router as payments_router
@@ -98,6 +100,34 @@ except Exception:
 # ---------------------------------------------------------------------------
 app = FastAPI(title="SwarmOS Sovereign Factory", version="2.0.0")
 
+
+# ---------------------------------------------------------------------------
+# Global exception handler — structured JSON errors on unhandled exceptions
+# ---------------------------------------------------------------------------
+
+
+@app.exception_handler(Exception)
+async def _global_exception_handler(_request: Request, exc: Exception) -> _JSONResponse:
+    request_id = getattr(_request.state, "request_id", "unknown")
+    logger.exception(
+        "Unhandled exception | request_id=%s | path=%s",
+        request_id,
+        _request.url.path,
+    )
+    return _JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "request_id": request_id,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Middleware 0 — Rate limiting (in-process; upgrade to slowapi for production)
+# ---------------------------------------------------------------------------
+_RATE_LIMIT = int(os.getenv("RATE_LIMIT_RPM", "120"))
+app.add_middleware(RateLimitMiddleware, requests_per_minute=_RATE_LIMIT)
 
 # ---------------------------------------------------------------------------
 # Middleware 1 — Request correlation ID (X-Request-ID on every response)
@@ -326,10 +356,42 @@ async def on_shutdown():
 
 
 # ---------------------------------------------------------------------------
-# Health check
+# Health check — checks DB, Redis, and Ollama connectivity
 # ---------------------------------------------------------------------------
 @app.get("/health")
 def health_check():
+    checks: dict = {}
+
+    # DB check
+    db_ok = False
+    try:
+        db_url = os.getenv("DATABASE_URL", "")
+        if db_url:
+            from sqlalchemy import create_engine, text
+
+            _chk_url = db_url.replace("+asyncpg", "").replace("postgresql+psycopg2", "postgresql")
+            _eng = create_engine(_chk_url, pool_pre_ping=True, pool_size=1, max_overflow=0)
+            with _eng.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            _eng.dispose()
+            db_ok = True
+    except Exception:
+        pass
+    checks["db"] = "ok" if db_ok else "unreachable"
+
+    # Redis check
+    redis_ok = False
+    try:
+        import redis as _redis
+
+        _r = _redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), socket_timeout=2)
+        _r.ping()
+        redis_ok = True
+    except Exception:
+        pass
+    checks["redis"] = "ok" if redis_ok else "unreachable"
+
+    # Ollama check
     ollama_ok = False
     try:
         import requests
@@ -340,10 +402,12 @@ def health_check():
             ollama_ok = r.status_code == 200
     except Exception:
         pass
+    checks["ollama"] = "ok" if ollama_ok else "unreachable"
+
     return {
         "status": "ONLINE",
         "version": "2.0.0",
         "engine": "SwarmOS",
         "deploy_profile": os.getenv("DEPLOY_PROFILE", "local"),
-        "ollama_reachable": ollama_ok,
+        "checks": checks,
     }

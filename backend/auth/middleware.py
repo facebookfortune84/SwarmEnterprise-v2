@@ -1,10 +1,15 @@
 """
 Authentication and authorization middleware
 """
-from typing import Optional, Callable
-from fastapi import Request, HTTPException, status, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+from typing import Callable, Optional
+
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from starlette.middleware.base import BaseHTTPMiddleware
+
 from .jwt_handler import decode_token, is_token_revoked
+from backend.db.session import get_db as _get_db
 
 
 security = HTTPBearer()
@@ -58,33 +63,24 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     }
 
 
-async def get_current_active_user(current_user: dict = Depends(get_current_user)) -> dict:
+async def get_current_active_user(
+    current_user: dict = Depends(get_current_user),
+    db=Depends(_get_db),
+) -> dict:
     """
-    Get current active user and verify status in database
+    Get current active user and verify status in database.
 
-    Args:
-        current_user: Current user from token
-
-    Returns:
-        Active user data
-
-    Raises:
-        HTTPException: If user is inactive or not found
+    Uses `get_db` via dependency injection so test overrides work correctly.
     """
-    from backend.db.session import SessionLocal
     from backend.db.models import User
 
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == current_user["id"]).first()
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-        if not user.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive"
-            )
-    finally:
-        db.close()
+    user = db.query(User).filter(User.id == current_user["id"]).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive"
+        )
 
     return current_user
 
@@ -131,60 +127,44 @@ async def get_current_superadmin_user(
     return current_user
 
 
-class RateLimitMiddleware:
+class RateLimitMiddleware(BaseHTTPMiddleware):
     """
-    Rate limiting middleware
+    Rate limiting middleware using BaseHTTPMiddleware.
 
-    Note: This is a basic implementation. For production, use Redis-based
-    rate limiting with libraries like slowapi or fastapi-limiter.
+    Note: This is an in-process implementation.
+    For high-throughput production use, replace with a Redis-backed
+    solution such as slowapi or fastapi-limiter.
     """
 
-    def __init__(self, requests_per_minute: int = 60):
-        """
-        Initialize rate limiter
-
-        Args:
-            requests_per_minute: Maximum requests per minute per IP
-        """
+    def __init__(self, app, requests_per_minute: int = 60):
+        super().__init__(app)
         self.requests_per_minute = requests_per_minute
-        self.request_counts = {}  # IP -> (count, timestamp)
+        self.request_counts: dict = {}  # IP -> (count, window_start)
 
-    async def __call__(self, request: Request, call_next: Callable):
-        """
-        Process request with rate limiting
-
-        Args:
-            request: FastAPI request
-            call_next: Next middleware/handler
-
-        Returns:
-            Response
-
-        Raises:
-            HTTPException: If rate limit exceeded
-        """
+    async def dispatch(self, request: Request, call_next: Callable):
         import time
 
         client_ip = request.client.host if request.client else "unknown"
         current_time = time.time()
 
-        # Clean old entries (older than 1 minute)
+        # Expire entries older than 60 seconds
         self.request_counts = {
-            ip: (count, timestamp)
-            for ip, (count, timestamp) in self.request_counts.items()
-            if current_time - timestamp < 60
+            ip: (count, ts)
+            for ip, (count, ts) in self.request_counts.items()
+            if current_time - ts < 60
         }
 
-        # Check rate limit
         if client_ip in self.request_counts:
-            count, timestamp = self.request_counts[client_ip]
-            if current_time - timestamp < 60:
+            count, ts = self.request_counts[client_ip]
+            if current_time - ts < 60:
                 if count >= self.requests_per_minute:
-                    raise HTTPException(
-                        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                        detail="Rate limit exceeded. Please try again later.",
+                    from fastapi.responses import JSONResponse
+
+                    return JSONResponse(
+                        status_code=429,
+                        content={"detail": "Rate limit exceeded. Please try again later."},
                     )
-                self.request_counts[client_ip] = (count + 1, timestamp)
+                self.request_counts[client_ip] = (count + 1, ts)
             else:
                 self.request_counts[client_ip] = (1, current_time)
         else:

@@ -1,0 +1,58 @@
+name: "Dependabot — Auto-Merge"
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: "Auto-merge Dependabot patches"
+    runs-on: ubuntu-latest
+    # Only act on Dependabot PRs
+    if: github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-approve patch and minor updates
+        # Approve patch and minor version bumps automatically.
+        # Major version bumps require human review.
+        if: |
+          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        run: |
+          gh pr review --approve "${{ github.event.pull_request.html_url }}" \
+            --body "Auto-approved: ${{ steps.meta.outputs.update-type }} dependency update."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-merge patch updates (squash)
+        if: steps.meta.outputs.update-type == 'version-update:semver-patch'
+        run: |
+          gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on minor/major updates that need review
+        if: |
+          steps.meta.outputs.update-type == 'version-update:semver-minor' ||
+          steps.meta.outputs.update-type == 'version-update:semver-major'
+        run: |
+          TYPE="${{ steps.meta.outputs.update-type }}"
+          if [[ "$TYPE" == *"major"* ]]; then
+            MSG="⚠️ **Major version bump** — manual review required before merging."
+          else
+            MSG="ℹ️ **Minor version bump** — auto-approved, but waiting for CI to pass before auto-merging."
+            gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}" || true
+          fi
+          gh pr comment "${{ github.event.pull_request.html_url }}" --body "$MSG"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

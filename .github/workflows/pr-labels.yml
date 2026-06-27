@@ -1,0 +1,109 @@
+name: "PR — Labels + Size Check"
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened, labeled, unlabeled, edited ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Auto-label based on changed file paths
+  # ──────────────────────────────────────────────────────────────────────────
+  labeler:
+    name: "Auto-label by path"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply path-based labels
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # PR size gate — warn on large PRs, block on huge ones
+  # ──────────────────────────────────────────────────────────────────────────
+  size-check:
+    name: "PR size check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Count changed lines
+        id: diff
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          ADDITIONS=$(git diff --numstat "${BASE}..${HEAD}" | awk '{sum += $1} END {print sum+0}')
+          DELETIONS=$(git diff --numstat "${BASE}..${HEAD}" | awk '{sum += $2} END {print sum+0}')
+          TOTAL=$((ADDITIONS + DELETIONS))
+          echo "additions=${ADDITIONS}" >> "$GITHUB_OUTPUT"
+          echo "deletions=${DELETIONS}" >> "$GITHUB_OUTPUT"
+          echo "total=${TOTAL}"         >> "$GITHUB_OUTPUT"
+          echo "PR diff: +${ADDITIONS} / -${DELETIONS} (total ${TOTAL} lines)"
+
+      - name: Determine size label
+        id: size-label
+        run: |
+          TOTAL="${{ steps.diff.outputs.total }}"
+          if   [ "$TOTAL" -lt 10  ]; then SIZE="size/XS"
+          elif [ "$TOTAL" -lt 50  ]; then SIZE="size/S"
+          elif [ "$TOTAL" -lt 250 ]; then SIZE="size/M"
+          elif [ "$TOTAL" -lt 500 ]; then SIZE="size/L"
+          else SIZE="size/XL"
+          fi
+          echo "label=${SIZE}" >> "$GITHUB_OUTPUT"
+
+      - name: Add size label via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SIZE_LABEL="${{ steps.size-label.outputs.label }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          REPO="${{ github.repository }}"
+
+          # Remove existing size/* labels
+          EXISTING=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name' 2>/dev/null | grep '^size/' || true)
+          for old in $EXISTING; do
+            gh pr edit "$PR_NUMBER" --remove-label "$old" || true
+          done
+
+          # Ensure the size label exists in the repo (create if missing)
+          gh label create "${SIZE_LABEL}" --color "ededed" --description "Auto: PR size" --force || true
+          gh pr edit "$PR_NUMBER" --add-label "${SIZE_LABEL}"
+
+      - name: Block XL PRs
+        if: steps.size-label.outputs.label == 'size/XL'
+        run: |
+          TOTAL="${{ steps.diff.outputs.total }}"
+          echo "::warning::This PR touches ${TOTAL} lines (size/XL)."
+          echo "Consider breaking it into smaller, focused PRs for easier review."
+          # Non-blocking — warn only; set to exit 1 to make it blocking
+          exit 0
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Require at least one label (not a blocker, just a nudge)
+  # ──────────────────────────────────────────────────────────────────────────
+  require-label:
+    name: "Require label"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for labels
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels) }}
+        run: |
+          COUNT=$(echo "$LABELS" | python3 -c "import sys, json; print(len(json.load(sys.stdin)))")
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::warning::This PR has no labels. Add at least one label to categorise the change."
+          else
+            echo "[OK] PR has ${COUNT} label(s)."
+          fi

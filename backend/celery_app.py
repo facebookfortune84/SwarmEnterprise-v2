@@ -20,15 +20,22 @@ from celery import Celery
 from celery.schedules import crontab
 from kombu import Exchange, Queue
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_TEST_MODE = os.getenv("TEST_MODE", "").lower() in ("true", "1", "yes")
+_CELERY_BROKER = os.getenv("CELERY_BROKER_URL", os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+_CELERY_BACKEND = os.getenv("CELERY_RESULT_BACKEND", os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+
+# In test mode use in-memory transport so no Redis connection is attempted
+if _TEST_MODE:
+    _CELERY_BROKER = "memory://"
+    _CELERY_BACKEND = "cache+memory://"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Application
 # ─────────────────────────────────────────────────────────────────────────────
 celery_app = Celery(
     "swarm",
-    broker=REDIS_URL,
-    backend=REDIS_URL,
+    broker=_CELERY_BROKER,
+    backend=_CELERY_BACKEND,
     include=[
         "backend.tasks.ticket_tasks",
         "backend.tasks.notification_tasks",

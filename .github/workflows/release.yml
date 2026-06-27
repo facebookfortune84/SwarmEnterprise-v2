@@ -1,0 +1,135 @@
+name: "Release — Changelog + Semantic Tag"
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: "Bump version + update CHANGELOG"
+    runs-on: ubuntu-latest
+    # Skip if the commit itself is a release commit (prevents loops)
+    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install semantic-release tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install commitizen
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine next version
+        id: version
+        run: |
+          # Parse conventional commits since the last tag to decide bump
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --oneline)
+          else
+            COMMITS=$(git log "${LAST_TAG}..HEAD" --oneline)
+          fi
+
+          MAJOR=0; MINOR=0; PATCH=1  # default: patch bump
+          if echo "$COMMITS" | grep -qE "^[0-9a-f]+ (feat|feature)(\(.*\))?!:"; then
+            MAJOR=1; MINOR=0; PATCH=0
+          elif echo "$COMMITS" | grep -qE "BREAKING CHANGE"; then
+            MAJOR=1; MINOR=0; PATCH=0
+          elif echo "$COMMITS" | grep -qE "^[0-9a-f]+ (feat|feature)(\(.*\))?:"; then
+            MINOR=1; PATCH=0
+          fi
+
+          if [ -z "$LAST_TAG" ]; then
+            BASE="0.0.0"
+          else
+            BASE="${LAST_TAG#v}"
+          fi
+          IFS='.' read -r VMAJ VMIN VPAT <<< "$BASE"
+          VMAJ=${VMAJ:-0}; VMIN=${VMIN:-0}; VPAT=${VPAT:-0}
+
+          if [ "$MAJOR" = "1" ]; then
+            NEW_VER="$((VMAJ + 1)).0.0"
+          elif [ "$MINOR" = "1" ]; then
+            NEW_VER="${VMAJ}.$((VMIN + 1)).0"
+          else
+            NEW_VER="${VMAJ}.${VMIN}.$((VPAT + 1))"
+          fi
+
+          echo "new_version=${NEW_VER}" >> "$GITHUB_OUTPUT"
+          echo "last_tag=${LAST_TAG}"   >> "$GITHUB_OUTPUT"
+          echo "[release] Bumping ${LAST_TAG:-<none>} → v${NEW_VER}"
+
+      - name: Update CHANGELOG.md
+        id: changelog
+        run: |
+          NEW_TAG="v${{ steps.version.outputs.new_version }}"
+          LAST_TAG="${{ steps.version.outputs.last_tag }}"
+          DATE=$(date -u '+%Y-%m-%d')
+
+          if [ -n "$LAST_TAG" ]; then
+            RANGE="${LAST_TAG}..HEAD"
+          else
+            RANGE="HEAD"
+          fi
+
+          # Build section from conventional commit types
+          FEATURES=$(git log ${RANGE} --oneline --format="- %s" | grep -E "^- (feat|feature)" | sed 's/^- feat[ure]*[^:]*: /- /' || true)
+          FIXES=$(git log ${RANGE} --oneline --format="- %s" | grep -E "^- fix" | sed 's/^- fix[^:]*: /- /' || true)
+          CHORES=$(git log ${RANGE} --oneline --format="- %s" | grep -E "^- (chore|ci|docs|style|refactor|test|perf)" | sed 's/^- [^:]*: /- /' || true)
+
+          SECTION="## [${NEW_TAG}] — ${DATE}\n"
+          [ -n "$FEATURES" ] && SECTION="${SECTION}\n### Features\n${FEATURES}\n"
+          [ -n "$FIXES"    ] && SECTION="${SECTION}\n### Bug Fixes\n${FIXES}\n"
+          [ -n "$CHORES"   ] && SECTION="${SECTION}\n### Maintenance\n${CHORES}\n"
+
+          # Prepend to CHANGELOG.md
+          if [ -f CHANGELOG.md ]; then
+            EXISTING=$(cat CHANGELOG.md)
+          else
+            EXISTING="# Changelog\n\nAll notable changes to this project will be documented here."
+          fi
+
+          printf "%b\n\n%s" "$SECTION" "$EXISTING" > CHANGELOG.md
+          echo "new_tag=${NEW_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit CHANGELOG + tag
+        run: |
+          NEW_TAG="${{ steps.changelog.outputs.new_tag }}"
+          git add CHANGELOG.md
+          git diff --staged --quiet && echo "[release] No changes to commit" && exit 0
+          git commit -m "chore(release): ${NEW_TAG} [skip ci]"
+          git tag -a "${NEW_TAG}" -m "Release ${NEW_TAG}"
+          git push origin main --follow-tags
+          echo "[release] Tagged and pushed ${NEW_TAG}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_TAG="${{ steps.changelog.outputs.new_tag }}"
+          LAST_TAG="${{ steps.version.outputs.last_tag }}"
+          if [ -n "$LAST_TAG" ]; then
+            NOTES=$(git log "${LAST_TAG}..${NEW_TAG}" --oneline --format="- %s")
+          else
+            NOTES=$(git log "${NEW_TAG}" --oneline --format="- %s" | head -30)
+          fi
+          gh release create "${NEW_TAG}" \
+            --title "SwarmOS ${NEW_TAG}" \
+            --notes "${NOTES}" \
+            --verify-tag

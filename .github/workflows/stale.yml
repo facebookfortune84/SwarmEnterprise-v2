@@ -1,0 +1,61 @@
+name: "Stale Issues + PRs"
+
+on:
+  schedule:
+    # Every day at 01:00 UTC
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: "Mark stale issues and PRs"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # ── Issues ──────────────────────────────────────────────────────────
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          stale-issue-label: "stale"
+          stale-issue-message: |
+            👋 This issue has been automatically marked **stale** because it has not had
+            any activity in the past 60 days.
+
+            If this issue is still relevant, please leave a comment or remove the `stale`
+            label — it will then stay open. Otherwise it will be closed in 14 days.
+
+          close-issue-message: |
+            This issue was automatically closed because it remained stale for 14 days
+            after being marked as such. Feel free to reopen it if the problem persists.
+
+          # Never stale these
+          exempt-issue-labels: "pinned,security,bug,P0,P1"
+
+          # ── Pull Requests ────────────────────────────────────────────────────
+          days-before-pr-stale: 30
+          days-before-pr-close: 7
+          stale-pr-label: "stale"
+          stale-pr-message: |
+            👋 This pull request has been automatically marked **stale** because it has
+            not had any activity in the past 30 days.
+
+            If this PR is still in progress, please push a new commit or remove the
+            `stale` label. Otherwise it will be closed in 7 days.
+
+          close-pr-message: |
+            This pull request was automatically closed because it remained stale for
+            7 days after being marked as such. Feel free to reopen it when you are ready.
+
+          exempt-pr-labels: "pinned,security,do-not-merge"
+
+          # ── Misc ─────────────────────────────────────────────────────────────
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          debug-only: false

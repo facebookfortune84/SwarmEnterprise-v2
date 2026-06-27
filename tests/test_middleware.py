@@ -120,17 +120,16 @@ class TestAuthMiddleware:
         assert "revoked" in exc_info.value.detail.lower()
 
     @pytest.mark.asyncio
-    async def test_get_current_active_user_success(self, active_user):
+    async def test_get_current_active_user_success(self, active_user, db_session):
         """Test getting active user succeeds"""
         current_user = {"id": active_user.id, "email": active_user.email, "role": active_user.role}
 
-        with patch("backend.db.session.SessionLocal", return_value=self.SessionLocal()):
-            result = await get_current_active_user(current_user)
+        result = await get_current_active_user(current_user, db_session)
 
         assert result == current_user
 
     @pytest.mark.asyncio
-    async def test_get_current_active_user_inactive(self, inactive_user):
+    async def test_get_current_active_user_inactive(self, inactive_user, db_session):
         """Test getting inactive user fails"""
         current_user = {
             "id": inactive_user.id,
@@ -138,21 +137,19 @@ class TestAuthMiddleware:
             "role": inactive_user.role,
         }
 
-        with patch("backend.db.session.SessionLocal", return_value=self.SessionLocal()):
-            with pytest.raises(HTTPException) as exc_info:
-                await get_current_active_user(current_user)
+        with pytest.raises(HTTPException) as exc_info:
+            await get_current_active_user(current_user, db_session)
 
         assert exc_info.value.status_code == 403
         assert "inactive" in exc_info.value.detail.lower()
 
     @pytest.mark.asyncio
-    async def test_get_current_active_user_not_found(self):
+    async def test_get_current_active_user_not_found(self, db_session):
         """Test getting non-existent user fails"""
         current_user = {"id": "nonexistent", "email": "none@example.com", "role": "user"}
 
-        with patch("backend.db.session.SessionLocal", return_value=self.SessionLocal()):
-            with pytest.raises(HTTPException) as exc_info:
-                await get_current_active_user(current_user)
+        with pytest.raises(HTTPException) as exc_info:
+            await get_current_active_user(current_user, db_session)
 
         assert exc_info.value.status_code == 404
 

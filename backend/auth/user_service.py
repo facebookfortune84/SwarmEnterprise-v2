@@ -250,7 +250,7 @@ class UserService:
         Returns:
             User response object without password
         """
-        return UserResponse.from_orm(user)
+        return UserResponse.model_validate(user)
 
 
 # Made with Bob

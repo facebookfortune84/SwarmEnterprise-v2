@@ -1,10 +1,18 @@
 import os
 
 os.environ.setdefault("OTEL_SDK_DISABLED", "true")
+os.environ.setdefault("DATABASE_URL", "sqlite://")
+os.environ.setdefault("JWT_SECRET_KEY", "ci-test-secret-key-do-not-use-in-production-64chars00")
+os.environ.setdefault("SECRET_KEY", "ci-test-secret-key-do-not-use-in-production-64chars01")
+os.environ.setdefault("TEST_MODE", "true")
+os.environ.setdefault("DRY_RUN_MODE", "true")
+os.environ.setdefault("CELERY_BROKER_URL", "memory://")
+os.environ.setdefault("CELERY_RESULT_BACKEND", "cache+memory://")
 
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, MagicMock, patch
+
 from backend.main import app
 
 
@@ -12,6 +20,31 @@ from backend.main import app
 def client():
     """FastAPI test client"""
     return TestClient(app)
+
+
+@pytest.fixture
+def app_client(db):
+    """
+    FastAPI TestClient wired to the same in-memory SQLite session as the
+    `db` fixture. The `db` fixture must be defined in the test module or
+    a closer conftest (the one in tests/test_new_modules.py defines it).
+    Mocks Redis so token revocation never dials localhost.
+    """
+    from backend.db.session import get_db
+
+    def override_get_db():
+        yield db
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    mock_redis = MagicMock()
+    mock_redis.exists.return_value = 0
+    mock_redis.setex.return_value = True
+
+    with patch("backend.auth.jwt_handler.redis_client", mock_redis):
+        yield TestClient(app, raise_server_exceptions=False)
+
+    app.dependency_overrides.pop(get_db, None)
 
 
 @pytest.fixture

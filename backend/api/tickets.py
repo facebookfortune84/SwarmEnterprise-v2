@@ -126,7 +126,12 @@ async def list_tickets(
         skip=skip,
         limit=limit,
     )
-    return {"items": [_serialize_ticket(t) for t in tickets], "skip": skip, "limit": limit}
+    return {
+        "items": [_serialize_ticket(t) for t in tickets],
+        "total": len(tickets),
+        "skip": skip,
+        "limit": limit,
+    }
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -287,4 +292,4 @@ async def get_ticket_history(
     svc = TicketService(db)
     if not svc.get_ticket(ticket_id):
         raise HTTPException(status_code=404, detail="Ticket not found")
-    return {"ticket_id": ticket_id, "history": get_history(db, ticket_id)}
+    return get_history(db, ticket_id)
