@@ -32,7 +32,7 @@ class ServiceManager:
                 r = requests.get(f"{env_url.rstrip('/')}/api/tags", timeout=2)
                 if r.status_code == 200:
                     return env_url
-            except:
+            except Exception:
                 pass
 
         common_ports = [11434, 11435, 11436]
@@ -43,7 +43,7 @@ class ServiceManager:
                 if r.status_code == 200:
                     logger.info(f"Ollama discovered at {url}")
                     return url
-            except:
+            except Exception:
                 continue
         return None
 
@@ -79,7 +79,7 @@ class ServiceManager:
         try:
             subprocess.run("docker --version", shell=True, check=True, stdout=subprocess.DEVNULL)
             return True
-        except:
+        except Exception:
             logger.warning("Docker command not found.")
             if os.name != "nt":  # Likely WSL or Linux
                 logger.info("Checking for Docker Desktop WSL integration...")
@@ -90,7 +90,7 @@ class ServiceManager:
                     time.sleep(2)
                     subprocess.run("docker --version", shell=True, check=True)
                     return True
-                except:
+                except Exception:
                     logger.error(
                         "Docker is not accessible. Please ensure Docker Desktop is running and WSL integration is enabled."
                     )

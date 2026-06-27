@@ -129,7 +129,7 @@ class NotificationService:
     def _get_admin_user_ids(self) -> list[str]:
         admins = (
             self.db.query(User.id)
-            .filter(User.role.in_(["admin", "superadmin"]), User.is_active == True)
+            .filter(User.role.in_(["admin", "superadmin"]), User.is_active.is_(True))
             .all()
         )
         return [row.id for row in admins]

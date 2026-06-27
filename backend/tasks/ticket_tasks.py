@@ -97,7 +97,7 @@ def escalate_overdue_tickets():
         overdue = (
             db.query(Ticket)
             .filter(
-                Ticket.due_date != None,
+                Ticket.due_date.is_not(None),
                 Ticket.due_date < now,
                 Ticket.status.in_(["OPEN", "IN_PROGRESS"]),
             )

@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from backend.auth.middleware import get_current_active_user
@@ -105,11 +105,12 @@ def export_user_data(
     "/account",
     summary="Delete account and all personal data (GDPR Art. 17 — erasure)",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
 )
 def delete_user_account(
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     db: Session = Depends(get_db),
-) -> None:
+) -> Response:
     """
     Permanently delete the authenticated user's account and all cascade records:
 
@@ -131,3 +132,4 @@ def delete_user_account(
 
     db.commit()
     logger.info("GDPR erasure: user %s deleted", user_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

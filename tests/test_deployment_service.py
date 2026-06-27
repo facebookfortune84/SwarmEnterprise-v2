@@ -2,6 +2,7 @@
 Unit tests for Deployment Service
 """
 import pytest
+from unittest.mock import patch
 from backend.services.deployment_service import (
     DeploymentService,
     DeploymentConfig,
@@ -262,17 +263,25 @@ class TestDeploymentService:
     @pytest.mark.asyncio
     async def test_create_backup(self, deployment_service):
         """Test creating a deployment backup"""
-        config = DeploymentConfig(company_id="comp-123", tenant_name="test", subdomain="test")
-        deployment = await deployment_service.create_deployment(config)
-        deployment_id = deployment["id"]
+        # Pre-mock all VM/docker operations so no real subprocesses are spawned
+        async def mock_provision_vm(config):
+            return {"vm_name": config.tenant_name, "ip": "127.0.0.1", "status": "running"}
 
-        # Mock VM provisioner snapshot method
         async def mock_create_snapshot(vm_name, snapshot_name):
             pass
 
+        deployment_service.vm_provisioner.provision_vm = mock_provision_vm
         deployment_service.vm_provisioner.create_snapshot = mock_create_snapshot
 
-        backup = await deployment_service.create_backup(deployment_id)
+        with patch(
+            "backend.services.deployment_service.subprocess.run",
+            side_effect=FileNotFoundError("docker not found"),
+        ):
+            config = DeploymentConfig(company_id="comp-123", tenant_name="test", subdomain="test")
+            deployment = await deployment_service.create_deployment(config)
+            deployment_id = deployment["id"]
+
+            backup = await deployment_service.create_backup(deployment_id)
 
         assert backup is not None
         assert "deployment_id" in backup

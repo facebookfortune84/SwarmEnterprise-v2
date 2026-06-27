@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy — SwarmEnterprise v2</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+            --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+        }
+        body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 15px; line-height: 1.7; color: var(--text); background: var(--bg); }
+        .container { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+        header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; }
+        header h1 { font-size: 1.75rem; font-weight: 700; }
+        header p { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
+        h2 { font-size: 1.15rem; font-weight: 600; margin: 36px 0 12px; }
+        h3 { font-size: 1rem; font-weight: 600; margin: 24px 0 8px; color: var(--muted); }
+        p { margin-bottom: 14px; }
+        ul { margin: 0 0 14px 24px; }
+        li { margin-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 0.9rem; }
+        th { background: var(--surface); text-align: left; padding: 10px 12px; font-weight: 600; border: 1px solid var(--border); }
+        td { padding: 10px 12px; border: 1px solid var(--border); vertical-align: top; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; }
+        .badge-essential { background: #d1fae5; color: #065f46; }
+        .badge-functional { background: #dbeafe; color: #1e40af; }
+        .badge-analytics { background: #fef3c7; color: #92400e; }
+        .notice { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin: 24px 0; font-size: 0.9rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        footer { border-top: 1px solid var(--border); margin-top: 60px; padding-top: 20px; font-size: 0.8rem; color: var(--muted); text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Cookie Policy</h1>
+        <p>RWV Techsolutions LLC &mdash; SwarmEnterprise v2 &nbsp;&bull;&nbsp; Last updated: June 2025</p>
+    </header>
+
+    <h2>1. What Are Cookies?</h2>
+    <p>Cookies are small text files placed on your device when you visit our platform. They allow us to recognise your browser across visits, maintain your session, and improve your experience.</p>
+    <p>This policy explains what cookies we use, why we use them, and how you can control them. It applies to the SwarmEnterprise v2 platform operated by <strong>RWV Techsolutions LLC</strong>, 1091 Harrison Ave, Elkins, WV 26241, USA.</p>
+
+    <h2>2. Types of Cookies We Use</h2>
+
+    <h3>2.1 Strictly Necessary / Essential Cookies</h3>
+    <p>These cookies are required for the platform to function. You cannot opt out of these without losing core functionality.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Cookie Name</th>
+                <th>Type</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>access_token</code></td>
+                <td><span class="badge badge-essential">Essential</span></td>
+                <td>JWT bearer token stored in sessionStorage (not a cookie) for API authentication</td>
+                <td>Session (15 min)</td>
+            </tr>
+            <tr>
+                <td><code>refresh_token</code></td>
+                <td><span class="badge badge-essential">Essential</span></td>
+                <td>Secure HttpOnly cookie used to renew access tokens without re-login</td>
+                <td>7 days</td>
+            </tr>
+            <tr>
+                <td><code>csrf_token</code></td>
+                <td><span class="badge badge-essential">Essential</span></td>
+                <td>CSRF protection token paired with the refresh token</td>
+                <td>Session</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 Functional Cookies</h3>
+    <p>These cookies enable enhanced functionality such as remembering your preferences.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Cookie / Storage Key</th>
+                <th>Type</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>swarm_theme</code></td>
+                <td><span class="badge badge-functional">Functional</span></td>
+                <td>Stores your light/dark mode preference (localStorage)</td>
+                <td>Persistent (1 year)</td>
+            </tr>
+            <tr>
+                <td><code>swarm_lang</code></td>
+                <td><span class="badge badge-functional">Functional</span></td>
+                <td>Stores your language preference (localStorage)</td>
+                <td>Persistent (1 year)</td>
+            </tr>
+            <tr>
+                <td><code>cookie_consent</code></td>
+                <td><span class="badge badge-functional">Functional</span></td>
+                <td>Records that you have reviewed and acknowledged this cookie policy (localStorage)</td>
+                <td>Persistent (1 year)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.3 Analytics Cookies</h3>
+    <p>We do <strong>not</strong> currently use any third-party analytics or advertising cookies. If we introduce them in future, we will update this policy and request your consent.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Cookie</th>
+                <th>Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Google Analytics, Mixpanel, etc.</td>
+                <td><span class="badge badge-analytics">Analytics</span></td>
+                <td>Not used</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Third-Party Cookies</h2>
+    <p>The following third-party services may set cookies or use browser storage when you interact with payment features:</p>
+    <ul>
+        <li><strong>Stripe</strong> — payment processing. Stripe may set cookies for fraud detection and session management when you view pricing or complete a checkout. See <a href="https://stripe.com/cookies-policy/legal" target="_blank" rel="noopener">Stripe's Cookie Policy</a>.</li>
+    </ul>
+    <p>We do not control third-party cookies. Refer to the respective provider's policy for details.</p>
+
+    <h2>4. How to Control Cookies</h2>
+
+    <h3>4.1 Browser Settings</h3>
+    <p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. Disabling essential cookies will prevent you from using the authenticated portions of the platform.</p>
+    <ul>
+        <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Google Chrome</a></li>
+        <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" target="_blank" rel="noopener">Mozilla Firefox</a></li>
+        <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471" target="_blank" rel="noopener">Apple Safari</a></li>
+        <li><a href="https://support.microsoft.com/en-us/windows/delete-and-manage-cookies-168dab11-0753-043d-7c16-ede5947fc64d" target="_blank" rel="noopener">Microsoft Edge</a></li>
+    </ul>
+
+    <h3>4.2 Opt-Out of Functional Cookies</h3>
+    <p>To remove functional cookies and preferences stored in localStorage, open your browser developer tools (F12) and clear the following keys from <strong>localStorage</strong>:</p>
+    <ul>
+        <li><code>swarm_theme</code></li>
+        <li><code>swarm_lang</code></li>
+        <li><code>cookie_consent</code></li>
+    </ul>
+
+    <h2>5. Cookies and GDPR</h2>
+    <p>Under the GDPR and the ePrivacy Directive, we rely on the following legal bases for cookies:</p>
+    <ul>
+        <li><strong>Strictly necessary cookies</strong>: Legitimate interest / contractual necessity — no consent required.</li>
+        <li><strong>Functional cookies</strong>: Legitimate interest (improving user experience). You can opt out at any time using the methods above.</li>
+        <li><strong>Analytics/advertising cookies</strong>: Explicit consent — none currently in use.</li>
+    </ul>
+    <p>You have the right to withdraw consent for non-essential cookies at any time without affecting the lawfulness of prior processing.</p>
+
+    <h2>6. Data Retention</h2>
+    <p>Session cookies are deleted when you close your browser. Persistent cookies expire on the schedule shown in the tables above. You can delete them at any time via your browser settings.</p>
+
+    <h2>7. Changes to This Policy</h2>
+    <p>We may update this Cookie Policy to reflect changes in technology, regulation, or our practices. We will post the updated policy here with a revised "Last updated" date. For material changes, we will notify registered users by email.</p>
+
+    <h2>8. Contact Us</h2>
+    <p>If you have any questions about our use of cookies, please contact us:</p>
+    <ul>
+        <li><strong>RWV Techsolutions LLC</strong></li>
+        <li>1091 Harrison Ave, Elkins, WV 26241, USA</li>
+        <li>Email: <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a></li>
+    </ul>
+
+    <div class="notice">
+        <strong>Related policies:</strong> &nbsp;
+        <a href="privacy-policy.html">Privacy Policy</a> &nbsp;&bull;&nbsp;
+        <a href="terms.html">Terms of Service</a>
+    </div>
+
+    <footer>
+        &copy; 2025 RWV Techsolutions LLC &mdash; 1091 Harrison Ave, Elkins, WV 26241
+    </footer>
+</div>
+</body>
+</html>

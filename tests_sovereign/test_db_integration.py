@@ -27,7 +27,7 @@ def test_user_creation_persistence(db):
     user_data = UserCreate(
         email="test@example.com", password="SecurePass123!", full_name="Test User"
     )
-    user = user_service.create_user(user_data)
+    user_service.create_user(user_data)
 
     # Query directly from DB
     db_user = db.query(User).filter(User.email == "test@example.com").first()

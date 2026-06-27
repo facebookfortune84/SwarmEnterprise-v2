@@ -22,7 +22,7 @@ class SwarmCommander:
 
     def __init__(self):
         try:
-            from crewai import Agent, Task, Crew
+            from crewai import Agent
         except ImportError:
             self.agent = None
             logger.warning("crewai not installed. Commander will use basic LLM orchestration.")

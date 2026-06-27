@@ -55,7 +55,7 @@ def check_failed_tickets():
         # Connect to DB and check status
         from backend.db.linear_engine import get_swarm_db
 
-        db = get_swarm_db()
+        get_swarm_db()
         # This is a bit simplified as the LinearEngine doesn't have a list_failed yet
         # but we can infer or add it.
         logger.info("No critical failures detected in ticketing system.")

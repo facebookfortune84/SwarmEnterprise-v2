@@ -43,7 +43,7 @@ async def list_notifications(
     limit = min(max(limit, 1), 200)
     q = db.query(Notification).filter(Notification.user_id == current_user["id"])
     if unread_only:
-        q = q.filter(Notification.is_read == False)
+        q = q.filter(Notification.is_read.is_(False))
     total = q.count()
     items = q.order_by(Notification.created_at.desc()).offset(skip).limit(limit).all()
     return {
@@ -84,7 +84,7 @@ async def mark_all_read(
     """Mark every notification for the current user as read."""
     db.query(Notification).filter(
         Notification.user_id == current_user["id"],
-        Notification.is_read == False,
+        Notification.is_read.is_(False),
     ).update({"is_read": True})
     db.commit()
     return {"ok": True}

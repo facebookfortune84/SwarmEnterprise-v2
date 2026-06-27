@@ -32,7 +32,7 @@ class TestLiveMarketing:
 
             # Verify in DB
             leads = discovery_agent.db.list_leads(limit=10)
-            assert any(l["email"] == "test@lead.com" for l in leads)
+            assert any(lead["email"] == "test@lead.com" for lead in leads)
 
     def test_outreach_queueing(self):
         """Verifies outreach tasks can be enqueued for the worker."""

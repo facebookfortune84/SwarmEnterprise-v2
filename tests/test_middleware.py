@@ -98,20 +98,23 @@ class TestAuthMiddleware:
 
     @pytest.mark.asyncio
     async def test_get_current_user_revoked_token(self):
-        """Test getting current user with revoked token"""
+        """Test getting current user with revoked token — Redis mocked so revocation is in-memory."""
         from backend.auth.jwt_handler import revoke_token
 
         token_data = {"sub": "user123"}
         token = create_access_token(token_data)
 
-        # Revoke the token
-        revoke_token(token)
+        # Mock Redis to behave as if the token is stored as revoked
+        with patch("backend.auth.jwt_handler.redis_client") as mock_redis:
+            mock_redis.setex.return_value = True
+            mock_redis.exists.return_value = 1  # 1 = key exists → token revoked
+            revoke_token(token)
 
-        credentials = Mock()
-        credentials.credentials = token
+            credentials = Mock()
+            credentials.credentials = token
 
-        with pytest.raises(HTTPException) as exc_info:
-            await get_current_user(credentials)
+            with pytest.raises(HTTPException) as exc_info:
+                await get_current_user(credentials)
 
         assert exc_info.value.status_code == 401
         assert "revoked" in exc_info.value.detail.lower()
@@ -121,7 +124,7 @@ class TestAuthMiddleware:
         """Test getting active user succeeds"""
         current_user = {"id": active_user.id, "email": active_user.email, "role": active_user.role}
 
-        with patch("backend.auth.middleware.SessionLocal", return_value=self.SessionLocal()):
+        with patch("backend.db.session.SessionLocal", return_value=self.SessionLocal()):
             result = await get_current_active_user(current_user)
 
         assert result == current_user
@@ -135,7 +138,7 @@ class TestAuthMiddleware:
             "role": inactive_user.role,
         }
 
-        with patch("backend.auth.middleware.SessionLocal", return_value=self.SessionLocal()):
+        with patch("backend.db.session.SessionLocal", return_value=self.SessionLocal()):
             with pytest.raises(HTTPException) as exc_info:
                 await get_current_active_user(current_user)
 
@@ -147,7 +150,7 @@ class TestAuthMiddleware:
         """Test getting non-existent user fails"""
         current_user = {"id": "nonexistent", "email": "none@example.com", "role": "user"}
 
-        with patch("backend.auth.middleware.SessionLocal", return_value=self.SessionLocal()):
+        with patch("backend.db.session.SessionLocal", return_value=self.SessionLocal()):
             with pytest.raises(HTTPException) as exc_info:
                 await get_current_active_user(current_user)
 
