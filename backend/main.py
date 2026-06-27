@@ -10,6 +10,7 @@ from backend.api.routes import router as core_router
 from backend.api.payments import router as payments_router
 from backend.api.admin import router as admin_router
 from backend.api.voice import router as voice_router
+from backend.api.gdpr import router as gdpr_router
 from backend.metrics import get_metrics_response, track_request
 import time
 
@@ -78,6 +79,7 @@ app.include_router(webhook_router)
 app.include_router(payments_router)
 app.include_router(admin_router)
 app.include_router(voice_router)
+app.include_router(gdpr_router)
 
 # Leads API
 try:

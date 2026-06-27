@@ -1,0 +1,54 @@
+# SwarmOS — Automated backup cron service
+#
+# Usage (from project root):
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f deploy/docker/docker-compose.backup.yml \
+#     up -d backup-cron
+#
+# The container runs scripts/backup_postgres.sh every day at 02:00 UTC.
+# Backup archives are written into ./backups/postgres/ on the host.
+
+services:
+  backup-cron:
+    image: alpine:3.19
+    container_name: swarmOS-backup-cron
+    restart: unless-stopped
+
+    # Mount the Docker socket so the container can run `docker exec` against
+    # the sibling swarmOS-postgres container, plus the project directory for
+    # the scripts and the backups output folder.
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/workspace:ro
+      - ./backups:/workspace/backups
+
+    working_dir: /workspace
+
+    # Install docker-cli and busybox crond, write the crontab, then start.
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache docker-cli bash > /dev/null 2>&1
+        mkdir -p /workspace/backups/postgres
+        # Write crontab: run backup at 02:00 UTC every day
+        echo "0 2 * * * /bin/bash /workspace/scripts/backup_postgres.sh >> /var/log/backup_postgres.log 2>&1" \
+          > /etc/crontabs/root
+        echo "[backup-cron] Cron schedule installed — daily at 02:00 UTC"
+        crond -f -l 8
+
+    environment:
+      # Passed through so backup_postgres.sh can pick them up without .env
+      - POSTGRES_USER=${POSTGRES_USER:-swarm}
+      - POSTGRES_DB=${POSTGRES_DB:-swarm}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-swarm}
+      - POSTGRES_CONTAINER=swarmOS-postgres
+
+    networks:
+      - swarmnet
+
+networks:
+  swarmnet:
+    external: true
+    name: swarmenterprises-v2_swarmnet

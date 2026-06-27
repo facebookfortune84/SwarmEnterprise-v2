@@ -30,6 +30,7 @@ h11>=0.16.0
 # Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
+alembic==1.13.1
 
 # Monitoring & Telemetry
 opentelemetry-api==1.22.0

@@ -425,6 +425,82 @@ docker exec swarm_postgres pg_isready -U swarm
 
 ---
 
+### Step 7: Smoke Test
+
+After all containers are running and DNS is resolvable, run the full smoke test
+to validate every critical endpoint end-to-end.
+
+#### Quick validation (bash)
+
+```bash
+# Make the script executable (once)
+chmod +x scripts/smoke_test.sh
+
+# Test against a live deployment
+./scripts/smoke_test.sh https://yourdomain.com
+
+# Test against a local stack
+./scripts/smoke_test.sh http://localhost:8000
+
+# Verbose output (prints full response bodies)
+./scripts/smoke_test.sh https://yourdomain.com --verbose
+```
+
+The script exits **0** if all checks pass and **1** if any check fails — suitable
+for blocking a CI/CD pipeline stage.
+
+#### Detailed assertion output (Python)
+
+For richer output with per-assertion detail, use `scripts/smoke_api.py`:
+
+```bash
+# In-process test (no running server required)
+python scripts/smoke_api.py
+
+# Against a live deployment
+python scripts/smoke_api.py --base-url https://yourdomain.com
+
+# Verbose — prints response bodies
+python scripts/smoke_api.py --base-url https://yourdomain.com --verbose
+```
+
+See [`scripts/smoke_api.py`](../../scripts/smoke_api.py) for the full list of
+assertions and to add custom checks.
+
+#### Expected passing conditions
+
+All of the following must be true for the smoke test to report **PASS**:
+
+| # | Endpoint | Method | Expected | Notes |
+|---|----------|--------|----------|-------|
+| 1 | `/health` | GET | `200` | Response body must contain `"status": "ONLINE"` |
+| 2 | `/health` body | — | `"ONLINE"` | `status` field assertion |
+| 3 | `/metrics` | GET | `200` | Prometheus metrics text |
+| 4 | `/docs` | GET | `200` | Swagger UI is served |
+| 5 | `/api/auth/register` | POST | `201` | New smoke-test user created |
+| 6 | `/api/auth/register` body | — | `access_token` present | JWT issued on registration |
+| 7 | `/api/auth/login` | POST | `200` | Login succeeds for registered user |
+| 8 | `/api/auth/login` body | — | `access_token` present | JWT returned |
+| 9 | `/api/auth/verify` | GET | `200` | Token accepted by auth middleware |
+| 10 | `/api/companies/` | GET | `200` | Authenticated list request succeeds |
+| 11 | `/api/companies/` (no token) | GET | `401`/`403` | Auth guard is active |
+| 12 | `/api/stripe/create-checkout-session` | GET | `405` | Route is mounted (POST-only endpoint) |
+| 13 | HTTPS TLS check | HEAD | `200` | Only when `BASE_URL` is `https://` |
+
+> **Note on `/api/payments/plans`:** The payments router is mounted under
+> `/api/stripe`. Use `/api/stripe/create-checkout-session` (POST) to test
+> payment-related routing in your integration suite.
+
+#### Integrating into CI/CD
+
+```yaml
+# Example GitHub Actions step
+- name: Smoke test staging
+  run: ./scripts/smoke_test.sh ${{ secrets.STAGING_URL }}
+```
+
+---
+
 ## DNS Configuration
 
 ### Option 1: Local DNS (Development)
@@ -560,6 +636,71 @@ docker compose -f docker-compose.production-self-hosted.yml exec minio mc ls mym
 # If needed, create manually
 docker compose -f docker-compose.production-self-hosted.yml exec minio mc mb myminio/swarm-companies
 ```
+
+---
+
+## Database Migrations
+
+SwarmEnterprise v2 uses **Alembic** as its database migration framework, integrated with the
+SQLAlchemy models defined in `backend/db/models.py`.
+
+### Before starting the application — always run migrations first
+
+```bash
+# Apply all pending migrations to bring the database to the latest schema
+make db-upgrade
+```
+
+This is equivalent to running `alembic upgrade head` and must be executed:
+- On **initial deployment** before any service accepts traffic
+- After every `git pull` that includes model changes
+- As part of any automated CI/CD deployment pipeline
+
+### Creating a new migration after changing models
+
+When you add, rename, or remove columns/tables in `backend/db/models.py`, generate a
+migration script automatically:
+
+```bash
+make db-migrate MSG="add subscription_plan to users"
+```
+
+This runs `alembic revision --autogenerate -m "<MSG>"` and writes a new versioned file into
+`alembic/versions/`. Always review the generated script before committing — autogenerate
+cannot detect column renames or certain constraint changes.
+
+### Rolling back the last migration
+
+```bash
+make db-downgrade
+```
+
+Reverts exactly one migration step (`alembic downgrade -1`). Run it again to step back further.
+
+### Running migrations inside Docker
+
+```bash
+# Apply migrations inside the running backend container
+docker compose exec backend alembic upgrade head
+
+# Generate a migration inside the container (source mounted as a volume)
+docker compose exec backend alembic revision --autogenerate -m "describe change"
+```
+
+### Environment variable requirement
+
+Alembic reads the database connection string exclusively from the `DATABASE_URL` environment
+variable. Ensure it is set before running any `alembic` or `make db-*` command:
+
+```bash
+export DATABASE_URL="postgresql://swarm:password@localhost:5432/swarmdb"
+make db-upgrade
+```
+
+### Migration files
+
+All migration scripts are stored in `alembic/versions/` and **must be committed** to version
+control alongside the model changes that triggered them.
 
 ---
 

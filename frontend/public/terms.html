@@ -3,39 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - SwarmEnterprise v2</title>
+    <title>Terms of Service — SwarmEnterprise v2</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        h2 { color: #34495e; margin-top: 30px; }
-        .last-updated { color: #7f8c8d; font-style: italic; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #f8f9fa;
+            --surface:   #ffffff;
+            --border:    #e2e8f0;
+            --primary:   #1e40af;
+            --heading:   #1e293b;
+            --body:      #374151;
+            --muted:     #6b7280;
+            --accent-bg: #eff6ff;
+            --accent-bd: #bfdbfe;
+            --warn-bg:   #fefce8;
+            --warn-bd:   #fde047;
+            --danger-bg: #fef2f2;
+            --danger-bd: #fecaca;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--body);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 3rem 3.5rem;
+            box-shadow: 0 1px 8px rgba(0,0,0,.06);
+        }
+
+        header { margin-bottom: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 1.5rem; }
+        header .logo { font-size: .85rem; font-weight: 600; letter-spacing: .08em;
+                       text-transform: uppercase; color: var(--primary); margin-bottom: .4rem; }
+        h1 { font-size: 2rem; font-weight: 700; color: var(--heading); line-height: 1.25; }
+        .meta { font-size: .875rem; color: var(--muted); margin-top: .5rem; }
+
+        h2 {
+            font-size: 1.2rem; font-weight: 700; color: var(--heading);
+            margin: 2.25rem 0 .6rem;
+            padding-left: .75rem;
+            border-left: 3px solid var(--primary);
+        }
+        h3 { font-size: 1rem; font-weight: 600; color: var(--heading); margin: 1.25rem 0 .4rem; }
+
+        p  { margin-bottom: .85rem; }
+        ul, ol { margin: .5rem 0 .85rem 1.5rem; }
+        li { margin-bottom: .35rem; }
+
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .callout {
+            border-radius: 6px; padding: 1rem 1.25rem; margin: 1.25rem 0;
+            font-size: .9375rem;
+        }
+        .callout-info   { background: var(--accent-bg); border: 1px solid var(--accent-bd); }
+        .callout-warn   { background: var(--warn-bg);   border: 1px solid var(--warn-bd); }
+        .callout-danger { background: var(--danger-bg); border: 1px solid var(--danger-bd); }
+        .callout strong { display: block; margin-bottom: .3rem; }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: .825em;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: .1em .4em;
+            color: #0f172a;
+        }
+
+        .toc { background: var(--accent-bg); border: 1px solid var(--accent-bd);
+               border-radius: 6px; padding: 1.1rem 1.4rem; margin-bottom: 2rem; }
+        .toc p { margin: 0 0 .5rem; font-weight: 600; color: var(--heading); }
+        .toc ol { margin: 0 0 0 1.2rem; }
+        .toc li { margin-bottom: .2rem; font-size: .9rem; }
+
+        footer {
+            margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+            font-size: .85rem; color: var(--muted); text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .wrapper { padding: 1.5rem 1.25rem; }
+            h1 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-    <h1>Terms of Service</h1>
-    <p class="last-updated">Last Updated: May 28, 2026</p>
-    
-    <h2>1. Acceptance of Terms</h2>
-    <p>By accessing or using SwarmEnterprise v2, you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the platform.</p>
-    
-    <h2>2. Description of Service</h2>
-    <p>SwarmEnterprise v2 provides an autonomous platform for generating and managing digital companies. This includes code generation, VM provisioning, and automated marketing outreach.</p>
-    
-    <h2>3. User Responsibilities</h2>
-    <p>You are responsible for:</p>
+<div class="wrapper">
+
+    <header>
+        <div class="logo">RWV Techsolutions LLC</div>
+        <h1>Terms of Service</h1>
+        <p class="meta">
+            Effective date: <strong>May 28, 2026</strong> &nbsp;·&nbsp;
+            Last updated: <strong>May 28, 2026</strong>
+        </p>
+    </header>
+
+    <div class="toc">
+        <p>Contents</p>
+        <ol>
+            <li><a href="#acceptance">Acceptance of Terms</a></li>
+            <li><a href="#description">Description of Service</a></li>
+            <li><a href="#accounts">Accounts &amp; Registration</a></li>
+            <li><a href="#subscription">Subscription &amp; Payment</a></li>
+            <li><a href="#acceptable-use">Acceptable Use</a></li>
+            <li><a href="#ip">Intellectual Property</a></li>
+            <li><a href="#disclaimer">Disclaimers &amp; Limitation of Liability</a></li>
+            <li><a href="#termination">Termination</a></li>
+            <li><a href="#governing-law">Governing Law</a></li>
+            <li><a href="#changes">Changes to Terms</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ol>
+    </div>
+
+    <!-- 1 -->
+    <h2 id="acceptance">1. Acceptance of Terms</h2>
+    <p>
+        By accessing, registering for, or using SwarmEnterprise v2 (the "Service"),
+        you agree to be bound by these Terms of Service ("Terms") and our
+        <a href="/privacy-policy.html">Privacy Policy</a>, which are incorporated
+        herein by reference.
+    </p>
+    <p>
+        If you are entering into these Terms on behalf of a company or other legal
+        entity, you represent that you have the authority to bind that entity to
+        these Terms. If you do not agree to these Terms, you must not access or use
+        the Service.
+    </p>
+    <p>
+        The Service is operated by <strong>RWV Techsolutions LLC</strong>,
+        1091 Harrison Ave, Elkins, WV 26241, USA
+        (<a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>).
+    </p>
+
+    <!-- 2 -->
+    <h2 id="description">2. Description of Service</h2>
+    <p>
+        SwarmEnterprise v2 is an <strong>AI agent workflow automation platform</strong>
+        that enables users to design, deploy, and orchestrate multi-agent pipelines for
+        business process automation. Features include:
+    </p>
     <ul>
-        <li>Maintaining the confidentiality of your account credentials.</li>
-        <li>Ensuring all content generated and actions taken by your swarm comply with local and international laws.</li>
-        <li>Paying all applicable fees for software licensing and hosting services.</li>
+        <li>Autonomous AI agent creation and orchestration via the SwarmFactory engine.</li>
+        <li>Automated code generation, VM provisioning, and deployment pipelines.</li>
+        <li>Outreach, marketing, and lead-generation automation modules.</li>
+        <li>Multi-tenant company ("Company in a Box") provisioning and management.</li>
+        <li>Subscription-based API access with role-based access controls.</li>
     </ul>
-    
-    <h2>4. Intellectual Property</h2>
-    <p>Code generated by the SwarmEnterprise Factory is generally provided under the license specified at the time of generation. The SwarmEnterprise platform itself remains the property of its creators and is protected by copyright laws.</p>
-    
-    <h2>5. Limitation of Liability</h2>
-    <p>The platform is provided "as is" without warranty of any kind. We shall not be liable for any indirect, incidental, or consequential damages arising out of your use of the swarm.</p>
-    
-    <h2>6. Termination</h2>
-    <p>We reserve the right to suspend or terminate your access to the platform for violations of these terms or for any other reason at our discretion.</p>
+    <p>
+        We reserve the right to modify, suspend, or discontinue any feature of the
+        Service at any time with reasonable notice. We will not be liable to you or
+        any third party for any such modification, suspension, or discontinuation.
+    </p>
+
+    <!-- 3 -->
+    <h2 id="accounts">3. Accounts &amp; Registration</h2>
+
+    <h3>3.1 Eligibility</h3>
+    <p>
+        You must be at least 18 years old and capable of forming a legally binding
+        contract to create an account. The Service is not directed at children under 13.
+    </p>
+
+    <h3>3.2 Account Creation</h3>
+    <p>
+        You must provide a valid email address, full name, and a secure password.
+        You agree to provide accurate, current, and complete information and to keep
+        your account information up to date.
+    </p>
+
+    <h3>3.3 Account Security</h3>
+    <p>
+        You are solely responsible for maintaining the confidentiality of your
+        credentials and for all activity that occurs under your account. You must
+        notify us immediately at
+        <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+        if you suspect any unauthorised access to your account. We will not be liable
+        for any loss arising from your failure to safeguard your credentials.
+    </p>
+
+    <h3>3.4 One Account per User</h3>
+    <p>
+        Each person may maintain only one free-tier account. Duplicate accounts
+        created to circumvent usage limits may be suspended without notice.
+    </p>
+
+    <!-- 4 -->
+    <h2 id="subscription">4. Subscription &amp; Payment</h2>
+
+    <h3>4.1 Plans</h3>
+    <p>
+        The Service is offered on a subscription basis with monthly and annual billing
+        plans. Current plan details, features, and pricing are listed on our pricing
+        page. A free tier is available with limited functionality.
+    </p>
+
+    <h3>4.2 Payment Processing</h3>
+    <p>
+        All payments are processed by <strong>Stripe, Inc.</strong> You agree to
+        Stripe's <a href="https://stripe.com/legal" target="_blank" rel="noopener">
+        Terms of Service</a> when completing a purchase. We do not store your payment
+        card details on our servers.
+    </p>
+
+    <h3>4.3 Billing Cycle</h3>
+    <p>
+        Subscriptions are billed in advance on a recurring basis (monthly or annually,
+        depending on the plan selected). Your subscription will automatically renew
+        at the end of each billing period unless cancelled before the renewal date.
+    </p>
+
+    <h3>4.4 Price Changes</h3>
+    <p>
+        We reserve the right to change subscription prices. We will provide at least
+        <strong>30 days' notice</strong> of any price change to your registered email
+        address. Continued use of the Service after a price change takes effect
+        constitutes your acceptance of the new price.
+    </p>
+
+    <h3>4.5 Refund Policy</h3>
+    <div class="callout callout-warn">
+        <strong>No refunds after 30 days</strong>
+        You may request a full refund within the first <strong>30 days</strong> of
+        your initial paid subscription. After 30 days, subscription fees are
+        non-refundable. Annual plan refunds are prorated for the unused portion only
+        within the first 30-day window. Cancellation stops future billing but does
+        not entitle you to a refund for the current billing period.
+    </div>
+
+    <h3>4.6 Late Payments &amp; Suspension</h3>
+    <p>
+        If a payment fails, we will attempt to re-charge the payment method on file.
+        After two failed attempts, the account may be downgraded to the free tier or
+        suspended until payment is resolved.
+    </p>
+
+    <!-- 5 -->
+    <h2 id="acceptable-use">5. Acceptable Use</h2>
+    <p>You agree not to use the Service to:</p>
+    <ul>
+        <li>Violate any applicable local, state, national, or international law or regulation.</li>
+        <li>Transmit spam, unsolicited commercial email, or other unsolicited mass messages.</li>
+        <li>Upload, generate, or distribute malware, viruses, or any malicious code.</li>
+        <li>Harass, threaten, defame, or harm any individual or group.</li>
+        <li>Infringe the intellectual property, privacy, or other rights of any third party.</li>
+        <li>Attempt to gain unauthorised access to any part of the Service, its infrastructure,
+            or any related systems.</li>
+        <li><strong>Reverse engineer, decompile, disassemble,</strong> or otherwise attempt to
+            derive the source code of any proprietary component of the Service.</li>
+        <li><strong>Resell, sublicense, or commercially redistribute</strong> the Service or
+            access to it without our prior written consent.</li>
+        <li>Use automated scripts to scrape, crawl, or systematically extract data from the
+            Service beyond normal API usage.</li>
+        <li>Circumvent or attempt to circumvent rate limits, subscription restrictions,
+            or access controls.</li>
+        <li>Use the Service to build a competing product or service.</li>
+    </ul>
+    <p>
+        We reserve the right to investigate suspected violations and, at our sole
+        discretion, terminate or suspend access without prior notice for any breach
+        of this section.
+    </p>
+
+    <!-- 6 -->
+    <h2 id="ip">6. Intellectual Property</h2>
+
+    <h3>6.1 Our Property</h3>
+    <p>
+        The SwarmEnterprise v2 platform, including its software, architecture,
+        user interface, documentation, trademarks, and all related intellectual
+        property, is owned by or licensed to RWV Techsolutions LLC and is protected
+        by copyright, trade-secret, and other intellectual property laws. Nothing in
+        these Terms transfers any ownership of our intellectual property to you.
+    </p>
+
+    <h3>6.2 Your Content</h3>
+    <p>
+        You retain ownership of any data, content, or workflows you upload to or
+        create through the Service ("User Content"). By using the Service, you grant
+        us a limited, non-exclusive, royalty-free licence to process and store your
+        User Content solely to the extent necessary to provide the Service to you.
+    </p>
+
+    <h3>6.3 Generated Output</h3>
+    <p>
+        Code, documents, and other artefacts generated by AI agents on your behalf
+        are provided to you subject to the terms in §6.1. You are responsible for
+        ensuring that generated outputs comply with all applicable laws, third-party
+        licences, and these Terms before deploying or distributing them.
+    </p>
+
+    <h3>6.4 Feedback</h3>
+    <p>
+        If you submit ideas, suggestions, or feedback about the Service, you grant
+        us a perpetual, irrevocable, royalty-free licence to use that feedback for
+        any purpose without compensation to you.
+    </p>
+
+    <!-- 7 -->
+    <h2 id="disclaimer">7. Disclaimers &amp; Limitation of Liability</h2>
+
+    <div class="callout callout-danger">
+        <strong>Please read this section carefully — it limits our liability to you.</strong>
+    </div>
+
+    <h3>7.1 "As Is" Disclaimer</h3>
+    <p>
+        THE SERVICE IS PROVIDED <strong>"AS IS"</strong> AND <strong>"AS AVAILABLE,"</strong>
+        WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+        WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+        NON-INFRINGEMENT, OR UNINTERRUPTED OPERATION. WE DO NOT WARRANT THAT THE
+        SERVICE WILL BE ERROR-FREE, SECURE, OR AVAILABLE AT ALL TIMES.
+    </p>
+
+    <h3>7.2 Limitation of Liability</h3>
+    <p>
+        TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, RWV TECHSOLUTIONS LLC,
+        ITS OFFICERS, DIRECTORS, EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY
+        INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES
+        (INCLUDING LOSS OF PROFITS, DATA, GOODWILL, OR BUSINESS INTERRUPTION) ARISING
+        OUT OF OR IN CONNECTION WITH YOUR USE OF OR INABILITY TO USE THE SERVICE,
+        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+    </p>
+    <p>
+        OUR TOTAL CUMULATIVE LIABILITY TO YOU FOR ANY CLAIM ARISING FROM OR RELATED
+        TO THE SERVICE SHALL NOT EXCEED THE GREATER OF (A) THE TOTAL FEES PAID BY
+        YOU TO US IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED
+        US DOLLARS (USD $100).
+    </p>
+
+    <h3>7.3 AI-Generated Content</h3>
+    <p>
+        AI agents may produce inaccurate, incomplete, or inappropriate output.
+        You are solely responsible for reviewing, testing, and validating all
+        AI-generated content before relying on or deploying it. We disclaim all
+        liability for losses arising from reliance on AI-generated output.
+    </p>
+
+    <h3>7.4 Third-Party Services</h3>
+    <p>
+        The Service integrates with third-party services (e.g., Stripe, cloud
+        hosting). We are not responsible for the availability, accuracy, or
+        practices of those third parties.
+    </p>
+
+    <!-- 8 -->
+    <h2 id="termination">8. Termination</h2>
+
+    <h3>8.1 Termination by You</h3>
+    <p>
+        You may cancel your account at any time via the account settings or by
+        emailing <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>.
+        Cancellation will take effect at the end of the current billing period.
+        You may also permanently delete your account and all data using the
+        <code>DELETE /api/user/account</code> endpoint described in our
+        <a href="/privacy-policy.html">Privacy Policy</a>.
+    </p>
+
+    <h3>8.2 Termination by Us</h3>
+    <p>
+        We reserve the right to suspend or permanently terminate your access to the
+        Service, with or without notice, if:
+    </p>
+    <ul>
+        <li>You breach any provision of these Terms.</li>
+        <li>We are required to do so by law or a court order.</li>
+        <li>We reasonably believe your account poses a security risk.</li>
+        <li>You fail to pay any fees owed and do not cure the failure within 14 days
+            of notice.</li>
+    </ul>
+
+    <h3>8.3 Effect of Termination</h3>
+    <p>
+        Upon termination, your right to access and use the Service ceases immediately.
+        Sections 6 (Intellectual Property), 7 (Disclaimers &amp; Limitation of
+        Liability), 9 (Governing Law), and all accrued payment obligations survive
+        termination. User data will be deleted in accordance with our
+        <a href="/privacy-policy.html">Privacy Policy</a> retention schedules.
+    </p>
+
+    <!-- 9 -->
+    <h2 id="governing-law">9. Governing Law &amp; Dispute Resolution</h2>
+    <p>
+        These Terms are governed by and construed in accordance with the laws of the
+        <strong>State of West Virginia, USA</strong>, without regard to its conflict-of-law
+        principles.
+    </p>
+    <p>
+        Any dispute, claim, or controversy arising out of or relating to these Terms
+        or the Service shall be resolved exclusively by the state or federal courts
+        sitting in <strong>Randolph County, West Virginia</strong>, and you consent
+        to personal jurisdiction in those courts.
+    </p>
+    <p>
+        Notwithstanding the foregoing, either party may seek injunctive or other
+        equitable relief in any court of competent jurisdiction to prevent irreparable
+        harm pending resolution of a dispute.
+    </p>
+
+    <!-- 10 -->
+    <h2 id="changes">10. Changes to Terms</h2>
+    <p>
+        We may update these Terms at any time. When we make material changes we will:
+    </p>
+    <ul>
+        <li>Update the "Last updated" date at the top of this page.</li>
+        <li>Send an email notification to your registered address at least
+            <strong>14 days</strong> before the new Terms take effect.</li>
+    </ul>
+    <p>
+        Your continued use of the Service after the effective date of the revised
+        Terms constitutes your acceptance of those Terms. If you do not agree to the
+        revised Terms, you must stop using the Service before the effective date.
+    </p>
+
+    <!-- 11 -->
+    <h2 id="contact">11. Contact</h2>
+    <p>
+        Questions about these Terms should be directed to:
+    </p>
+    <address style="font-style:normal;">
+        <strong>RWV Techsolutions LLC — Legal</strong><br>
+        1091 Harrison Ave, Elkins, WV 26241, USA<br>
+        Email: <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+    </address>
+
+    <footer>
+        &copy; 2026 RWV Techsolutions LLC &nbsp;·&nbsp; 1091 Harrison Ave, Elkins, WV 26241, USA
+        &nbsp;·&nbsp; <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+        &nbsp;·&nbsp; <a href="/privacy-policy.html">Privacy Policy</a>
+    </footer>
+
+</div>
 </body>
 </html>

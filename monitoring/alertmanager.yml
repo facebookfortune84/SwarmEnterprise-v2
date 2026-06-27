@@ -1,0 +1,80 @@
+# Alertmanager Configuration for SwarmEnterprise v2
+# SMTP credentials are injected at runtime from environment variables.
+# See .env.example for SMTP_SERVER, SMTP_PORT, SMTP_USER, SMTP_PASS.
+
+global:
+  smtp_smarthost: '${SMTP_SERVER}:${SMTP_PORT}'
+  smtp_from: '${SMTP_USER}'
+  smtp_auth_username: '${SMTP_USER}'
+  smtp_auth_password: '${SMTP_PASS}'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'email-critical'
+  routes:
+    - match:
+        severity: critical
+      receiver: 'email-critical'
+      group_wait: 10s
+      repeat_interval: 1h
+    - match:
+        severity: warning
+      receiver: 'email-warning'
+      group_wait: 5m
+      repeat_interval: 12h
+
+receivers:
+  - name: 'email-critical'
+    email_configs:
+      - to: 'robertdemottojr50@gmail.com'
+        subject: '[CRITICAL] SwarmEnterprise Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          ========================================
+          Alert:       {{ .Labels.alertname }}
+          Severity:    {{ .Labels.severity }}
+          Instance:    {{ .Labels.instance }}
+          Job:         {{ .Labels.job }}
+
+          Summary:     {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+
+          Fired At:    {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ if .EndsAt }}Resolved At: {{ .EndsAt.Format "2006-01-02 15:04:05 UTC" }}{{ end }}
+          ========================================
+          {{ end }}
+
+          -- SwarmEnterprise v2 Monitoring
+
+  - name: 'email-warning'
+    email_configs:
+      - to: 'robertdemottojr50@gmail.com'
+        subject: '[WARNING] SwarmEnterprise Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          ========================================
+          Alert:       {{ .Labels.alertname }}
+          Severity:    {{ .Labels.severity }}
+          Instance:    {{ .Labels.instance }}
+          Job:         {{ .Labels.job }}
+
+          Summary:     {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+
+          Fired At:    {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ if .EndsAt }}Resolved At: {{ .EndsAt.Format "2006-01-02 15:04:05 UTC" }}{{ end }}
+          ========================================
+          {{ end }}
+
+          -- SwarmEnterprise v2 Monitoring
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']

@@ -3,43 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - SwarmEnterprise v2</title>
+    <title>Privacy Policy — SwarmEnterprise v2</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        h2 { color: #34495e; margin-top: 30px; }
-        .last-updated { color: #7f8c8d; font-style: italic; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #f8f9fa;
+            --surface:   #ffffff;
+            --border:    #e2e8f0;
+            --primary:   #1e40af;
+            --heading:   #1e293b;
+            --body:      #374151;
+            --muted:     #6b7280;
+            --accent-bg: #eff6ff;
+            --accent-bd: #bfdbfe;
+            --warn-bg:   #fefce8;
+            --warn-bd:   #fde047;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--body);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 3rem 3.5rem;
+            box-shadow: 0 1px 8px rgba(0,0,0,.06);
+        }
+
+        header { margin-bottom: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 1.5rem; }
+        header .logo { font-size: .85rem; font-weight: 600; letter-spacing: .08em;
+                       text-transform: uppercase; color: var(--primary); margin-bottom: .4rem; }
+        h1 { font-size: 2rem; font-weight: 700; color: var(--heading); line-height: 1.25; }
+        .meta { font-size: .875rem; color: var(--muted); margin-top: .5rem; }
+
+        h2 {
+            font-size: 1.2rem; font-weight: 700; color: var(--heading);
+            margin: 2.25rem 0 .6rem;
+            padding-left: .75rem;
+            border-left: 3px solid var(--primary);
+        }
+        h3 { font-size: 1rem; font-weight: 600; color: var(--heading); margin: 1.25rem 0 .4rem; }
+
+        p  { margin-bottom: .85rem; }
+        ul, ol { margin: .5rem 0 .85rem 1.5rem; }
+        li { margin-bottom: .35rem; }
+
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .callout {
+            border-radius: 6px; padding: 1rem 1.25rem; margin: 1.25rem 0;
+            font-size: .9375rem;
+        }
+        .callout-info  { background: var(--accent-bg); border: 1px solid var(--accent-bd); }
+        .callout-warn  { background: var(--warn-bg);   border: 1px solid var(--warn-bd); }
+        .callout strong { display: block; margin-bottom: .3rem; }
+
+        table {
+            width: 100%; border-collapse: collapse; font-size: .9rem;
+            margin: .75rem 0 1.25rem;
+        }
+        thead th {
+            background: var(--accent-bg); color: var(--heading); font-weight: 600;
+            text-align: left; padding: .6rem .85rem;
+            border: 1px solid var(--accent-bd);
+        }
+        tbody td {
+            padding: .55rem .85rem; border: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tbody tr:nth-child(even) td { background: #f9fbff; }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: .825em;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: .1em .4em;
+            color: #0f172a;
+        }
+
+        .toc { background: var(--accent-bg); border: 1px solid var(--accent-bd);
+               border-radius: 6px; padding: 1.1rem 1.4rem; margin-bottom: 2rem; }
+        .toc p { margin: 0 0 .5rem; font-weight: 600; color: var(--heading); }
+        .toc ol { margin: 0 0 0 1.2rem; }
+        .toc li { margin-bottom: .2rem; font-size: .9rem; }
+
+        footer {
+            margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+            font-size: .85rem; color: var(--muted); text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .wrapper { padding: 1.5rem 1.25rem; }
+            h1 { font-size: 1.5rem; }
+            table { font-size: .8rem; }
+        }
     </style>
 </head>
 <body>
-    <h1>Privacy Policy</h1>
-    <p class="last-updated">Last Updated: May 28, 2026</p>
-    
-    <p>Welcome to SwarmEnterprise v2 ("we", "our", or "us"). We are committed to protecting your privacy and ensuring the security of your data while you use our autonomous digital factory platform.</p>
-    
-    <h2>1. Data We Collect</h2>
-    <p>We collect information necessary to provide our services, including:</p>
+<div class="wrapper">
+
+    <header>
+        <div class="logo">RWV Techsolutions LLC</div>
+        <h1>Privacy Policy</h1>
+        <p class="meta">
+            Effective date: <strong>May 28, 2026</strong> &nbsp;·&nbsp;
+            Last updated: <strong>May 28, 2026</strong>
+        </p>
+    </header>
+
+    <div class="toc">
+        <p>Contents</p>
+        <ol>
+            <li><a href="#who-we-are">Who We Are</a></li>
+            <li><a href="#data-we-collect">Data We Collect</a></li>
+            <li><a href="#legal-basis">Legal Basis for Processing</a></li>
+            <li><a href="#how-we-use">How We Use Your Data</a></li>
+            <li><a href="#retention">Data Retention</a></li>
+            <li><a href="#third-parties">Third-Party Services</a></li>
+            <li><a href="#your-rights">Your Rights Under GDPR</a></li>
+            <li><a href="#erasure">Right to Erasure</a></li>
+            <li><a href="#export">Data Portability &amp; Export</a></li>
+            <li><a href="#international">International Transfers</a></li>
+            <li><a href="#cookies">Cookies &amp; Session Storage</a></li>
+            <li><a href="#security">Security</a></li>
+            <li><a href="#contact">Contact &amp; DPO</a></li>
+            <li><a href="#changes">Changes to This Policy</a></li>
+        </ol>
+    </div>
+
+    <!-- 1 -->
+    <h2 id="who-we-are">1. Who We Are</h2>
+    <p>
+        SwarmEnterprise v2 is operated by <strong>RWV Techsolutions LLC</strong>
+        ("Company," "we," "our," or "us"), a limited liability company registered
+        in the state of West Virginia, USA.
+    </p>
+    <address style="font-style: normal; margin-bottom:.85rem;">
+        RWV Techsolutions LLC<br>
+        1091 Harrison Ave<br>
+        Elkins, WV 26241<br>
+        United States of America<br>
+        Email: <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+    </address>
+    <p>
+        We are the data controller for all personal data collected through the
+        SwarmEnterprise v2 platform (the "Service"). This Privacy Policy explains
+        what data we collect, how we use it, and what rights you have over it.
+    </p>
+
+    <!-- 2 -->
+    <h2 id="data-we-collect">2. Data We Collect</h2>
+    <p>We collect only the data necessary to provide, improve, and secure the Service.</p>
+
+    <h3>2.1 Account &amp; Identity Data</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th><th>Model</th><th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><code>email</code></td><td>User</td><td>Primary identifier and login credential</td></tr>
+            <tr><td><code>full_name</code></td><td>User</td><td>Display name for the account</td></tr>
+            <tr><td><code>password_hash</code></td><td>User</td><td>Bcrypt hash of your password — plaintext is never stored</td></tr>
+            <tr><td><code>role</code></td><td>User</td><td>Access-control level (user / admin)</td></tr>
+            <tr><td><code>subscription_tier</code></td><td>User</td><td>Active billing plan</td></tr>
+            <tr><td><code>is_active</code></td><td>User</td><td>Whether the account is currently enabled</td></tr>
+            <tr><td><code>created_at</code> / <code>updated_at</code></td><td>User</td><td>Account lifecycle timestamps</td></tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 Lead Data</h3>
+    <table>
+        <thead><tr><th>Field</th><th>Model</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td><code>email</code></td><td>Lead</td><td>Contact email captured through outreach or sign-up forms</td></tr>
+            <tr><td><code>name</code></td><td>Lead</td><td>Prospect's name (optional)</td></tr>
+            <tr><td><code>company</code></td><td>Lead</td><td>Prospect's employer (optional)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>2.3 Payment &amp; Billing Data</h3>
+    <p>
+        Payment is processed entirely by <strong>Stripe, Inc.</strong> We receive a
+        Stripe <code>session_id</code> and <code>customer_email</code> (stored in
+        the <code>Project</code> model) to fulfil your order. We never store raw
+        credit card numbers, CVV codes, or full card numbers on our servers.
+    </p>
+
+    <h3>2.4 Usage &amp; Telemetry Data</h3>
+    <table>
+        <thead><tr><th>Field</th><th>Model</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td><code>event_type</code></td><td>UsageEvent</td><td>Type of platform action (e.g., <code>build_triggered</code>)</td></tr>
+            <tr><td><code>project_id</code></td><td>UsageEvent</td><td>Project the event relates to</td></tr>
+            <tr><td><code>metadata_json</code></td><td>UsageEvent</td><td>Structured context for the event (may include IP address)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>2.5 API Keys</h3>
+    <p>
+        Programmatic access tokens (<code>APIKey</code> model) are linked to your
+        user account. We store a hashed or opaque key value, scope, and last-used
+        timestamp. Revoked and expired keys are purged according to the retention
+        schedule in §5.
+    </p>
+
+    <h3>2.6 Technical Metadata</h3>
+    <p>
+        Server logs may capture your <strong>IP address</strong> and
+        <strong>User-Agent string</strong> for security monitoring and rate-limiting
+        purposes. These are not linked to your account in our application database.
+    </p>
+
+    <!-- 3 -->
+    <h2 id="legal-basis">3. Legal Basis for Processing</h2>
+
+    <div class="callout callout-info">
+        <strong>Applicable law</strong>
+        The processing activities below apply GDPR Article 6 legal bases to
+        residents of the European Economic Area (EEA) and United Kingdom.
+        For all other users, equivalent consumer-protection standards apply.
+    </div>
+
+    <table>
+        <thead><tr><th>Data Category</th><th>Legal Basis</th><th>GDPR Article</th></tr></thead>
+        <tbody>
+            <tr><td>Account &amp; identity data</td><td>Performance of a contract (providing the Service)</td><td>Art. 6(1)(b)</td></tr>
+            <tr><td>Payment &amp; billing data</td><td>Performance of a contract; legal obligation (tax records)</td><td>Art. 6(1)(b) / (c)</td></tr>
+            <tr><td>Usage &amp; telemetry events</td><td>Legitimate interests (platform security, abuse prevention, performance)</td><td>Art. 6(1)(f)</td></tr>
+            <tr><td>Lead contact data</td><td>Legitimate interests (business development) or consent where required</td><td>Art. 6(1)(f) / (a)</td></tr>
+            <tr><td>API keys</td><td>Performance of a contract</td><td>Art. 6(1)(b)</td></tr>
+            <tr><td>Server / IP logs</td><td>Legitimate interests (security, fraud prevention)</td><td>Art. 6(1)(f)</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 4 -->
+    <h2 id="how-we-use">4. How We Use Your Data</h2>
     <ul>
-        <li><strong>Account Information:</strong> Name, email address, and authentication credentials.</li>
-        <li><strong>Usage Data:</strong> Information about how you interact with our agents and the factory engine.</li>
-        <li><strong>Payment Information:</strong> Processed securely via Stripe; we do not store full credit card details on our servers.</li>
+        <li><strong>Service delivery</strong> — provision and operation of AI agent workflow automation features.</li>
+        <li><strong>Authentication &amp; access control</strong> — verifying your identity and enforcing role-based permissions via JWT tokens.</li>
+        <li><strong>Billing</strong> — creating Stripe checkout sessions, associating payments with accounts, and managing subscription tiers.</li>
+        <li><strong>Platform analytics</strong> — aggregated usage metrics to improve agent performance and system reliability.</li>
+        <li><strong>Security &amp; abuse prevention</strong> — IP-based rate limiting, audit logging, and detection of anomalous activity.</li>
+        <li><strong>Communications</strong> — transactional emails related to account activity (password reset, billing receipts). We do not send marketing email without your explicit consent.</li>
+        <li><strong>Legal compliance</strong> — retention of records required by applicable law.</li>
     </ul>
-    
-    <h2>2. How We Use Your Data</h2>
-    <p>Your data is used to:</p>
+    <p>We do <strong>not</strong> sell, rent, or trade your personal data to third parties.</p>
+
+    <!-- 5 -->
+    <h2 id="retention">5. Data Retention</h2>
+    <table>
+        <thead><tr><th>Data Category</th><th>Retention Period</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>User accounts (User model)</td>
+                <td>For the duration of active service, then deleted within <strong>30 days</strong> of account closure or deletion request</td>
+            </tr>
+            <tr>
+                <td>API keys (APIKey model)</td>
+                <td>Deleted with the associated user account; expired keys purged within 30 days of expiry</td>
+            </tr>
+            <tr>
+                <td>Lead records (Lead model)</td>
+                <td><strong>2 years</strong> from date of capture, then permanently deleted</td>
+            </tr>
+            <tr>
+                <td>Usage / telemetry events (UsageEvent)</td>
+                <td><strong>90 days</strong> from event timestamp</td>
+            </tr>
+            <tr>
+                <td>Payment records (Project model)</td>
+                <td>7 years (US tax-record obligation), then deleted</td>
+            </tr>
+            <tr>
+                <td>Server / IP logs</td>
+                <td>90 days via hosting provider log rotation</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        You may request earlier deletion at any time (see §8, Right to Erasure).
+        Anonymised, aggregated statistical data that cannot be re-linked to an
+        individual is not subject to these retention limits.
+    </p>
+
+    <!-- 6 -->
+    <h2 id="third-parties">6. Third-Party Services</h2>
+
+    <h3>6.1 Stripe</h3>
+    <p>
+        Payment processing is provided by <strong>Stripe, Inc.</strong>
+        (<a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a>).
+        When you subscribe, you are redirected to a Stripe-hosted checkout page.
+        Stripe processes your payment card data directly under their own privacy policy
+        and PCI-DSS compliance programme. We receive only a tokenised session reference.
+    </p>
+
+    <h3>6.2 Hosting Provider</h3>
+    <p>
+        The Service is hosted on cloud infrastructure (the specific provider is
+        disclosed in our infrastructure documentation). The hosting provider may
+        process server logs and infrastructure telemetry on our behalf as a data
+        processor under a Data Processing Agreement.
+    </p>
+
+    <h3>6.3 Redis</h3>
+    <p>
+        We use Redis for JWT token revocation and short-term session state. No
+        personal data beyond token identifiers is persisted in Redis beyond the
+        token's expiry window.
+    </p>
+
+    <h3>6.4 No Advertising Networks</h3>
+    <p>We do not integrate with advertising networks, analytics SDKs, or social-media
+    tracking pixels on the platform.</p>
+
+    <!-- 7 -->
+    <h2 id="your-rights">7. Your Rights Under GDPR</h2>
+    <p>
+        If you are located in the EEA, UK, or another jurisdiction with comparable
+        data-protection law, you have the following rights:
+    </p>
+    <table>
+        <thead><tr><th>Right</th><th>Description</th><th>How to Exercise</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Access</strong></td>
+                <td>Obtain a copy of all personal data we hold about you</td>
+                <td><code>GET /api/user/export</code> (see §9) or email us</td>
+            </tr>
+            <tr>
+                <td><strong>Rectification</strong></td>
+                <td>Correct inaccurate or incomplete data</td>
+                <td><code>PUT /api/users/me</code> or email us</td>
+            </tr>
+            <tr>
+                <td><strong>Erasure</strong></td>
+                <td>Request deletion of your data ("right to be forgotten")</td>
+                <td><code>DELETE /api/user/account</code> (see §8) or email us</td>
+            </tr>
+            <tr>
+                <td><strong>Portability</strong></td>
+                <td>Receive your data in a machine-readable format (JSON)</td>
+                <td><code>GET /api/user/export</code></td>
+            </tr>
+            <tr>
+                <td><strong>Objection</strong></td>
+                <td>Object to processing based on legitimate interests</td>
+                <td>Email us at <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a></td>
+            </tr>
+            <tr>
+                <td><strong>Restriction</strong></td>
+                <td>Request that we restrict processing while a dispute is resolved</td>
+                <td>Email us</td>
+            </tr>
+            <tr>
+                <td><strong>Withdraw Consent</strong></td>
+                <td>Where processing is based on consent, withdraw it at any time</td>
+                <td>Email us or use in-platform controls</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        We will respond to verifiable rights requests within <strong>30 days</strong>.
+        We may need to verify your identity before fulfilling the request.
+        If you are unsatisfied with our response, you have the right to lodge a
+        complaint with your local supervisory authority.
+    </p>
+
+    <!-- 8 -->
+    <h2 id="erasure">8. Right to Erasure (Account Deletion)</h2>
+    <p>
+        You can permanently delete your account and all associated personal data by
+        making an authenticated API request:
+    </p>
+    <div class="callout callout-warn">
+        <strong>⚠ This action is irreversible</strong>
+        Deleting your account will permanently erase your user record, all API keys,
+        and all usage events linked to your account. Stripe billing records are
+        retained for 7 years as required by US tax law and cannot be erased early.
+    </div>
+    <pre style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:1rem;overflow-x:auto;font-size:.85rem;"><code>DELETE /api/user/account
+Authorization: Bearer &lt;your_access_token&gt;
+
+→ HTTP 204 No Content</code></pre>
+    <p>
+        Alternatively, email <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+        with the subject line <em>"Account Deletion Request"</em> and we will process
+        the request within 30 days.
+    </p>
+
+    <!-- 9 -->
+    <h2 id="export">9. Data Portability &amp; Export</h2>
+    <p>
+        You may download a complete JSON export of all personal data we hold about
+        you — including your user profile, API keys, and usage events:
+    </p>
+    <pre style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:1rem;overflow-x:auto;font-size:.85rem;"><code>GET /api/user/export
+Authorization: Bearer &lt;your_access_token&gt;
+
+→ HTTP 200 OK
+Content-Type: application/json</code></pre>
+    <p>
+        The response is structured JSON you can save locally or import into another
+        service. The exported file does <em>not</em> include your password hash.
+    </p>
+
+    <!-- 10 -->
+    <h2 id="international">10. International Transfers</h2>
+    <p>
+        RWV Techsolutions LLC is based in the United States. If you access the
+        Service from outside the US, your data will be transferred to and processed
+        in the US. The US does not have an adequacy decision from the European
+        Commission. Where GDPR applies, we rely on <strong>Standard Contractual
+        Clauses (SCCs)</strong> and appropriate safeguards for any cross-border
+        transfers of EEA personal data.
+    </p>
+    <p>
+        For questions about international transfer mechanisms, contact us at
+        <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>.
+    </p>
+
+    <!-- 11 -->
+    <h2 id="cookies">11. Cookies &amp; Session Storage</h2>
+    <p>
+        SwarmEnterprise v2 uses <strong>session-only cookies and browser
+        sessionStorage</strong> to maintain your authenticated session. No persistent
+        tracking cookies are set; all session identifiers are cleared when you close
+        your browser tab.
+    </p>
+    <table>
+        <thead><tr><th>Name / Mechanism</th><th>Purpose</th><th>Expiry</th></tr></thead>
+        <tbody>
+            <tr><td>JWT access token (sessionStorage)</td><td>Authenticates API requests</td><td>15 minutes from issue</td></tr>
+            <tr><td>JWT refresh token (sessionStorage)</td><td>Obtains fresh access tokens without re-login</td><td>7 days from issue</td></tr>
+        </tbody>
+    </table>
+    <p>We do not use any advertising, analytics, or third-party cookies.</p>
+
+    <!-- 12 -->
+    <h2 id="security">12. Security</h2>
+    <p>We implement the following technical and organisational measures:</p>
     <ul>
-        <li>Provision and maintain your autonomous company instances.</li>
-        <li>Improve our agent intelligence and platform performance.</li>
-        <li>Process transactions and send service-related notifications.</li>
+        <li>Passwords stored exclusively as <strong>bcrypt hashes</strong> — plaintext is never persisted.</li>
+        <li><strong>JWT-based authentication</strong> with short-lived access tokens (15 minutes) and Redis-backed revocation.</li>
+        <li>API keys stored and validated as opaque tokens; access scoped with read/write permissions.</li>
+        <li>All data in transit protected by <strong>TLS 1.2+</strong>.</li>
+        <li>Role-based access control enforced at the API layer.</li>
+        <li>Rate limiting per IP address to prevent brute-force attacks.</li>
     </ul>
-    
-    <h2>3. Data Sovereignty</h2>
-    <p>Unlike traditional SaaS, SwarmEnterprise v2 is designed for self-hosting. When you deploy a "Company in a Box," you retain full ownership and control over the data within that instance.</p>
-    
-    <h2>4. Security</h2>
-    <p>We implement industry-standard security measures, including end-to-end encryption for sensitive metadata and secure vaulting for API keys.</p>
-    
-    <h2>5. Contact Us</h2>
-    <p>If you have any questions about this Privacy Policy, please contact us at privacy@realms2riches.com.</p>
+    <p>
+        No method of transmission over the internet or electronic storage is 100% secure.
+        We will notify affected users within 72 hours of becoming aware of a data breach
+        that is likely to result in a high risk to their rights and freedoms.
+    </p>
+
+    <!-- 13 -->
+    <h2 id="contact">13. Contact &amp; Data Protection Officer</h2>
+    <p>
+        For privacy enquiries, rights requests, or data-breach notifications,
+        contact our Data Protection Officer:
+    </p>
+    <address style="font-style:normal;">
+        <strong>Data Protection Officer — RWV Techsolutions LLC</strong><br>
+        1091 Harrison Ave, Elkins, WV 26241, USA<br>
+        Email: <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+    </address>
+    <p style="margin-top:.85rem;">
+        We aim to respond to all enquiries within <strong>5 business days</strong>
+        and to complete requests within 30 days.
+    </p>
+
+    <!-- 14 -->
+    <h2 id="changes">14. Changes to This Policy</h2>
+    <p>
+        We may update this Privacy Policy to reflect changes in our practices or
+        applicable law. When we make material changes we will:
+    </p>
+    <ul>
+        <li>Update the "Last updated" date at the top of this page.</li>
+        <li>Send a notification to the email address on your account at least
+            <strong>14 days</strong> before the changes take effect.</li>
+        <li>For significant changes, request your renewed consent where required.</li>
+    </ul>
+    <p>
+        Your continued use of the Service after the effective date constitutes
+        acceptance of the revised policy.
+    </p>
+
+    <footer>
+        &copy; 2026 RWV Techsolutions LLC &nbsp;·&nbsp; 1091 Harrison Ave, Elkins, WV 26241, USA
+        &nbsp;·&nbsp; <a href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+        &nbsp;·&nbsp; <a href="/terms.html">Terms of Service</a>
+    </footer>
+
+</div>
 </body>
 </html>

@@ -23,6 +23,12 @@ jobs:
         run: python scripts/pip_audit_gate.py
       - name: Run tests
         run: pytest tests/ -q
+      - name: Migration dry-run (SQLite)
+        run: |
+          export DATABASE_URL="sqlite:///./test_migration.db"
+          alembic upgrade head
+          alembic downgrade base
+          rm -f test_migration.db
       - name: Lint (black check)
         run: |
           pip install black ruff

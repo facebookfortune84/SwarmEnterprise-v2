@@ -1,0 +1,14 @@
+# Scale overlay: removes direct port binding from backend, sets replicas
+# Usage: docker compose -f docker-compose.yml -f deploy/docker/docker-compose.scale.yml up -d
+services:
+  backend:
+    ports: []  # Remove direct port binding — Caddy handles routing
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: rolling-update

@@ -1,0 +1,38 @@
+groups:
+  - name: service_availability
+    rules:
+      - alert: BackendDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend service is down"
+          description: "The FastAPI backend (job=backend) has been unreachable for more than 1 minute. Target: {{ $labels.instance }}"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis service is down"
+          description: "Redis (job=redis) has been unreachable for more than 1 minute. Target: {{ $labels.instance }}"
+
+      - alert: PostgresDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL service is down"
+          description: "PostgreSQL (job=postgres) has been unreachable for more than 1 minute. Target: {{ $labels.instance }}"
+
+      - alert: CaddyDown
+        expr: up{job="caddy"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Caddy reverse proxy is down"
+          description: "Caddy (job=caddy) has been unreachable for more than 1 minute. Target: {{ $labels.instance }}"

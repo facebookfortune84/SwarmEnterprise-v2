@@ -58,7 +58,7 @@ class LeadDiscoveryAgent:
 
         # 1. Search for targets
         query = f"recent Y Combinator startups or funded SaaS companies in {niche}"
-        search_results = web_search.run(query)
+        search_results = web_search(query)
         
         # 2. Analyze and extract (Simulated agent task here)
         # In a real CrewAI setup, this would be a Task
@@ -69,9 +69,9 @@ class LeadDiscoveryAgent:
         for lead in extracted_leads:
             try:
                 self.db.create_lead(
-                    email=lead.get("email", "info@"+lead.get("company", "unknown").lower()+".com"),
-                    name=lead.get("name"),
-                    company=lead.get("company"),
+                    email=str(lead.get("email", "info@"+str(lead.get("company", "unknown")).lower()+".com")),
+                    name=str(lead.get("name", "")),
+                    company=str(lead.get("company", "")),
                     metadata=lead
                 )
                 count += 1

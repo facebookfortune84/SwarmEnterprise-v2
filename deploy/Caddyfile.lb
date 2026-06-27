@@ -1,0 +1,75 @@
+# Load-balancing Caddyfile — used with docker-compose.scale.yml
+# Docker Compose scale creates numbered containers: backend_1, backend_2, backend_3
+# Usage: mount this file instead of Caddyfile when running with the scale overlay.
+#
+# Caddy upstream blocks provide passive health checking and round-robin distribution
+# across all three backend replicas.
+
+{
+	email {$ACME_EMAIL:ops@realms2riches.com}
+}
+
+# Upstream block — shared by all site blocks below
+(backend_upstream) {
+	reverse_proxy {
+		to backend_1:8000 backend_2:8000 backend_3:8000
+
+		# Active health checks
+		health_uri /health
+		health_interval 15s
+		health_timeout 5s
+		health_status 200
+
+		# Passive failure tracking
+		fail_duration 30s
+		max_fails 3
+		unhealthy_status 5xx
+
+		lb_policy round_robin
+
+		transport http {
+			dial_timeout 5s
+			response_header_timeout 30s
+		}
+	}
+}
+
+# Main app + API
+realms2riches.com, www.realms2riches.com {
+	root * /srv/frontend
+	try_files {path} /index.html
+
+	handle /api/* {
+		import backend_upstream
+	}
+
+	handle /health {
+		import backend_upstream
+	}
+
+	handle /metrics {
+		import backend_upstream
+	}
+
+	file_server
+}
+
+api.realms2riches.com {
+	import backend_upstream
+}
+
+# Corporate static site
+corp.realms2riches.com {
+	root * /srv/frontend/corp
+	try_files {path} /corp.html
+	file_server
+}
+
+# Tenant boxes on tech domain
+*.realms2riches.tech {
+	import backend_upstream
+}
+
+realms2riches.tech {
+	import backend_upstream
+}

@@ -1,0 +1,38 @@
+groups:
+  - name: performance
+    rules:
+      - alert: HighErrorRate
+        expr: >
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "More than 1% of HTTP requests are returning 5xx status codes. Current rate: {{ $value | humanizePercentage }}"
+
+      - alert: HighP95Latency
+        expr: >
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 request latency"
+          description: "The 95th percentile request duration has exceeded 2 seconds. Current p95: {{ $value | humanizeDuration }}"
+
+      - alert: HighMemoryUsage
+        expr: system_memory_usage > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High system memory usage"
+          description: "System memory usage has been above 85% for more than 10 minutes. Current usage: {{ $value | humanize }}%"

@@ -1,0 +1,41 @@
+groups:
+  - name: infrastructure
+    rules:
+      - alert: DiskSpaceHigh
+        expr: >
+          (
+            node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+            /
+            node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}
+          ) < 0.2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space usage above 80%"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has less than 20% free space remaining. Available: {{ $value | humanizePercentage }}"
+
+      - alert: HighCPUSustained
+        expr: >
+          100 - (
+            avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m]))
+            * 100
+          ) > 90
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Sustained high CPU usage"
+          description: "CPU usage on {{ $labels.instance }} has been above 90% for more than 10 minutes. Current usage: {{ $value | humanize }}%"
+
+      - alert: ContainerRestarting
+        expr: >
+          increase(kube_pod_container_status_restarts_total[1h]) > 3
+          or
+          increase(container_start_time_seconds[1h]) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container is restarting frequently"
+          description: "Container {{ $labels.container }} (pod: {{ $labels.pod }}) has restarted more than 3 times in the last hour."

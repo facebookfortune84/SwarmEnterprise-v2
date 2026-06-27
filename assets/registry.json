@@ -1,7 +1,7 @@
 {
     "metadata": {
         "ingested_at": "2026-05-07T00:30:20.819382",
-        "version": "1.0"
+        "version": "1.1"
     },
     "prompts": [
         {
@@ -302,316 +302,316 @@
     ],
     "sops": [
         {
-            "name": "COLD_OUTREACH_SOP.md",
-            "path": "assets/sops/COLD_OUTREACH_SOP.md",
-            "type": "md"
+            "id": "COLD_OUTREACH_SOP",
+            "file": "sops/COLD_OUTREACH_SOP.md",
+            "description": "Perpetual autonomous B2B cold-outreach engine using a multi-agent swarm for signal-driven engagement."
         },
         {
-            "name": "GOV_001_TICKET_ISSUANCE.md",
-            "path": "assets/sops/GOV_001_TICKET_ISSUANCE.md",
-            "type": "md"
+            "id": "GOV_001",
+            "file": "sops/GOV_001_TICKET_ISSUANCE.md",
+            "description": "Standard for generating verifiable work orders for all swarm tasks."
         },
         {
-            "name": "GOV_002_PERSONA_RESONANCE.md",
-            "path": "assets/sops/GOV_002_PERSONA_RESONANCE.md",
-            "type": "md"
+            "id": "GOV_002",
+            "file": "sops/GOV_002_PERSONA_RESONANCE.md",
+            "description": "How agents autonomously select the most effective Oracle persona."
         },
         {
-            "name": "GOV_003_REVENUE_RECONCILIATION.md",
-            "path": "assets/sops/GOV_003_REVENUE_RECONCILIATION.md",
-            "type": "md"
+            "id": "GOV_003",
+            "file": "sops/GOV_003_REVENUE_RECONCILIATION.md",
+            "description": "Syncing Stripe event logs with internal SQLStore records."
         },
         {
-            "name": "GOV_004_AUTONOMOUS_BACKLOG.md",
-            "path": "assets/sops/GOV_004_AUTONOMOUS_BACKLOG.md",
-            "type": "md"
+            "id": "GOV_004",
+            "file": "sops/GOV_004_AUTONOMOUS_BACKLOG.md",
+            "description": "Algorithm for filling agent idle time with high-priority maintenance tasks."
         },
         {
-            "name": "GOV_005_TASK_PRIORITIZATION.md",
-            "path": "assets/sops/GOV_005_TASK_PRIORITIZATION.md",
-            "type": "md"
+            "id": "GOV_005",
+            "file": "sops/GOV_005_TASK_PRIORITIZATION.md",
+            "description": "Logic for assigning Critical/High priority tags based on ROI."
         },
         {
-            "name": "GOV_006_AGENT_ONBOARDING.md",
-            "path": "assets/sops/GOV_006_AGENT_ONBOARDING.md",
-            "type": "md"
+            "id": "GOV_006",
+            "file": "sops/GOV_006_AGENT_ONBOARDING.md",
+            "description": "Steps for tax ID issuance and wage tier assignment when registering a new agent."
         },
         {
-            "name": "GOV_007_LINEAGE_SIGNATURE.md",
-            "path": "assets/sops/GOV_007_LINEAGE_SIGNATURE.md",
-            "type": "md"
+            "id": "GOV_007",
+            "file": "sops/GOV_007_LINEAGE_SIGNATURE.md",
+            "description": "Cryptographic signing of all agent-generated artifacts."
         },
         {
-            "name": "LEAD_EXTRACTION.md",
-            "path": "assets/sops/LEAD_EXTRACTION.md",
-            "type": "md"
+            "id": "LEAD_EXTRACTION",
+            "file": "sops/LEAD_EXTRACTION.md",
+            "description": "High-value B2B lead extraction and targeting process for Stream 12."
         },
         {
-            "name": "MKT_001_TIKTOK_VIRALITY.md",
-            "path": "assets/sops/MKT_001_TIKTOK_VIRALITY.md",
-            "type": "md"
+            "id": "MKT_001",
+            "file": "sops/MKT_001_TIKTOK_VIRALITY.md",
+            "description": "Hook-Value-CTA framework for sub-60-second short-form video scripts."
         },
         {
-            "name": "MKT_002_LINKEDIN_AUTHORITY.md",
-            "path": "assets/sops/MKT_002_LINKEDIN_AUTHORITY.md",
-            "type": "md"
+            "id": "MKT_002",
+            "file": "sops/MKT_002_LINKEDIN_AUTHORITY.md",
+            "description": "Structure for technical long-form LinkedIn posts to drive enterprise leads."
         },
         {
-            "name": "MKT_003_EMAIL_COPYWRITING.md",
-            "path": "assets/sops/MKT_003_EMAIL_COPYWRITING.md",
-            "type": "md"
+            "id": "MKT_003",
+            "file": "sops/MKT_003_EMAIL_COPYWRITING.md",
+            "description": "Principles of the Jarvis 3.5 conversion-sharding email template."
         },
         {
-            "name": "MKT_004_AD_COPY_PPC.md",
-            "path": "assets/sops/MKT_004_AD_COPY_PPC.md",
-            "type": "md"
+            "id": "MKT_004",
+            "file": "sops/MKT_004_AD_COPY_PPC.md",
+            "description": "A/B testing guidelines for high-CTR Facebook and Google ad headlines."
         },
         {
-            "name": "MKT_005_SEO_KEYWORD_RESEARCH.md",
-            "path": "assets/sops/MKT_005_SEO_KEYWORD_RESEARCH.md",
-            "type": "md"
+            "id": "MKT_005",
+            "file": "sops/MKT_005_SEO_KEYWORD_RESEARCH.md",
+            "description": "Identifying low-difficulty, high-intent keywords for immediate ranking."
         },
         {
-            "name": "MKT_007_VIDEO_EDITING_DIRECTION.md",
-            "path": "assets/sops/MKT_007_VIDEO_EDITING_DIRECTION.md",
-            "type": "md"
+            "id": "MKT_007",
+            "file": "sops/MKT_007_VIDEO_EDITING_DIRECTION.md",
+            "description": "Scene-by-scene instructions for autonomous video assembly."
         },
         {
-            "name": "MKT_008_SOCIAL_MEDIA_BROADCAST.md",
-            "path": "assets/sops/MKT_008_SOCIAL_MEDIA_BROADCAST.md",
-            "type": "md"
+            "id": "MKT_008",
+            "file": "sops/MKT_008_SOCIAL_MEDIA_BROADCAST.md",
+            "description": "Multiplexer schedule for omni-channel social presence across FB, X, and LinkedIn."
         },
         {
-            "name": "MKT_009_LEAD_NURTURE_SEQUENCE.md",
-            "path": "assets/sops/MKT_009_LEAD_NURTURE_SEQUENCE.md",
-            "type": "md"
+            "id": "MKT_009",
+            "file": "sops/MKT_009_LEAD_NURTURE_SEQUENCE.md",
+            "description": "7-day auto-responder logic for email subscribers."
         },
         {
-            "name": "MKT_010_BRAND_VOICE_ALIGNMENT.md",
-            "path": "assets/sops/MKT_010_BRAND_VOICE_ALIGNMENT.md",
-            "type": "md"
+            "id": "MKT_010",
+            "file": "sops/MKT_010_BRAND_VOICE_ALIGNMENT.md",
+            "description": "Ensuring all content sounds like the Sovereign Architect persona."
         },
         {
-            "name": "MON_001_AFFILIATE_ARBITRAGE.md",
-            "path": "assets/sops/MON_001_AFFILIATE_ARBITRAGE.md",
-            "type": "md"
+            "id": "MON_001",
+            "file": "sops/MON_001_AFFILIATE_ARBITRAGE.md",
+            "description": "Procedure for scraping TikTok Shop and ClickFunnels links and generating viral bridge pages."
         },
         {
-            "name": "MON_002_API_SAAS_BILLING.md",
-            "path": "assets/sops/MON_002_API_SAAS_BILLING.md",
-            "type": "md"
+            "id": "MON_002",
+            "file": "sops/MON_002_API_SAAS_BILLING.md",
+            "description": "Standard for provisioning API keys and setting up Stripe metered billing."
         },
         {
-            "name": "MON_003_LEAD_GEN_BROKER.md",
-            "path": "assets/sops/MON_003_LEAD_GEN_BROKER.md",
-            "type": "md"
+            "id": "MON_003",
+            "file": "sops/MON_003_LEAD_GEN_BROKER.md",
+            "description": "Workflow for extracting B2B leads and selling them to verified high-ticket partners."
         },
         {
-            "name": "MON_004_DIGITAL_PRODUCT_STORE.md",
-            "path": "assets/sops/MON_004_DIGITAL_PRODUCT_STORE.md",
-            "type": "md"
+            "id": "MON_004",
+            "file": "sops/MON_004_DIGITAL_PRODUCT_STORE.md",
+            "description": "Protocol for generating and listing Brand Kits and Strategy Guides on the Sovereign Store."
         },
         {
-            "name": "MON_005_NEWSLETTER_SPONSORSHIP.md",
-            "path": "assets/sops/MON_005_NEWSLETTER_SPONSORSHIP.md",
-            "type": "md"
+            "id": "MON_005",
+            "file": "sops/MON_005_NEWSLETTER_SPONSORSHIP.md",
+            "description": "Guidelines for pitching newsletter ad slots to AI vendors and SaaS founders."
         },
         {
-            "name": "MON_006_PRINT_ON_DEMAND.md",
-            "path": "assets/sops/MON_006_PRINT_ON_DEMAND.md",
-            "type": "md"
+            "id": "MON_006",
+            "file": "sops/MON_006_PRINT_ON_DEMAND.md",
+            "description": "Workflow for generating AI art and listing it on integrated print-on-demand platforms."
         },
         {
-            "name": "MON_007_PROGRAMMATIC_ADS.md",
-            "path": "assets/sops/MON_007_PROGRAMMATIC_ADS.md",
-            "type": "md"
+            "id": "MON_007",
+            "file": "sops/MON_007_PROGRAMMATIC_ADS.md",
+            "description": "Standard for ad-injection into auto-generated SEO blog posts."
         },
         {
-            "name": "MON_008_CRYPTO_YIELD_FARMING.md",
-            "path": "assets/sops/MON_008_CRYPTO_YIELD_FARMING.md",
-            "type": "md"
+            "id": "MON_008",
+            "file": "sops/MON_008_CRYPTO_YIELD_FARMING.md",
+            "description": "Safety protocol for analyzing DeFi rates and posting risk-adjusted alerts."
         },
         {
-            "name": "MON_009_PAID_COMMUNITY.md",
-            "path": "assets/sops/MON_009_PAID_COMMUNITY.md",
-            "type": "md"
+            "id": "MON_009",
+            "file": "sops/MON_009_PAID_COMMUNITY.md",
+            "description": "Onboarding flow for Discord/Telegram premium community members."
         },
         {
-            "name": "MON_010_DATA_LICENSING.md",
-            "path": "assets/sops/MON_010_DATA_LICENSING.md",
-            "type": "md"
+            "id": "MON_010",
+            "file": "sops/MON_010_DATA_LICENSING.md",
+            "description": "Drafting enterprise agreements for RAG-memory datasets."
         },
         {
-            "name": "MON_011_SEO_TRAFFIC.md",
-            "path": "assets/sops/MON_011_SEO_TRAFFIC.md",
-            "type": "md"
+            "id": "MON_011",
+            "file": "sops/MON_011_SEO_TRAFFIC.md",
+            "description": "Daily generation of 5 high-intent blog posts with ad-conversion hooks."
         },
         {
-            "name": "MON_012_COLD_OUTREACH.md",
-            "path": "assets/sops/MON_012_COLD_OUTREACH.md",
-            "type": "md"
+            "id": "MON_012",
+            "file": "sops/MON_012_COLD_OUTREACH.md",
+            "description": "Execution of high-deliverability SMTP sequences using Oracle personas."
         },
         {
-            "name": "MON_013_FAST_DEPLOY.md",
-            "path": "assets/sops/MON_013_FAST_DEPLOY.md",
-            "type": "md"
+            "id": "MON_013",
+            "file": "sops/MON_013_FAST_DEPLOY.md",
+            "description": "Protocol for spinning up new niche monetization sites in under 5 minutes."
         },
         {
-            "name": "OUTREACH_EXECUTION.md",
-            "path": "assets/sops/OUTREACH_EXECUTION.md",
-            "type": "md"
+            "id": "OUTREACH_EXECUTION",
+            "file": "sops/OUTREACH_EXECUTION.md",
+            "description": "Cold outreach execution playbook for Stream 12 operations."
         },
         {
-            "name": "SEC_001_SECRET_PROTECTION.md",
-            "path": "assets/sops/SEC_001_SECRET_PROTECTION.md",
-            "type": "md"
+            "id": "SEC_001",
+            "file": "sops/SEC_001_SECRET_PROTECTION.md",
+            "description": "Ban on logging or committing .env variables or API keys."
         },
         {
-            "name": "SEC_002_SANDBOX_ENFORCEMENT.md",
-            "path": "assets/sops/SEC_002_SANDBOX_ENFORCEMENT.md",
-            "type": "md"
+            "id": "SEC_002",
+            "file": "sops/SEC_002_SANDBOX_ENFORCEMENT.md",
+            "description": "Mandatory use of Docker for untested agent-generated code."
         },
         {
-            "name": "SEC_003_PHISHING_DEFENSE.md",
-            "path": "assets/sops/SEC_003_PHISHING_DEFENSE.md",
-            "type": "md"
+            "id": "SEC_003",
+            "file": "sops/SEC_003_PHISHING_DEFENSE.md",
+            "description": "Verifying sender reputation before processing incoming webhook payloads."
         },
         {
-            "name": "SEC_004_IP_REPUTATION_MANAGEMENT.md",
-            "path": "assets/sops/SEC_004_IP_REPUTATION_MANAGEMENT.md",
-            "type": "md"
+            "id": "SEC_004",
+            "file": "sops/SEC_004_IP_REPUTATION_MANAGEMENT.md",
+            "description": "Monitoring SMTP relay health to prevent blacklisting."
         },
         {
-            "name": "SEC_005_DATA_PRIVACY_GDPR.md",
-            "path": "assets/sops/SEC_005_DATA_PRIVACY_GDPR.md",
-            "type": "md"
+            "id": "SEC_005",
+            "file": "sops/SEC_005_DATA_PRIVACY_GDPR.md",
+            "description": "Handling PII (emails/names) according to global GDPR standards."
         },
         {
-            "name": "SEC_006_INJECTION_PREVENTION.md",
-            "path": "assets/sops/SEC_006_INJECTION_PREVENTION.md",
-            "type": "md"
+            "id": "SEC_006",
+            "file": "sops/SEC_006_INJECTION_PREVENTION.md",
+            "description": "Sanitizing LLM outputs before passing them to shell or DB tools."
         },
         {
-            "name": "SEC_007_RATE_LIMITING_SMTP.md",
-            "path": "assets/sops/SEC_007_RATE_LIMITING_SMTP.md",
-            "type": "md"
+            "id": "SEC_007",
+            "file": "sops/SEC_007_RATE_LIMITING_SMTP.md",
+            "description": "Strict 50-email-per-hour limit to maintain Gmail standing."
         },
         {
-            "name": "SEC_008_STASIS_BRANCH_LOCK.md",
-            "path": "assets/sops/SEC_008_STASIS_BRANCH_LOCK.md",
-            "type": "md"
+            "id": "SEC_008",
+            "file": "sops/SEC_008_STASIS_BRANCH_LOCK.md",
+            "description": "No-manual-edit policy for the archival stasis Git branch."
         },
         {
-            "name": "SEC_009_VIRTUAL_ENV_ISOLATION.md",
-            "path": "assets/sops/SEC_009_VIRTUAL_ENV_ISOLATION.md",
-            "type": "md"
+            "id": "SEC_009",
+            "file": "sops/SEC_009_VIRTUAL_ENV_ISOLATION.md",
+            "description": "Ensuring all swarm nodes run in dedicated Python virtual environments."
         },
         {
-            "name": "SEC_010_AUDIT_TRAIL_INTEGRITY.md",
-            "path": "assets/sops/SEC_010_AUDIT_TRAIL_INTEGRITY.md",
-            "type": "md"
+            "id": "SEC_010",
+            "file": "sops/SEC_010_AUDIT_TRAIL_INTEGRITY.md",
+            "description": "Protecting activity logs from unauthorized modification."
         },
         {
-            "name": "SELF_HEALING.md",
-            "path": "assets/sops/SELF_HEALING.md",
-            "type": "md"
+            "id": "SELF_HEALING",
+            "file": "sops/SELF_HEALING.md",
+            "description": "Autonomous self-healing and upkeep orchestration owned by INTEGRITY_SHIELD."
         },
         {
-            "name": "TEC_001_DB_SCHEMA_MIGRATION.md",
-            "path": "assets/sops/TEC_001_DB_SCHEMA_MIGRATION.md",
-            "type": "md"
+            "id": "TEC_001",
+            "file": "sops/TEC_001_DB_SCHEMA_MIGRATION.md",
+            "description": "Safely applying SQL patches via the Self-Healing service."
         },
         {
-            "name": "TEC_002_DEPENDENCY_AUDIT.md",
-            "path": "assets/sops/TEC_002_DEPENDENCY_AUDIT.md",
-            "type": "md"
+            "id": "TEC_002",
+            "file": "sops/TEC_002_DEPENDENCY_AUDIT.md",
+            "description": "Weekly scan of requirements.txt for vulnerabilities and updates."
         },
         {
-            "name": "TEC_003_LOG_ROTATION.md",
-            "path": "assets/sops/TEC_003_LOG_ROTATION.md",
-            "type": "md"
+            "id": "TEC_003",
+            "file": "sops/TEC_003_LOG_ROTATION.md",
+            "description": "Pruning swarm_activity.log once it exceeds the 100 MB threshold."
         },
         {
-            "name": "TEC_004_RAG_MEMORY_INDEXING.md",
-            "path": "assets/sops/TEC_004_RAG_MEMORY_INDEXING.md",
-            "type": "md"
+            "id": "TEC_004",
+            "file": "sops/TEC_004_RAG_MEMORY_INDEXING.md",
+            "description": "Cleaning and re-embedding sovereign_memory.json every 24 hours."
         },
         {
-            "name": "TEC_005_DOCKER_CONTAINER_UPKEEP.md",
-            "path": "assets/sops/TEC_005_DOCKER_CONTAINER_UPKEEP.md",
-            "type": "md"
+            "id": "TEC_005",
+            "file": "sops/TEC_005_DOCKER_CONTAINER_UPKEEP.md",
+            "description": "Pruning orphaned Docker images and volumes to maintain disk health."
         },
         {
-            "name": "TEC_006_API_KEY_ROTATION.md",
-            "path": "assets/sops/TEC_006_API_KEY_ROTATION.md",
-            "type": "md"
+            "id": "TEC_006",
+            "file": "sops/TEC_006_API_KEY_ROTATION.md",
+            "description": "Safety protocol for rotating Stripe and Groq keys without downtime."
         },
         {
-            "name": "TEC_007_ERROR_HANDLING_HARDENING.md",
-            "path": "assets/sops/TEC_007_ERROR_HANDLING_HARDENING.md",
-            "type": "md"
+            "id": "TEC_007",
+            "file": "sops/TEC_007_ERROR_HANDLING_HARDENING.md",
+            "description": "Wrapping tool calls in Pydantic-validated try/except blocks."
         },
         {
-            "name": "TEC_008_CODE_COMPILATION_TEST.md",
-            "path": "assets/sops/TEC_008_CODE_COMPILATION_TEST.md",
-            "type": "md"
+            "id": "TEC_008",
+            "file": "sops/TEC_008_CODE_COMPILATION_TEST.md",
+            "description": "Running compileall before every Vanguard deployment as a mandatory gate."
         },
         {
-            "name": "TEC_009_SUBMODULE_SYNC.md",
-            "path": "assets/sops/TEC_009_SUBMODULE_SYNC.md",
-            "type": "md"
+            "id": "TEC_009",
+            "file": "sops/TEC_009_SUBMODULE_SYNC.md",
+            "description": "Aligning primary core with core_secondary assets after cross-repo merges."
         },
         {
-            "name": "TEC_010_TELEMETRY_DASHBOARD.md",
-            "path": "assets/sops/TEC_010_TELEMETRY_DASHBOARD.md",
-            "type": "md"
+            "id": "TEC_010",
+            "file": "sops/TEC_010_TELEMETRY_DASHBOARD.md",
+            "description": "Aggregating latency and wage metrics for the weekly audit."
         },
         {
-            "name": "TRAFFIC_DOMINANCE_v1.md",
-            "path": "assets/sops/TRAFFIC_DOMINANCE_v1.md",
-            "type": "md"
+            "id": "TRAFFIC_DOMINANCE_v1",
+            "file": "sops/TRAFFIC_DOMINANCE_v1.md",
+            "description": "Programmatic SEO and traffic capture protocol targeting immediate sales conversion."
         }
     ],
     "tools": [
         {
-            "name": "Agent Tools v1.0.json",
-            "path": "assets/tools/Agent Tools v1.0.json",
-            "type": "json"
+            "id": "agent-tools-v1",
+            "file": "tools/Agent Tools v1.0.json",
+            "description": "Archived v1.0 tool manifest retained for rollback reference."
         },
         {
-            "name": "Agent Tools.json",
-            "path": "assets/tools/Agent Tools.json",
-            "type": "json"
+            "id": "agent-tools",
+            "file": "tools/Agent Tools.json",
+            "description": "Primary and most complete tool manifest for all current swarm agents."
         },
         {
-            "name": "Builder Tools.json",
-            "path": "assets/tools/Builder Tools.json",
-            "type": "json"
+            "id": "builder-tools",
+            "file": "tools/Builder Tools.json",
+            "description": "Tool set scoped to build, compile, and deploy operations for the Builder persona."
         },
         {
-            "name": "claude-4-sonnet-tools.json",
-            "path": "assets/tools/claude-4-sonnet-tools.json",
-            "type": "json"
+            "id": "claude-4-sonnet-tools",
+            "file": "tools/claude-4-sonnet-tools.json",
+            "description": "Model-specific tool definitions formatted for the Claude 4 Sonnet API."
         },
         {
-            "name": "gpt-5-tools.json",
-            "path": "assets/tools/gpt-5-tools.json",
-            "type": "json"
+            "id": "gpt-5-tools",
+            "file": "tools/gpt-5-tools.json",
+            "description": "Model-specific tool definitions formatted for the GPT-5 OpenAI API."
         },
         {
-            "name": "phase_mode_tools.json",
-            "path": "assets/tools/phase_mode_tools.json",
-            "type": "json"
+            "id": "phase-mode-tools",
+            "file": "tools/phase_mode_tools.json",
+            "description": "Restricted tool set active during phase-modal execution cycles."
         },
         {
-            "name": "plan_mode_tools.json",
-            "path": "assets/tools/plan_mode_tools.json",
-            "type": "json"
+            "id": "plan-mode-tools",
+            "file": "tools/plan_mode_tools.json",
+            "description": "Read-only tool set active during planning-only mode to prevent unintended side effects."
         },
         {
-            "name": "Tools.json",
-            "path": "assets/tools/Tools.json",
-            "type": "json"
+            "id": "tools-base",
+            "file": "tools/Tools.json",
+            "description": "Base fallback tool manifest used when no model-specific file is matched."
         }
     ]
 }

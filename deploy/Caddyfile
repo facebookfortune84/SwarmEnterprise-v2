@@ -5,32 +5,135 @@
 	email {$ACME_EMAIL:ops@realms2riches.com}
 }
 
-# Main app + API
+# ---------------------------------------------------------------------------
+# Snippets
+# ---------------------------------------------------------------------------
+
+# Security headers applied to every response sitewide.
+(security_headers) {
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# Remove server fingerprint
+		-Server
+	}
+}
+
+# Long-lived cache headers for immutable static assets.
+(static_cache) {
+	header Cache-Control "public, max-age=31536000, immutable"
+}
+
+# ---------------------------------------------------------------------------
+# Rate limiting on /api/* routes
+#
+# Requires the caddy-ratelimit module:
+#   https://github.com/mholt/caddy-ratelimit
+#
+# To build Caddy with this module:
+#   xcaddy build --with github.com/mholt/caddy-ratelimit
+#
+# Uncomment the block below once the module is available:
+#
+# rate_limit {
+#   zone api_zone {
+#     key {remote_host}
+#     events 100
+#     window 1m
+#   }
+# }
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Main app + API  (realms2riches.com / www)
+# ---------------------------------------------------------------------------
 realms2riches.com, www.realms2riches.com {
+	import security_headers
+
 	root * /srv/frontend
-	try_files {path} /index.html
+
+	# ------------------------------------------------------------------
+	# Rate limiting: 100 req/min per IP on /api/* routes
+	# Requires caddy-ratelimit module: https://github.com/mholt/caddy-ratelimit
+	# rate_limit {
+	#   zone api_zone {
+	#     key {remote_host}
+	#     events 100
+	#     window 1m
+	#   }
+	# }
+	# ------------------------------------------------------------------
+	@ratelimit path /api/*
+
+	# Static assets — cache forever (content-hashed filenames assumed)
+	@static {
+		path /static/* *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot *.webp *.avif
+	}
+	handle @static {
+		import static_cache
+		file_server
+	}
+
+	# API + internal endpoints — proxy to backend
 	reverse_proxy /api/* backend:8000
 	reverse_proxy /health backend:8000
 	reverse_proxy /metrics backend:8000
+
+	# SPA fallback for everything else
+	try_files {path} /index.html
 	file_server
 }
 
+# ---------------------------------------------------------------------------
+# Dedicated API subdomain
+# ---------------------------------------------------------------------------
 api.realms2riches.com {
+	import security_headers
+
+	# Rate limiting: 100 req/min per IP on /api/* routes
+	# Requires caddy-ratelimit module: https://github.com/mholt/caddy-ratelimit
+	# rate_limit {
+	#   zone api_zone {
+	#     key {remote_host}
+	#     events 100
+	#     window 1m
+	#   }
+	# }
+	@ratelimit path /api/*
+
 	reverse_proxy backend:8000
 }
 
+# ---------------------------------------------------------------------------
 # Corporate static site
+# ---------------------------------------------------------------------------
 corp.realms2riches.com {
+	import security_headers
+
 	root * /srv/frontend/corp
+
+	@static {
+		path /static/* *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot *.webp *.avif
+	}
+	handle @static {
+		import static_cache
+		file_server
+	}
+
 	try_files {path} /corp.html
 	file_server
 }
 
-# Tenant boxes on tech domain (wildcard — per-tenant containers behind Caddy or Traefik labels)
+# ---------------------------------------------------------------------------
+# Tenant boxes on tech domain (wildcard — per-tenant containers)
+# ---------------------------------------------------------------------------
 *.realms2riches.tech {
+	import security_headers
 	reverse_proxy backend:8000
 }
 
 realms2riches.tech {
+	import security_headers
 	reverse_proxy backend:8000
 }
