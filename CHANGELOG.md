@@ -1,3 +1,6 @@
+## [v2.0.1] — 2026-06-27
+
+
 # Changelog — SwarmEnterprise v2
 
 All notable changes to this project are documented in this file.
