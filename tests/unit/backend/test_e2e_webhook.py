@@ -54,7 +54,7 @@ def test_stripe_webhook_end_to_end(client, monkeypatch):
     monkeypatch.setattr(wh, "DB", fresh_db)
 
     headers = {"stripe-signature": "t=1,v1=signature"}
-    r = client.post("/api/webhooks/stripe", data=b"{}", headers=headers)
+    r = client.post("/api/webhooks/stripe", content=b"{}", headers=headers)
     assert r.status_code == 200
     assert r.json().get("status") == "success"
     assert called.get("project_id") is not None

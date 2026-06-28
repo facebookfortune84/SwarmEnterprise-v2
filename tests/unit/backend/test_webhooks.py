@@ -25,11 +25,11 @@ def test_stripe_webhook_idempotency(client, monkeypatch):
 
     headers = {"stripe-signature": "t=1,v1=signature"}
 
-    r1 = client.post("/api/webhooks/stripe", data=b"{}", headers=headers)
+    r1 = client.post("/api/webhooks/stripe", content=b"{}", headers=headers)
     assert r1.status_code == 200
     assert r1.json().get("status") == "success"
 
     # Replay same event - should be idempotent
-    r2 = client.post("/api/webhooks/stripe", data=b"{}", headers=headers)
+    r2 = client.post("/api/webhooks/stripe", content=b"{}", headers=headers)
     assert r2.status_code == 200
     assert r2.json().get("note") == "already_processed"

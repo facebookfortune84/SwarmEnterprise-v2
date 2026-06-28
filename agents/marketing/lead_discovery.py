@@ -131,8 +131,8 @@ class LeadDiscoveryAgent:
         )
 
         try:
-            # brain is a LangChain Ollama LLM; call it as a string -> string function
-            raw = brain(prompt) if callable(brain) else str(brain)
+            # brain is a LangChain Ollama LLM; use .invoke() per LangChain ≥0.1.7
+            raw = brain.invoke(prompt) if hasattr(brain, "invoke") else str(brain)
         except Exception as e:
             logger.error(f"LLM invocation failed during lead analysis: {e}")
             return self._MOCK_LEADS

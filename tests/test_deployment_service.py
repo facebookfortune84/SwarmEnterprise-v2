@@ -1,9 +1,10 @@
 """
 Unit tests for Deployment Service
 """
+import asyncio
 import subprocess
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from backend.services.deployment_service import (
     DeploymentService,
     DeploymentConfig,
@@ -16,8 +17,32 @@ class TestDeploymentService:
 
     @pytest.fixture
     def deployment_service(self):
-        """Create a DeploymentService instance for testing"""
-        return DeploymentService()
+        """Create a DeploymentService instance with all subprocess / async-subprocess
+        calls mocked so that no real PowerShell processes or Docker daemons are
+        invoked.  This eliminates the asyncio transport resource warnings that
+        appear when unclosed subprocess transports outlive the event loop.
+        """
+        # Mock asyncio.create_subprocess_exec so _run_powershell never touches
+        # a real pipe — the fake process returns b"" stdout, b"" stderr, rc=0.
+        fake_proc = AsyncMock()
+        fake_proc.returncode = 0
+        fake_proc.communicate = AsyncMock(return_value=(b"", b""))
+
+        # Mock subprocess.run for synchronous docker/shell calls
+        ok_result = MagicMock(spec=subprocess.CompletedProcess)
+        ok_result.returncode = 0
+        ok_result.stdout = ""
+        ok_result.stderr = ""
+
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=fake_proc),
+            patch(
+                "backend.services.deployment_service.subprocess.run",
+                return_value=ok_result,
+            ),
+        ):
+            svc = DeploymentService()
+            yield svc
 
     @pytest.fixture
     def sample_config(self):
@@ -95,8 +120,6 @@ class TestDeploymentService:
         deployment_id = created["id"]
 
         # Wait a moment for async task to start
-        import asyncio
-
         await asyncio.sleep(0.1)
 
         deployment = await deployment_service.get_deployment(deployment_id)
@@ -344,9 +367,7 @@ class TestDeploymentService:
         stats_result.returncode = 0
         stats_result.stdout = "45.5%\t256MiB / 4GiB\t1.2kB / 3.4kB\t10MB / 5MB"
 
-        with patch(
-            "backend.services.deployment_service.subprocess.run", return_value=stats_result
-        ):
+        with patch("backend.services.deployment_service.subprocess.run", return_value=stats_result):
             metrics = await deployment_service.get_deployment_metrics(deployment_id)
 
         assert metrics is not None
