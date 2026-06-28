@@ -87,6 +87,9 @@ async def create_checkout_session(payload: CheckoutCreate):
 
         return {"url": session.url, "id": session.id}
 
+    except HTTPException:
+        raise
+
     except stripe.error.StripeError as exc:
         logger.exception("Stripe API error: %s", exc)
         raise HTTPException(

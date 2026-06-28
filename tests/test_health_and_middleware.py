@@ -196,11 +196,12 @@ class TestRateLimitMiddleware:
 
 
 class TestGetCurrentUser:
-    def test_revoked_token_returns_401(self):
+    @pytest.mark.asyncio
+    async def test_revoked_token_returns_401(self):
         from backend.auth.jwt_handler import create_access_token
         from backend.auth.middleware import get_current_user
         from fastapi.security import HTTPAuthorizationCredentials
-        import asyncio
+        from fastapi import HTTPException
 
         token = create_access_token({"sub": "u1", "email": "u@t.com"})
         creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
@@ -208,18 +209,15 @@ class TestGetCurrentUser:
         mock_redis = MagicMock()
         mock_redis.exists.return_value = 1  # revoked
 
-        import pytest
-        from fastapi import HTTPException
-
         with patch("backend.auth.jwt_handler.redis_client", mock_redis):
             with pytest.raises(HTTPException) as exc_info:
-                asyncio.get_event_loop().run_until_complete(get_current_user(creds))
+                await get_current_user(creds)
         assert exc_info.value.status_code == 401
 
-    def test_invalid_token_returns_401(self):
+    @pytest.mark.asyncio
+    async def test_invalid_token_returns_401(self):
         from backend.auth.middleware import get_current_user
         from fastapi.security import HTTPAuthorizationCredentials
-        import asyncio
         from fastapi import HTTPException
 
         creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials="garbage.token.here")
@@ -228,14 +226,14 @@ class TestGetCurrentUser:
 
         with patch("backend.auth.jwt_handler.redis_client", mock_redis):
             with pytest.raises(HTTPException) as exc_info:
-                asyncio.get_event_loop().run_until_complete(get_current_user(creds))
+                await get_current_user(creds)
         assert exc_info.value.status_code == 401
 
-    def test_refresh_token_as_access_returns_401(self):
+    @pytest.mark.asyncio
+    async def test_refresh_token_as_access_returns_401(self):
         from backend.auth.jwt_handler import create_refresh_token
         from backend.auth.middleware import get_current_user
         from fastapi.security import HTTPAuthorizationCredentials
-        import asyncio
         from fastapi import HTTPException
 
         token = create_refresh_token({"sub": "u1", "email": "u@t.com"})
@@ -245,7 +243,7 @@ class TestGetCurrentUser:
 
         with patch("backend.auth.jwt_handler.redis_client", mock_redis):
             with pytest.raises(HTTPException) as exc_info:
-                asyncio.get_event_loop().run_until_complete(get_current_user(creds))
+                await get_current_user(creds)
         assert exc_info.value.status_code == 401
 
 

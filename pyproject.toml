@@ -79,3 +79,6 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = "test_*.py"
 addopts = "--tb=short"
+
+[tool.coverage.report]
+fail_under = 90

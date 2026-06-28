@@ -8,12 +8,34 @@ os.environ.setdefault("TEST_MODE", "true")
 os.environ.setdefault("DRY_RUN_MODE", "true")
 os.environ.setdefault("CELERY_BROKER_URL", "memory://")
 os.environ.setdefault("CELERY_RESULT_BACKEND", "cache+memory://")
+# Raise the rate limit to prevent 429s during large test runs
+os.environ.setdefault("RATE_LIMIT_RPM", "100000")
 
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import AsyncMock, Mock, MagicMock, patch
 
 from backend.main import app
+
+
+# ---------------------------------------------------------------------------
+# Session-scoped patch: prevent real network calls during lifespan startup.
+# backend/main.py calls start_worker() and lead_discovery_agent.run_discovery_cycle()
+# on every TestClient instantiation; both require live network services.
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _patch_slow_lifespan_startup():
+    """Patch outreach worker and lead discovery so TestClient starts instantly."""
+    with (
+        patch("agents.outreach.worker.start_worker", return_value=None),
+        patch(
+            "agents.marketing.lead_discovery.lead_discovery_agent.run_discovery_cycle",
+            return_value=AsyncMock(),
+        ),
+    ):
+        yield
 
 
 @pytest.fixture
