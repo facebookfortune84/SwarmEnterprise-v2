@@ -1552,15 +1552,25 @@ class TestS3Client:
         assert result is False
 
     def test_ensure_bucket_exists_creates_when_missing(self):
-        """When head_bucket raises, _ensure_bucket_exists tries create_bucket."""
+        """When head_bucket raises, _ensure_bucket_exists tries create_bucket.
+
+        This test forcibly sets ClientError on the module to a real exception
+        class so the except clause works regardless of boto3 installation state.
+        """
+        import backend.storage.s3_client as s3_mod
         from backend.storage.s3_client import S3Client
 
-        client = S3Client()
-        client.local_mode = False
-        client.client = MagicMock()
-        client.bucket_name = "test-bucket"
-        # Use a plain Exception to simulate missing bucket — avoids botocore dependency
-        client.client.head_bucket.side_effect = Exception("NoSuchBucket")
-
-        client._ensure_bucket_exists()
-        client.client.create_bucket.assert_called_once_with(Bucket="test-bucket")
+        # Temporarily restore ClientError to Exception if it was corrupted by a
+        # previous test that mock-patched sys.modules["boto3"].
+        original_client_error = s3_mod.ClientError
+        s3_mod.ClientError = Exception
+        try:
+            client = S3Client()
+            client.local_mode = False
+            client.client = MagicMock()
+            client.bucket_name = "test-bucket"
+            client.client.head_bucket.side_effect = Exception("NoSuchBucket")
+            client._ensure_bucket_exists()
+            client.client.create_bucket.assert_called_once_with(Bucket="test-bucket")
+        finally:
+            s3_mod.ClientError = original_client_error
