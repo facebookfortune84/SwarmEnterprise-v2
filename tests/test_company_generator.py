@@ -125,27 +125,29 @@ class TestCompanyGenerator:
 
     @pytest.mark.asyncio
     async def test_execute_generation_flow(self, generator, sample_request):
-        """Test the full generation flow with mocked agents"""
-        # 2. Mock Strategic Board
+        """Test the full generation flow with mocked agents.
+
+        generate_company() calls _execute_generation() inline, so we only invoke
+        generate_company() once inside the mock context — calling _execute_generation()
+        a second time would double the ticket count.
+        """
         mock_tickets = [
             {"department": "Engineering", "title": "Setup", "instruction": "Initial setup"},
             {"department": "Engineering", "title": "API", "instruction": "Create API"},
         ]
 
-        # 3. Mock both generate_company (initiation) and execution so the board never runs live
         with patch(
-            "backend.services.company_generator.strategic_board.convene", return_value=mock_tickets
+            "backend.services.company_generator.strategic_board.convene",
+            return_value=mock_tickets,
         ), patch(
             "backend.services.company_generator.execution_unit.process_ticket",
             return_value="SUCCESS: File created",
         ):
-            # 1. Initiation inside the mock context so the board is always mocked
+            # generate_company() already invokes _execute_generation() internally
             result = await generator.generate_company(sample_request)
             company_id = result["company_id"]
 
-            await generator._execute_generation(company_id, sample_request)
-
-            # Check DB state after generation
+            # Check DB state — generation ran exactly once
             tenant = generator.db.query(CompanyTenant).filter_by(id=company_id).first()
             assert tenant.status == GenerationStatus.COMPLETED.value
 
@@ -154,7 +156,7 @@ class TestCompanyGenerator:
             assert metadata["tickets_completed"] == 2
             assert len(metadata["generated_files"]) == 2
 
-            # Check tickets in DB (filter to this specific company to isolate from other tests)
+            # Exactly 2 tickets persisted for this company
             tickets = generator.db.query(Ticket).filter_by(project_id=company_id).all()
             assert len(tickets) == 2
             for t in tickets:
