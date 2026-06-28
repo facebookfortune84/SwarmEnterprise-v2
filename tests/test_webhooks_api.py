@@ -222,7 +222,11 @@ class TestStripeCheckoutHosted:
                 "tech_stack": "fastapi-react-postgres",
             },
         }
-        event = {"id": "evt_hosted", "type": "checkout.session.completed", "data": {"object": session}}
+        event = {
+            "id": "evt_hosted",
+            "type": "checkout.session.completed",
+            "data": {"object": session},
+        }
         mock_db = _mock_db()
 
         with (

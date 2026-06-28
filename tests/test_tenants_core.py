@@ -314,7 +314,9 @@ class TestDeployDockerFallback:
         _seed_tenant(db_session, "TEN-DF004", "fallback-004")
         tenant = svc.get("TEN-DF004")
 
-        with patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="docker", timeout=60)):
+        with patch(
+            "subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="docker", timeout=60)
+        ):
             result = svc._deploy_docker_fallback(tenant)
 
         assert result["status"] == "failed"

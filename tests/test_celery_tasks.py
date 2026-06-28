@@ -318,9 +318,7 @@ class TestSendEmailNotification:
         with patch.dict(os.environ, {"SMTP_HOST": ""}, clear=False):
             from backend.tasks.notification_tasks import send_email_notification
 
-            result = send_email_notification.apply(
-                args=["user@test.com", "Subject", "Body"]
-            ).get()
+            result = send_email_notification.apply(args=["user@test.com", "Subject", "Body"]).get()
 
         assert result["ok"] is False
         assert result["reason"] == "smtp_not_configured"
@@ -330,15 +328,17 @@ class TestSendEmailNotification:
         mock_smtp_instance.__enter__ = MagicMock(return_value=mock_smtp_instance)
         mock_smtp_instance.__exit__ = MagicMock(return_value=False)
 
-        env_patch = {"SMTP_HOST": "smtp.test.com", "SMTP_PORT": "587",
-                     "SMTP_USER": "u@t.com", "SMTP_PASS": "p"}
+        env_patch = {
+            "SMTP_HOST": "smtp.test.com",
+            "SMTP_PORT": "587",
+            "SMTP_USER": "u@t.com",
+            "SMTP_PASS": "p",
+        }
         with patch.dict(os.environ, env_patch):
             with patch("smtplib.SMTP", return_value=mock_smtp_instance):
                 from backend.tasks.notification_tasks import send_email_notification
 
-                result = send_email_notification.apply(
-                    args=["to@test.com", "Subj", "Body"]
-                ).get()
+                result = send_email_notification.apply(args=["to@test.com", "Subj", "Body"]).get()
 
         assert result["ok"] is True
 
@@ -600,15 +600,17 @@ class TestSendEmailNotificationAdditional:
         mock_smtp_instance.__enter__ = MagicMock(return_value=mock_smtp_instance)
         mock_smtp_instance.__exit__ = MagicMock(return_value=False)
 
-        env_patch = {"SMTP_HOST": "smtp.test.com", "SMTP_PORT": "587",
-                     "SMTP_USER": "", "SMTP_PASS": ""}
+        env_patch = {
+            "SMTP_HOST": "smtp.test.com",
+            "SMTP_PORT": "587",
+            "SMTP_USER": "",
+            "SMTP_PASS": "",
+        }
         with patch.dict(os.environ, env_patch):
             with patch("smtplib.SMTP", return_value=mock_smtp_instance):
                 from backend.tasks.notification_tasks import send_email_notification
 
-                result = send_email_notification.apply(
-                    args=["to@test.com", "Subj", "Body"]
-                ).get()
+                result = send_email_notification.apply(args=["to@test.com", "Subj", "Body"]).get()
 
         assert result["ok"] is True
         mock_smtp_instance.login.assert_not_called()
@@ -621,9 +623,9 @@ class TestSendEmailNotificationAdditional:
                 from backend.tasks.notification_tasks import send_email_notification
 
                 try:
-                    send_email_notification.apply(
-                        args=["to@test.com", "S", "B"]
-                    ).get(propagate=True)
+                    send_email_notification.apply(args=["to@test.com", "S", "B"]).get(
+                        propagate=True
+                    )
                 except Exception:
                     pass  # retry expected
 

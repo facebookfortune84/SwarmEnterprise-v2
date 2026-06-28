@@ -67,10 +67,7 @@ class TestStoreCompany:
             metadata={"count": 5, "active": True, "nested": {"ignored": 1}},
         )
         assert result == "companies/c004/source.zip"
-        # Nested dict should be filtered out
-        call_kwargs = s3.upload_file.call_args
-        metadata_arg = call_kwargs[1].get("metadata", call_kwargs[0][2] if len(call_kwargs[0]) > 2 else {})
-        # Verify simple values are there
+        # Nested dict should be filtered out — verify simple values present
         assert "count" in str(s3.upload_file.call_args)
 
 
@@ -190,7 +187,7 @@ class TestListCompanies:
     def test_list_companies_with_user_filter(self):
         fm, s3 = _make_manager()
         s3.list_files.return_value = ["companies/user1/c001/source.zip"]
-        result = fm.list_companies(user_id="user1")
+        fm.list_companies(user_id="user1")
         s3.list_files.assert_called_with("companies/user1/")
 
     def test_list_companies_empty(self):
@@ -201,7 +198,9 @@ class TestListCompanies:
 
     def test_list_companies_short_paths_ignored(self):
         fm, s3 = _make_manager()
-        s3.list_files.return_value = ["companies"]  # only one segment (no slash split produces 1 part)
+        s3.list_files.return_value = [
+            "companies"
+        ]  # only one segment (no slash split produces 1 part)
         result = fm.list_companies()
         # "companies".split("/") = ["companies"] — len < 2, should be ignored
         assert isinstance(result, list)

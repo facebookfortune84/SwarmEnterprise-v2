@@ -590,7 +590,7 @@ class TestRestoreBackup:
             patch.object(svc, "stop_deployment", new_callable=AsyncMock, return_value=dep),
             patch.object(svc, "start_deployment", new_callable=AsyncMock, return_value=dep),
         ):
-            result = await svc.restore_backup("dep-rst-nodk", "snap-vm")
+            await svc.restore_backup("dep-rst-nodk", "snap-vm")
 
         mock_vm.restore_snapshot.assert_called_once()
 

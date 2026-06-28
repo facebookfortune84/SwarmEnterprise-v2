@@ -62,7 +62,9 @@ def client_and_http(mock_httpx_client):
 class TestOllamaConfig:
     def test_default_config_from_env(self):
         with (
-            patch.dict(os.environ, {"OLLAMA_URL": "http://myhost:11434", "OLLAMA_MODEL": "mistral"}),
+            patch.dict(
+                os.environ, {"OLLAMA_URL": "http://myhost:11434", "OLLAMA_MODEL": "mistral"}
+            ),
             patch("httpx.AsyncClient"),
         ):
             c = OllamaClient()

@@ -217,9 +217,7 @@ class TestGetCompany:
     def test_get_company_not_found(self, client_and_db):
         client, db = client_and_db
         _seed_user(db, user_id="get-user-001")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=None
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=None):
             resp = client.get(
                 "/api/companies/nonexistent-id",
                 headers=_auth_headers(user_id="get-user-001"),
@@ -242,9 +240,7 @@ class TestGetCompany:
         client, db = client_and_db
         _seed_user(db, user_id="get-user-002")
         fake = self._full_company("c1", "other-user")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=fake
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=fake):
             resp = client.get(
                 "/api/companies/c1",
                 headers=_auth_headers(user_id="get-user-002"),
@@ -255,9 +251,7 @@ class TestGetCompany:
         client, db = client_and_db
         _seed_user(db, user_id="get-user-003")
         fake = self._full_company("c2", "get-user-003")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=fake
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=fake):
             resp = client.get(
                 "/api/companies/c2",
                 headers=_auth_headers(user_id="get-user-003"),
@@ -268,9 +262,7 @@ class TestGetCompany:
         client, db = client_and_db
         _seed_user(db, role="admin", user_id="admin-001")
         fake = self._full_company("c3", "someone-else")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=fake
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=fake):
             resp = client.get(
                 "/api/companies/c3",
                 headers=_auth_headers(role="admin", user_id="admin-001"),
@@ -305,9 +297,7 @@ class TestGetCompanyStatus:
         client, db = client_and_db
         _seed_user(db, user_id="status-user-002")
         fake = self._fake_company("failed", "status-user-002")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=fake
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=fake):
             resp = client.get(
                 "/api/companies/s1/status",
                 headers=_auth_headers(user_id="status-user-002"),
@@ -318,9 +308,7 @@ class TestGetCompanyStatus:
     def test_status_not_found(self, client_and_db):
         client, db = client_and_db
         _seed_user(db, user_id="status-user-003")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=None
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=None):
             resp = client.get(
                 "/api/companies/nope/status",
                 headers=_auth_headers(user_id="status-user-003"),
@@ -337,9 +325,7 @@ class TestDeleteCompany:
     def test_delete_not_found(self, client_and_db):
         client, db = client_and_db
         _seed_user(db, user_id="del-user-001")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=None
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=None):
             resp = client.delete(
                 "/api/companies/missing",
                 headers=_auth_headers(user_id="del-user-001"),
@@ -352,9 +338,7 @@ class TestDeleteCompany:
         _seed_company_tenant(db, tenant_id="del-comp-001", slug="del-company-01")
         fake = {"id": "del-comp-001", "name": "D", "user_id": "del-user-002", "status": "completed"}
         with (
-            patch(
-                "backend.api.companies.generator.get_generation_status", return_value=fake
-            ),
+            patch("backend.api.companies.generator.get_generation_status", return_value=fake),
             patch("backend.api.companies.file_manager.company_exists", return_value=True),
             patch("backend.api.companies.file_manager.delete_company"),
         ):
@@ -376,9 +360,7 @@ class TestDownloadCompany:
         client, db = client_and_db
         _seed_user(db, user_id="dl-user-001")
         fake = {"id": "dl-1", "name": "D", "user_id": "dl-user-001", "status": "pending"}
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=fake
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=fake):
             resp = client.get(
                 "/api/companies/dl-1/download",
                 headers=_auth_headers(user_id="dl-user-001"),
@@ -390,9 +372,7 @@ class TestDownloadCompany:
         _seed_user(db, user_id="dl-user-002")
         fake = {"id": "dl-2", "name": "D", "user_id": "dl-user-002", "status": "completed"}
         with (
-            patch(
-                "backend.api.companies.generator.get_generation_status", return_value=fake
-            ),
+            patch("backend.api.companies.generator.get_generation_status", return_value=fake),
             patch("backend.api.companies.file_manager.company_exists", return_value=False),
         ):
             resp = client.get(
@@ -406,9 +386,7 @@ class TestDownloadCompany:
         _seed_user(db, user_id="dl-user-003")
         fake = {"id": "dl-3", "name": "D", "user_id": "dl-user-003", "status": "completed"}
         with (
-            patch(
-                "backend.api.companies.generator.get_generation_status", return_value=fake
-            ),
+            patch("backend.api.companies.generator.get_generation_status", return_value=fake),
             patch("backend.api.companies.file_manager.company_exists", return_value=True),
             patch(
                 "backend.api.companies.file_manager.get_company_download_url",
@@ -432,9 +410,7 @@ class TestGetCompanyMetadata:
     def test_metadata_not_found(self, client_and_db):
         client, db = client_and_db
         _seed_user(db, user_id="meta-user-001")
-        with patch(
-            "backend.api.companies.generator.get_generation_status", return_value=None
-        ):
+        with patch("backend.api.companies.generator.get_generation_status", return_value=None):
             resp = client.get(
                 "/api/companies/nope/metadata",
                 headers=_auth_headers(user_id="meta-user-001"),
@@ -452,9 +428,7 @@ class TestGetCompanyMetadata:
             "metadata": {"key": "val"},
         }
         with (
-            patch(
-                "backend.api.companies.generator.get_generation_status", return_value=fake
-            ),
+            patch("backend.api.companies.generator.get_generation_status", return_value=fake),
             patch(
                 "backend.api.companies.file_manager.get_company_metadata",
                 return_value={"size": 100},

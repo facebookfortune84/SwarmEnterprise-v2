@@ -352,11 +352,7 @@ class TestNotificationService:
 
         ns = NotificationService(db)
         ns.broadcast_system_event("deploy.done", "Deployment completed successfully")
-        admin_notifs = (
-            db.query(Notification)
-            .filter(Notification.user_id.in_([a1.id, a2.id]))
-            .all()
-        )
+        admin_notifs = db.query(Notification).filter(Notification.user_id.in_([a1.id, a2.id])).all()
         assert len(admin_notifs) == 2
 
     def test_create_notification_with_metadata(self, db):

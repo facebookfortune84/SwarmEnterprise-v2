@@ -62,7 +62,7 @@ class TestGetSwarmDb:
     def test_returns_engine(self):
         from backend.db.linear_engine import get_swarm_db
 
-        with patch("backend.db.linear_engine.SessionLocal") as mock_sl:
+        with patch("backend.db.linear_engine.SessionLocal"):
             db = get_swarm_db()
         assert db is not None
 
@@ -128,7 +128,9 @@ class TestCreateLead:
 
     def test_create_lead_crm_sync_errors_ignored(self, engine):
         """CRM sync failures don't prevent lead creation."""
-        with patch("backend.connectors.hubspot.create_contact", side_effect=Exception("hubspot down")):
+        with patch(
+            "backend.connectors.hubspot.create_contact", side_effect=Exception("hubspot down")
+        ):
             lead_id = engine.create_lead("crm-fail@example.com")
         assert lead_id is not None
 

@@ -242,7 +242,9 @@ class TestGetAvailableTemplates:
 
 class TestCreateContext:
     def test_create_context_basic(self, engine):
-        ctx = engine.create_context("Acme Corp", "Best company", ["authentication", "database", "api"])
+        ctx = engine.create_context(
+            "Acme Corp", "Best company", ["authentication", "database", "api"]
+        )
         assert ctx["company_name"] == "Acme Corp"
         assert ctx["slug"] == "acme-corp"
         assert ctx["snake_case"] == "acme_corp"

@@ -709,7 +709,9 @@ class TestGetDeploymentLogs:
                 new_callable=AsyncMock,
                 return_value=_fake_deployment("dep-logs-timeout"),
             ),
-            patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="docker", timeout=30)),
+            patch(
+                "subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="docker", timeout=30)
+            ),
         ):
             resp = client.get(
                 "/api/deployments/dep-logs-timeout/logs",
