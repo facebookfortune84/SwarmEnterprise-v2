@@ -21,8 +21,19 @@ SQLite path fixup:
 """
 
 import os
+import sys
 from logging.config import fileConfig
 from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Ensure the project root is on sys.path so that `from backend.db.models`
+# works whether Alembic is invoked from the repo root, a subdirectory, or
+# inside a Docker container where PYTHONPATH may not be set.
+# ---------------------------------------------------------------------------
+_ALEMBIC_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT_STR = os.path.abspath(os.path.join(_ALEMBIC_DIR, ".."))
+if _PROJECT_ROOT_STR not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT_STR)
 
 from sqlalchemy import engine_from_config, pool
 
