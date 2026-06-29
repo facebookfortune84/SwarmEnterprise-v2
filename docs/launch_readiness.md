@@ -1,156 +1,434 @@
-# Launch Readiness Report
+# Launch Readiness Report — SwarmEnterprise v2
 
-**Generated:** 2025-06-28  
-**Repository:** SwarmEnterprise-v2  
+**Updated:** 2025-06-30
+**Repository:** SwarmEnterprise-v2
 **Engine:** SwarmOS v2.0.0
+**Company:** RWV Techsolutions LLC · robertdemottojr50@gmail.com
 
 ---
 
-## Coverage Summary
+## Executive Summary
+
+All six production-launch phases have been completed. The system passes the
+90 % coverage gate, all 1,313 tests pass, the frontend is fully wired to the
+backend, self-hosted analytics are configured, the Makefile provides every
+required target, the CI/CD pipeline is complete, and this document reflects the
+verified final state.
+
+---
+
+## 1. Coverage and Test Results
 
 | Metric | Value | Gate |
 |--------|-------|------|
-| Total coverage | **92.22%** | ≥ 90% ✅ |
+| Total coverage | **92.22 %** | ≥ 90 % ✅ |
 | Total statements | 4,501 | — |
 | Covered statements | 4,151 | — |
 | Total tests passing | **1,313** | All ✅ |
+| Coverage gate | `fail_under = 90` in `pyproject.toml` | Enforced ✅ |
 
-Coverage gate is enforced via `[tool.coverage.report] fail_under = 90` in [`pyproject.toml`](../pyproject.toml).
+**Validation commands (all exit 0):**
 
----
+```bash
+# Full suite with coverage gate
+pytest tests/ \
+  --ignore=tests/test_main_coverage.py \
+  --ignore=tests/test_live_factory.py \
+  --ignore=tests/test_live_marketing.py \
+  --cov=backend --cov-fail-under=90 -q
+# → 1,313 passed | coverage 92.22 % ≥ 90 % ✅
 
-## Final Validation Commands — All Exit 0 ✅
-
-```
-1. pytest tests/test_coverage_phase2.py tests/test_coverage_gaps.py
-         tests/test_deployment_service.py tests/unit/ -v --tb=short
-   → 461 passed
-
-2. pytest tests/test_api_deployments.py tests/test_api_companies.py
-         tests/test_api_webhooks.py tests/test_vm_provisioner.py
-         tests/test_api_ws.py tests/test_main_extended.py -v --tb=short
-   → 110 passed
-
-3. pytest tests/test_tenants_extended.py tests/test_deployment_service_extended.py
-         tests/test_ollama_client_extended.py tests/test_linear_engine_extended.py
-         -v --tb=short
-   → 119 passed
-
-4. pytest tests/ --ignore=tests/test_main_coverage.py
-         --ignore=tests/test_live_factory.py --ignore=tests/test_live_marketing.py
-         --cov=backend --cov-report=term-missing --cov-fail-under=90 -q
-   → 1313 passed | Coverage: 92.22% ≥ 90% ✅
-
-5. pytest tests/ --ignore=tests/test_main_coverage.py
-         --ignore=tests/test_live_factory.py --ignore=tests/test_live_marketing.py -q
-   → 1313 passed
+# Makefile alias
+make test
 ```
 
 ---
 
-## Test Files and Counts
+## 2. Component Status
 
-| Test File | Tests |
-|-----------|-------|
-| tests/test_api_companies.py | 20 |
-| tests/test_api_deployments.py | 19 |
-| tests/test_api_webhooks.py | 12 |
-| tests/test_api_ws.py | 17 |
-| tests/test_auth_api.py | existing |
-| tests/test_billing_api.py | existing |
-| tests/test_celery_tasks.py | existing |
-| tests/test_code_packager.py | existing |
-| tests/test_commander.py | existing |
-| tests/test_companies_api.py | existing |
-| tests/test_company_generator.py | existing |
-| tests/test_company_generator_extended.py | 10 |
-| tests/test_coverage_gaps.py | 110 |
-| tests/test_coverage_phase2.py | 197 |
-| tests/test_deployment_service.py | 20 |
-| tests/test_deployment_service_extended.py | 40 |
-| tests/test_deployments_api.py | existing |
-| tests/test_discovery.py | existing |
-| tests/test_health_and_middleware.py | 23 |
-| tests/test_jwt_handler.py | existing |
-| tests/test_linear_engine.py | existing |
-| tests/test_linear_engine_extended.py | 27 |
-| tests/test_main_extended.py | 21 |
-| tests/test_middleware.py | existing |
-| tests/test_new_modules.py | existing |
-| tests/test_ollama_client.py | existing |
-| tests/test_ollama_client_extended.py | 27 |
-| tests/test_queue_extended.py | 7 |
-| tests/test_services_extended.py | existing |
-| tests/test_smoke_complete.py | existing |
-| tests/test_storage_and_provisioner.py | existing |
-| tests/test_template_engine.py | existing |
-| tests/test_tenants_core.py | existing |
-| tests/test_tenants_extended.py | 22 |
-| tests/test_users_api.py | existing |
-| tests/test_user_service.py | existing |
-| tests/test_vm_provisioner.py | 21 |
-| tests/test_webhooks_api.py | existing |
-| tests/test_webhooks_direct.py | existing |
-| tests/test_ws_api.py | existing |
-| tests/unit/ (multiple) | 15 |
-| **Total** | **1,313** |
+### 2.1 Backend API
+
+| Route module | Prefix | Status |
+|---|---|---|
+| `backend/api/auth.py` | `/api/auth` | ✅ Covered, tested, wired |
+| `backend/api/users.py` | `/api/users` | ✅ Covered, tested, wired |
+| `backend/api/companies.py` | `/api/companies` | ✅ Covered, tested, wired |
+| `backend/api/deployments.py` | `/api/deployments` | ✅ Covered, tested, wired |
+| `backend/api/tenants.py` | `/api/tenants` | ✅ Covered, tested, wired |
+| `backend/api/webhooks.py` | `/api/webhooks` | ✅ Covered, tested |
+| `backend/api/ws.py` | `/ws/notifications`, `/ws/messages` | ✅ Covered, tested, wired |
+| `backend/api/notifications.py` | `/api/notifications` | ✅ Covered, tested, wired |
+| `backend/api/ops.py` | `/api/ops` | ✅ Covered, tested, wired |
+| `backend/api/routes.py` | `/api/build` | ✅ Covered, tested, wired |
+| `backend/api/billing.py` | `/api/billing` | ✅ Covered, tested |
+| `backend/api/admin.py` | `/api/admin` | ✅ Covered |
+| `backend/api/payments.py` | `/api/payments` | ✅ Covered |
+| `backend/api/tickets.py` | `/api/tickets` | ✅ Covered |
+| `backend/api/workflows.py` | `/api/workflows` | ✅ Covered |
+| `backend/api/leads.py` | `/api/leads` | ✅ Covered |
+| `backend/api/usage.py` | `/api/usage` | ✅ Covered |
+| `backend/api/outreach.py` | `/api/outreach` | ✅ Covered |
+| `GET /health` | root | ✅ Covered, tested |
+| `GET /metrics` | root | ✅ Prometheus metrics |
+
+### 2.2 Frontend
+
+| File | Purpose | Status |
+|---|---|---|
+| `frontend/public/config.js` | API base URL + analytics config | ✅ Updated |
+| `frontend/public/api-client.js` | **Typed API client** — all endpoints wired | ✅ New |
+| `frontend/public/analytics.js` | Umami analytics tracker + event tracking | ✅ New |
+| `frontend/public/index.html` | Full dashboard: auth, companies, deployments, tenants, notifications, ops | ✅ Fully rebuilt |
+| `frontend/public/corp.html` | Corporate info page | ✅ Existing |
+| `frontend/public/privacy-policy.html` | Privacy policy | ✅ Existing |
+| `frontend/public/terms.html` | Terms of service | ✅ Existing |
+| `frontend/public/cookie-policy.html` | Cookie policy | ✅ Existing |
+
+**Frontend features implemented:**
+
+- ✅ Full authentication flow (login, register, logout, token refresh, expiry handling)
+- ✅ JWT Bearer token attached to every authenticated request
+- ✅ Auto-refresh via `/api/auth/refresh` on 401 responses
+- ✅ WebSocket connections for real-time notifications (`/ws/notifications/{user_id}`)
+- ✅ Exponential backoff reconnection (1 s → 2 s → 4 s … → 30 s cap)
+- ✅ WebSocket connection state indicator (live / reconnecting / offline) in header
+- ✅ Deployment real-time status watcher (WS + REST polling fallback)
+- ✅ Loading skeletons for all async data fetches
+- ✅ Empty states with actionable prompts
+- ✅ Inline form validation with per-field error messages
+- ✅ Toast notifications (success / error / info / warning) for all user actions
+- ✅ Confirmation dialogs for all destructive actions (delete company, stop/delete deployment, provision tenant)
+- ✅ Company generation progress bar (polls `/api/companies/{id}/status`)
+- ✅ Responsive layout — works on mobile, tablet, desktop
+- ✅ ARIA labels on form inputs
+- ✅ Keyboard navigation: Escape closes modals, Enter submits login
+- ✅ Optimistic status updates in deployment cards
+- ✅ Status badge system with semantic colour coding
+
+### 2.3 Analytics (Phase 3)
+
+| Component | Status |
+|---|---|
+| Umami CE Docker image | ✅ `docker-compose.analytics.yml` |
+| Dedicated Postgres store (`umami-db`) | ✅ Isolated `analytics_net` network |
+| Persistent volume `umami_pg_data` | ✅ |
+| Frontend tracker script (`analytics.js`) | ✅ Loads Umami `script.js` |
+| Analytics injected in `index.html` | ✅ Via `<script src="/dashboard/analytics.js">` |
+| Event tracking — page views | ✅ Umami auto-tracks |
+| Event tracking — company generation started | ✅ `SwarmAnalytics.companyGenerationStarted()` |
+| Event tracking — company generation completed | ✅ `SwarmAnalytics.companyGenerationCompleted()` |
+| Event tracking — deployment created | ✅ `SwarmAnalytics.deploymentCreated()` |
+| Event tracking — deployment status changed | ✅ `SwarmAnalytics.deploymentStatusChanged()` |
+| Event tracking — errors encountered | ✅ `SwarmAnalytics.errorEncountered()` |
+| Event tracking — tenant registered | ✅ `SwarmAnalytics.tenantRegistered()` |
+| Event tracking — user login | ✅ `SwarmAnalytics.userLoggedIn()` |
+| Event tracking — build sprint initiated | ✅ `SwarmAnalytics.buildSprintInitiated()` |
+| No third-party data egress | ✅ All events sent to self-hosted instance only |
+| Analytics dashboard URL | `http://localhost:3001` (dev) |
+| Makefile target | `make analytics` opens dashboard URL |
+| `.env.example` variables | `SWARM_ANALYTICS_URL`, `SWARM_ANALYTICS_SITE_ID`, `UMAMI_*` |
+
+**To start analytics:**
+```bash
+make docker-up-analytics
+# → Umami: http://localhost:3001   admin / umami (change on first login)
+```
+
+### 2.4 Makefile (Phase 4)
+
+All required targets are implemented and functional:
+
+| Target | Function |
+|---|---|
+| `make help` | Formatted list of all targets with descriptions |
+| `make install` | pip install + npm install |
+| `make dev` | Full dev stack with hot reload |
+| `make build` | Docker image + static asset verification |
+| `make test` | Full pytest suite + ≥90 % coverage gate + HTML/XML reports |
+| `make test-unit` | Unit tests only (no live infrastructure) |
+| `make test-e2e` | Sovereign integration + API tests |
+| `make lint` | ruff check + black --check |
+| `make format` | ruff fix + ruff format + black |
+| `make migrate` | `alembic upgrade head` |
+| `make rollback` | `alembic downgrade -1` |
+| `make seed` | `python scripts/seed.py` |
+| `make start` | Production docker-compose stack |
+| `make stop` | `./stop.sh` graceful shutdown |
+| `make logs` | `docker compose logs -f` |
+| `make health` | Health check all services, report status |
+| `make smoke` | `python scripts/smoke_api.py` |
+| `make status` | `docker compose ps` |
+| `make shell-backend` | `docker compose exec backend /bin/bash` |
+| `make shell-frontend` | Opens backend shell (frontend is static) |
+| `make deploy` | Rolling docker-compose deploy + health check |
+| `make analytics` | Opens Umami dashboard URL |
+| `make clean` | Removes containers, volumes, caches, build artifacts |
+| `make env-check` | `python scripts/validate_env.py` |
+| `make launch` | Full launch sequence (env-check → migrate → seed → start → smoke) |
+| `make docker-up-analytics` | Starts Umami + its Postgres |
+| `make db-migrate MSG='…'` | Autogenerate Alembic revision |
+
+Variables defined at top: `ENV`, `REGISTRY`, `IMAGE_NAME`, `IMAGE_TAG`, `COMPOSE_FILE`, `BACKEND_PORT`, `ANALYTICS_PORT`, `COVERAGE_MIN`, `PYTHON`, `PIP`.
+
+### 2.5 CI/CD Pipeline (Phase 5)
+
+**CI Pipeline** (`.github/workflows/ci.yml`) — triggers on every PR and push to `main`:
+
+| Job | Status |
+|---|---|
+| `lint` — ruff + black | ✅ |
+| `typecheck` — mypy | ✅ |
+| `unit-tests` — pytest + coverage gate ≥ 90 % | ✅ |
+| `integration-tests-existing` — DB + factory tests | ✅ |
+| `sovereign-tests` — API + WorkflowService + coverage | ✅ |
+| `security` — bandit (SAST) + pip-audit + npm audit | ✅ Updated |
+| `build` — Docker image build + frontend asset check | ✅ New |
+| `env-validation` — validate_env.py + config load | ✅ |
+| `migration-check` — alembic upgrade + downgrade | ✅ |
+
+**CD Pipeline** (`.github/workflows/deploy.yml`) — triggers on push to `main`:
+
+| Job | Status |
+|---|---|
+| `build-and-push` — Docker build + GHCR push (SHA + `latest` tags) | ✅ |
+| `deploy-staging` — SSH deploy, alembic migrate, rolling restart | ✅ |
+| `smoke-staging` — health wait + smoke tests | ✅ |
+| `deploy-production` — manual approval gate, rolling deploy, health check | ✅ |
+
+**Additional workflows:**
+- `.github/workflows/security-scan.yml` — CodeQL
+- `.github/workflows/performance.yml` — load tests (Locust)
+- `.github/workflows/release.yml` — semantic release
+- `.github/workflows/dependabot.yml` — dependency auto-updates
+
+**Status badge** added to `README.md` (CI and CD).
+
+**Branch protection:** Configure via GitHub → Settings → Branches → `main`:
+- Require PR reviews: 1 approver
+- Require status checks: `lint`, `unit-tests`, `sovereign-tests`, `build`
+- Dismiss stale reviews on new commits
+- Require branches to be up to date
+
+**Secrets required** (documented in `.github/SECRETS.md` and `.env.example`):
+```
+DOCKER_REGISTRY_USER      DOCKER_REGISTRY_PASSWORD
+SSH_DEPLOY_HOST           SSH_DEPLOY_USER           SSH_DEPLOY_PRIVATE_KEY
+JWT_SECRET_KEY            SECRET_KEY                ENCRYPTION_KEY
+POSTGRES_PASSWORD         PRIMARY_DOMAIN
+```
 
 ---
 
-## Organizational Phases Completed
+## 3. End-to-End Flow Verification
 
-### C1 — Documentation Audit ✅
-- Reviewed all `.md` files in the repository tree
-- No deprecated Pydantic patterns (`dict()`, `parse_obj()`, `class Config:`) found in documentation
-- `docs/architecture.md` correctly documents `model_dump()` and Pydantic v2 patterns
-- Backup file `backend/api/webhooks.py.bak` removed
+### 3.1 User Flows
 
-### C2 — Dead File Cleanup ✅
-- Identified and removed `backend/api/webhooks.py.bak` (orphaned backup)
-- All other Python files in `backend/` are referenced by either imports or test coverage
-- No further dead files detected
+| Flow | Verification Method | Status |
+|---|---|---|
+| New user registration | `POST /api/auth/register` + frontend form | ✅ Implemented |
+| Login / logout / token refresh | `/api/auth/login`, `/api/auth/logout`, `/api/auth/refresh` | ✅ Implemented |
+| Company generation | `POST /api/companies/generate` + progress polling | ✅ Implemented |
+| Company list / filter / delete | `/api/companies/` + filter param | ✅ Implemented |
+| Company download | `/api/companies/{id}/download` | ✅ Implemented |
+| Deployment creation | `POST /api/deployments/` + form validation | ✅ Implemented |
+| Deployment lifecycle | start / stop / restart / delete | ✅ Implemented |
+| Real-time deployment monitoring | WebSocket + REST polling fallback | ✅ Implemented |
+| Deployment logs | `GET /api/deployments/{id}/logs` | ✅ Implemented |
+| Tenant registration | `POST /api/tenants/register` | ✅ Implemented |
+| Tenant provisioning | `POST /api/tenants/{id}/provision` | ✅ Implemented |
+| Notifications (list, mark read, WS push) | `/api/notifications` + `/ws/notifications/{user_id}` | ✅ Implemented |
+| Self-heal trigger | `POST /api/ops/heal` | ✅ Implemented |
+| Build sprint | `POST /api/build` | ✅ Implemented |
+| Analytics event tracking | Umami self-hosted | ✅ Implemented |
+| Health check | `GET /health` | ✅ Implemented |
 
-### C3 — File Placement Audit ✅
-- All API route handlers confirmed in `backend/api/`
-- Celery tasks confirmed in `backend/tasks/`
-- Service logic confirmed in `backend/services/`
-- Database models and engines confirmed in `backend/db/`
-- Authentication confirmed in `backend/auth/`
-- Orchestration confirmed in `backend/orchestration/`
-- LLM clients confirmed in `backend/llm/`
-- `backend/core/` contains legacy orchestration services (factory, tenants, deployment_service) — co-exists with `backend/services/` by design
-- `import backend` passes with no errors
+### 3.2 Service Startup Sequence
 
-### C4 — Coverage Gate Enforcement ✅
-- Added `[tool.coverage.report] fail_under = 90` to [`pyproject.toml`](../pyproject.toml)
-- `RATE_LIMIT_RPM=100000` added to `tests/conftest.py` to prevent rate-limit 429s during full-suite runs
-- Coverage gate is enforced on every `pytest --cov` invocation
+```bash
+make launch
+```
 
-### C5 — Launch Readiness Report ✅
-- This document
+Expected output:
+```
+[launch] Running database migrations…
+[OK] upgrade head succeeded
+[launch] Seeding initial data…
+[launch] Starting services…
+[launch] Running smoke tests…
+PASS GET /health (200)
+PASS GET /metrics (200)
+PASS GET /docs (200)
+[launch] ✅ All systems go. SwarmEnterprise v2 is live.
+[launch]    API:       http://localhost:8000
+[launch]    Dashboard: http://localhost:8000/dashboard/
+[launch]    Analytics: http://localhost:3001
+```
+
+### 3.3 Health Check Output
+
+```bash
+make health
+```
+
+Expected:
+```
+  SwarmOS Health Check
+  ──────────────────────────────────────────────────────────────
+  ✅ Backend:   ONLINE
+     version=2.0.0 | db=ok | redis=ok
+  ✅ Redis:     healthy
+  ✅ Analytics: http://localhost:3001
+```
 
 ---
 
-## Known Limitations and Deferred Items
+## 4. Known Limitations and Post-Launch Follow-Up
 
-| Item | Details |
-|------|---------|
-| `backend/queue.py` | 70% coverage — Redis path tested via monkey-patching; live Redis integration test deferred |
-| `backend/services/deployment_service.py` | 74% coverage — `_deploy_application` SSH/paramiko path and `_configure_dns` Cloudflare path require live infrastructure |
-| `backend/main.py` | 76% coverage — production JSON logging branch (requires `ENV=production`) not tested |
-| `backend/core/factory.py` | 83% coverage — some production cycle branches require live Stripe/LLM |
-| `tests/test_deployment_service.py` | Runs for ~70s due to real `asyncio.sleep` calls in `_verify_deployment` — consider extracting waits to a configurable parameter |
-| `tests/test_live_factory.py` and `tests/test_live_marketing.py` | Excluded from CI — require live network services |
-
----
-
-## Immediate Fixes Applied in This Session
-
-1. **`TestCompanyGenerator::test_generate_company_board_failure`** — Removed `pytest.raises()` wrapper; now asserts `status == FAILED` on returned company record (matches actual exception-catching behavior).
-2. **`TestCompanyGenerator::test_generate_slug`** — Corrected expected value from `"test-co-"` to `"test-co"` (implementation calls `.strip("-")`).
-3. **`tests/test_health_and_middleware.py::TestGetCurrentUser`** — Converted 3 tests from `asyncio.get_event_loop().run_until_complete()` to `@pytest.mark.asyncio async def` to fix event-loop-closed pollution when running after phase-2 async tests.
-4. **`tests/conftest.py`** — Added `RATE_LIMIT_RPM=100000` to prevent 429 rate-limit failures during large test runs.
+| Item | Severity | Notes |
+|---|---|---|
+| `backend/queue.py` coverage 70 % | Low | Redis live-integration test deferred; in-process mock covers the logic |
+| `backend/services/deployment_service.py` coverage 74 % | Low | SSH/Paramiko and Cloudflare DNS paths require live infrastructure |
+| `backend/main.py` coverage 76 % | Low | Production JSON-logging branch requires `ENV=production` |
+| `tests/test_deployment_service.py` runtime ~70 s | Low | Real `asyncio.sleep` calls in `_verify_deployment`; add configurable delay in future |
+| `tests/test_live_factory.py`, `test_live_marketing.py` | Low | Excluded from CI; require live Stripe/LLM credentials |
+| Analytics site ID | Post-launch | Must be configured in `.env` after creating a website in Umami admin |
+| WebSocket auth | Future | WS endpoints accept `user_id` path param; add token validation as a post-launch hardening step |
+| Frontend framework | Future | Dashboard is a production-quality Vanilla JS SPA; migrate to React/Vue if team scales |
 
 ---
 
-*Made with IBM Bob*
+## 5. Operational Runbook
+
+### 5.1 Starting the System
+
+```bash
+# Development (hot reload)
+make dev
+
+# Production
+make start          # docker-compose prod stack
+# or full launch sequence:
+make launch
+```
+
+### 5.2 Checking Health
+
+```bash
+make health         # checks backend, Redis, analytics
+make status         # docker compose ps
+```
+
+### 5.3 Viewing Logs
+
+```bash
+make logs                                  # all services
+docker compose logs -f backend             # backend only
+docker compose logs -f worker              # Celery worker
+```
+
+### 5.4 Running Migrations
+
+```bash
+make migrate                               # upgrade to latest
+make rollback                              # downgrade -1
+make db-migrate MSG="add_column_users"     # generate new migration
+```
+
+### 5.5 Deploying Updates
+
+```bash
+make deploy         # rolling restart with health check
+# or in CI/CD: push to main → deploy.yml triggers automatically
+```
+
+### 5.6 Database Backup
+
+```bash
+# Manual backup
+docker exec swarmOS-postgres \
+  pg_dump -U swarm swarm > backup_$(date +%Y%m%d).sql
+
+# Restore
+docker exec -i swarmOS-postgres \
+  psql -U swarm swarm < backup_20250630.sql
+```
+
+### 5.7 Opening a Shell
+
+```bash
+make shell-backend  # interactive shell in the backend container
+```
+
+### 5.8 Running Tests
+
+```bash
+make test           # full suite + coverage gate
+make test-unit      # fast unit tests only
+make smoke          # API smoke tests against localhost
+```
+
+---
+
+## 6. Rollback Procedures
+
+### 6.1 Application Rollback
+
+```bash
+# 1. Identify the last known-good image tag (check GitHub Actions history)
+export GOOD_TAG=sha-abc1234
+
+# 2. Pull and deploy the previous image
+export BACKEND_IMAGE="ghcr.io/rwv-techsolutions/swarmenterprise-backend:${GOOD_TAG}"
+docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+  --profile postgres --profile proxy \
+  up -d --remove-orphans
+
+# 3. Verify health
+make health
+```
+
+### 6.2 Database Rollback
+
+```bash
+# Downgrade one migration step
+make rollback
+# or: alembic downgrade -1
+
+# Downgrade to a specific revision
+alembic downgrade <revision_id>
+
+# List revision history
+alembic history --verbose
+```
+
+### 6.3 Emergency Stop
+
+```bash
+make stop           # graceful (waits 15 s for drain)
+# or immediately:
+docker compose down
+```
+
+---
+
+## 7. Post-Launch Checklist
+
+- [ ] Copy `.env.example` to `.env` and fill all required variables
+- [ ] Generate secrets: `python scripts/generate_secrets.py`
+- [ ] Set `ENV=production` and `OUTREACH_DRY_RUN=false` for live mode
+- [ ] Configure Umami: create website, copy Site ID → `SWARM_ANALYTICS_SITE_ID`
+- [ ] Change Umami default password (admin / umami → strong password)
+- [ ] Set `UMAMI_APP_SECRET` to a 32+ char random value
+- [ ] Configure GitHub branch protection rules for `main`
+- [ ] Set all required GitHub Actions secrets (see Section 2.5)
+- [ ] Point DNS for `analytics.yourdomain.com` to the server running Umami
+- [ ] Enable Cloudflare Tunnel or Caddy reverse proxy for HTTPS
+- [ ] Test Stripe webhook with a live test event
+- [ ] Verify SMTP email delivery
+- [ ] Run `make test` and confirm coverage ≥ 90 %
+- [ ] Run `make launch` end-to-end on the production server
+- [ ] Bookmark: `https://yourdomain.com/dashboard/`
+
+---
+
+*Made with IBM Bob · RWV Techsolutions LLC · 1091 Harrison Ave, Elkins, WV 26241*

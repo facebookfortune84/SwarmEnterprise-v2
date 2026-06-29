@@ -1,0 +1,89 @@
+# SwarmEnterprise v2 — Analytics overlay (Umami self-hosted)
+# Adds Umami Community Edition + its own Postgres backing store.
+#
+# Usage (development):
+#   docker compose -f docker-compose.yml -f docker-compose.analytics.yml up -d
+#
+# Usage (production, combined with prod overlay):
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f docker-compose.prod.yml \
+#     -f docker-compose.analytics.yml \
+#     --profile postgres --profile proxy \
+#     up -d
+#
+# Analytics dashboard: http://localhost:3001  (or https://analytics.yourdomain.com via Caddy)
+# Default credentials:  admin / umami   ← CHANGE on first login
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Umami — self-hosted web analytics
+  # ---------------------------------------------------------------------------
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: swarmOS-umami
+    restart: unless-stopped
+    ports:
+      - "${ANALYTICS_PORT:-3001}:3000"
+    environment:
+      DATABASE_URL: "postgresql://${UMAMI_DB_USER:-umami}:${UMAMI_DB_PASSWORD:-umami_pass}@umami-db:5432/${UMAMI_DB_NAME:-umami}"
+      DATABASE_TYPE: postgresql
+      APP_SECRET: "${UMAMI_APP_SECRET:-change-me-in-production-32chars}"
+      # Disable Umami's built-in telemetry
+      DISABLE_TELEMETRY: "1"
+    networks:
+      - swarmnet
+      - analytics_net
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/heartbeat || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ---------------------------------------------------------------------------
+  # Umami PostgreSQL — dedicated backing store (isolated from app DB)
+  # ---------------------------------------------------------------------------
+  umami-db:
+    image: postgres:16-alpine
+    container_name: swarmOS-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${UMAMI_DB_NAME:-umami}
+      POSTGRES_USER:     ${UMAMI_DB_USER:-umami}
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD:-umami_pass}
+    volumes:
+      - umami_pg_data:/var/lib/postgresql/data
+    networks:
+      - analytics_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${UMAMI_DB_USER:-umami} -d ${UMAMI_DB_NAME:-umami}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  swarmnet:
+    external: true
+  analytics_net:
+    driver: bridge
+    internal: true
+
+volumes:
+  umami_pg_data:
+    driver: local

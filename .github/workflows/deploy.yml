@@ -1,13 +1,11 @@
-# Stage 7: Docker Build + Push to GHCR
-# Stage 10: Staging Deployment
-# Stage 11: Smoke Tests against Staging
-# Stage 12: Production Deployment Gate (manual approval)
-#
+# CD Pipeline — Build · Push · Stage · Smoke · Production Gate
+# Triggered on push to main or version tags.
 # Required secrets: DOCKER_REGISTRY_USER, DOCKER_REGISTRY_PASSWORD,
 #   SSH_DEPLOY_HOST, SSH_DEPLOY_USER, SSH_DEPLOY_PRIVATE_KEY,
-#   JWT_SECRET_KEY, SECRET_KEY, ENCRYPTION_KEY, POSTGRES_PASSWORD
+#   JWT_SECRET_KEY, SECRET_KEY, ENCRYPTION_KEY, POSTGRES_PASSWORD,
+#   PRIMARY_DOMAIN
 
-name: "Deploy — Build · Stage · Smoke · Prod Gate"
+name: "CD — Build · Stage · Smoke · Prod Gate"
 
 on:
   push:

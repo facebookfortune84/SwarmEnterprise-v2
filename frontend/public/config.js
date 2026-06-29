@@ -1,4 +1,5 @@
 // API base — override per environment (baked at deploy or via query ?api=)
+// Analytics — set ANALYTICS_URL and ANALYTICS_SITE_ID in environment
 (function () {
   const params = new URLSearchParams(window.location.search);
   const override = params.get("api");
@@ -18,4 +19,11 @@
       : "https://api.realms2riches.com";
   }
   window.SWARM_API_BASE = base;
+
+  // ── Analytics configuration ─────────────────────────────────────────────
+  // These are injected at build time or set here for self-hosted Umami.
+  // SWARM_ANALYTICS_URL:     URL of the Umami instance (e.g. http://localhost:3001)
+  // SWARM_ANALYTICS_SITE_ID: Umami website ID (UUID from Umami admin dashboard)
+  window.SWARM_ANALYTICS_URL     = window.SWARM_ANALYTICS_URL     || "";
+  window.SWARM_ANALYTICS_SITE_ID = window.SWARM_ANALYTICS_SITE_ID || "";
 })();

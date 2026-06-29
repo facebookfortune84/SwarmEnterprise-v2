@@ -6,156 +6,1294 @@
   <title>SwarmOS | Deployment Command</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/dashboard/config.js"></script>
+  <script src="/dashboard/api-client.js"></script>
+  <script src="/dashboard/analytics.js"></script>
   <style>
-    body { background: #030712; color: #e2e8f0; font-family: system-ui, sans-serif; }
-    .node { border: 1px solid #1e3a5f; background: #0f172a; border-radius: 8px; padding: 12px; }
-    .pulse { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
-    .ok { color: #4ade80; } .bad { color: #f87171; }
+    /* ── Base ─────────────────────────────────────────────────── */
+    body { background:#030712; color:#e2e8f0; font-family:system-ui,sans-serif; }
+    .node { border:1px solid #1e3a5f; background:#0f172a; border-radius:8px; padding:1rem; }
+
+    /* ── Skeleton loading ─────────────────────────────────────── */
+    .skeleton { background:linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);
+      background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:4px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Status badges ────────────────────────────────────────── */
+    .badge { display:inline-block; padding:2px 8px; border-radius:9999px; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+    .badge-running  { background:#14532d; color:#4ade80; }
+    .badge-stopped  { background:#451a03; color:#fb923c; }
+    .badge-failed   { background:#450a0a; color:#f87171; }
+    .badge-pending  { background:#1e3a5f; color:#38bdf8; }
+    .badge-creating { background:#312e81; color:#a5b4fc; }
+    .badge-healthy  { background:#14532d; color:#4ade80; }
+    .badge-unhealthy{ background:#450a0a; color:#f87171; }
+    .badge-unknown  { background:#1c1917; color:#a8a29e; }
+    .badge-completed{ background:#14532d; color:#4ade80; }
+    .badge-initializing { background:#312e81; color:#a5b4fc; }
+
+    /* ── Progress bar ─────────────────────────────────────────── */
+    .progress-track { background:#1e293b; border-radius:9999px; height:6px; overflow:hidden; }
+    .progress-bar { height:100%; background:#38bdf8; border-radius:9999px; transition:width .4s; }
+
+    /* ── WS connection indicator ──────────────────────────────── */
+    .ws-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .ws-connected { background:#4ade80; box-shadow:0 0 6px #4ade80; }
+    .ws-disconnected { background:#6b7280; }
+    .ws-reconnecting { background:#fbbf24; animation:pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    /* ── Empty state ──────────────────────────────────────────── */
+    .empty-state { text-align:center; padding:3rem 1rem; color:#64748b; }
+    .empty-state svg { margin:0 auto 1rem; }
+
+    /* ── Modal ────────────────────────────────────────────────── */
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:1000;
+      display:flex; align-items:center; justify-content:center; padding:1rem; }
+    .modal { background:#0f172a; border:1px solid #1e3a5f; border-radius:10px;
+      width:100%; max-width:520px; max-height:90vh; overflow-y:auto; padding:1.5rem; }
+
+    /* ── Responsive nav ───────────────────────────────────────── */
+    @media(max-width:640px) { .hide-mobile { display:none !important; } }
+
+    /* ── Form elements ────────────────────────────────────────── */
+    .input { background:#0f172a; border:1px solid #334155; border-radius:6px;
+      padding:0.5rem 0.75rem; font-size:0.875rem; color:#e2e8f0; width:100%; outline:none; }
+    .input:focus { border-color:#38bdf8; }
+    .input.error { border-color:#f87171; }
+    .btn-primary { background:#0369a1; color:#fff; border:none; border-radius:6px;
+      padding:0.5rem 1.25rem; font-size:0.875rem; font-weight:600; cursor:pointer; transition:background .2s; }
+    .btn-primary:hover { background:#0284c7; }
+    .btn-primary:disabled { background:#334155; cursor:not-allowed; }
+    .btn-danger { background:#7f1d1d; color:#fff; border:none; border-radius:6px;
+      padding:0.5rem 1.25rem; font-size:0.875rem; font-weight:600; cursor:pointer; }
+    .btn-danger:hover { background:#991b1b; }
+    .btn-ghost { background:transparent; color:#94a3b8; border:1px solid #334155; border-radius:6px;
+      padding:0.5rem 1rem; font-size:0.875rem; cursor:pointer; }
+    .btn-ghost:hover { background:#1e293b; color:#e2e8f0; }
+
+    /* ── Tab nav ──────────────────────────────────────────────── */
+    .tab { cursor:pointer; padding:0.5rem 1rem; font-size:0.875rem; border-bottom:2px solid transparent;
+      color:#64748b; transition:color .2s,border-color .2s; white-space:nowrap; }
+    .tab.active { color:#38bdf8; border-color:#38bdf8; }
+    .tab:hover:not(.active) { color:#94a3b8; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* ── Label + validation ───────────────────────────────────── */
+    label { font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:4px; }
+    .field-error { font-size:0.75rem; color:#f87171; margin-top:4px; }
   </style>
 </head>
-<body class="p-6 max-w-7xl mx-auto">
+<body class="p-4 max-w-7xl mx-auto">
+
+  <!-- ── Auth overlay ──────────────────────────────────────────────────── -->
+  <div id="authOverlay" class="modal-backdrop" style="display:none;">
+    <div class="modal">
+      <h2 class="text-xl font-bold text-sky-400 mb-1">SwarmOS</h2>
+      <p class="text-sm text-slate-500 mb-6">Deployment Command Center</p>
+
+      <div id="authTabs" class="flex border-b border-slate-800 mb-6">
+        <button class="tab active" data-tab="login">Sign In</button>
+        <button class="tab" data-tab="register">Register</button>
+      </div>
+
+      <!-- Login form -->
+      <div id="loginPanel" class="tab-panel active">
+        <div class="space-y-4">
+          <div>
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" class="input" placeholder="you@example.com" autocomplete="email" />
+            <span id="loginEmailErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div>
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" class="input" placeholder="••••••••" autocomplete="current-password" />
+            <span id="loginPasswordErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div id="loginGlobalErr" class="text-sm text-red-400" style="display:none;"></div>
+          <button id="loginBtn" class="btn-primary w-full" style="width:100%">Sign In</button>
+          <p class="text-xs text-center text-slate-500">
+            Using the API without auth? Some features require a token.
+          </p>
+        </div>
+      </div>
+
+      <!-- Register form -->
+      <div id="registerPanel" class="tab-panel">
+        <div class="space-y-4">
+          <div>
+            <label for="regName">Full Name</label>
+            <input id="regName" type="text" class="input" placeholder="Jane Smith" />
+          </div>
+          <div>
+            <label for="regEmail">Email</label>
+            <input id="regEmail" type="email" class="input" placeholder="you@example.com" />
+          </div>
+          <div>
+            <label for="regPassword">Password (min 8 chars)</label>
+            <input id="regPassword" type="password" class="input" placeholder="••••••••" />
+            <span id="regPasswordErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div id="regGlobalErr" class="text-sm text-red-400" style="display:none;"></div>
+          <button id="registerBtn" class="btn-primary" style="width:100%">Create Account</button>
+        </div>
+      </div>
+
+      <button id="skipAuthBtn" class="btn-ghost w-full mt-3 text-xs" style="width:100%">Continue without login (read-only)</button>
+    </div>
+  </div>
+
+  <!-- ── Confirm dialog ─────────────────────────────────────────────────── -->
+  <div id="confirmDialog" class="modal-backdrop" style="display:none;">
+    <div class="modal" style="max-width:380px;">
+      <h3 id="confirmTitle" class="font-semibold text-white mb-2">Confirm Action</h3>
+      <p id="confirmMsg" class="text-sm text-slate-400 mb-6"></p>
+      <div class="flex justify-end gap-3">
+        <button id="confirmCancel" class="btn-ghost">Cancel</button>
+        <button id="confirmOk" class="btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <header class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-sky-400">SwarmOS Deployment Command</h1>
-      <p class="text-sm text-slate-500">realms2riches.com · corp · api · realms2riches.tech boxes</p>
+      <p class="text-sm text-slate-500">realms2riches.com · corp · api</p>
     </div>
-    <nav class="flex gap-3 text-sm">
-      <a href="/dashboard/" class="text-sky-400 font-semibold">Main</a>
-      <a href="/corp/corp.html" class="text-slate-400 hover:text-white">Corp</a>
-      <button id="healBtn" class="bg-amber-700 hover:bg-amber-600 px-4 py-2 rounded font-semibold">Run self-heal</button>
+    <nav class="flex flex-wrap items-center gap-2 text-sm">
+      <span id="wsIndicator" class="flex items-center text-xs text-slate-500">
+        <span class="ws-dot ws-disconnected"></span><span class="ws-label">offline</span>
+      </span>
+      <span id="userBadge" class="text-xs text-slate-500 px-2 py-1 bg-slate-800 rounded" style="display:none;"></span>
+      <a href="/dashboard/" class="text-sky-400 font-semibold">Dashboard</a>
+      <a href="/corp/corp.html" class="text-slate-400 hover:text-white hide-mobile">Corp</a>
+      <button id="loginNavBtn" class="btn-ghost text-xs">Sign In</button>
+      <button id="logoutBtn" class="btn-ghost text-xs" style="display:none;">Sign Out</button>
     </nav>
   </header>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-3 text-white">Architecture</h2>
-    <div class="grid md:grid-cols-3 gap-4 text-sm">
-      <div class="node text-center">
-        <div class="text-sky-300 font-bold mb-1">💻 Laptop</div>
-        <div>ollama serve :11434</div>
-        <div id="ollamaStatus" class="mt-2 text-xs">checking…</div>
-      </div>
-      <div class="node text-center">
-        <div class="text-violet-300 font-bold mb-1">🖥 Hyper-V → WSL2 Docker</div>
-        <div>backend · redis · caddy</div>
-        <div id="dockerHint" class="mt-2 text-xs text-slate-500">OLLAMA_URL → laptop LAN IP</div>
-      </div>
-      <div class="node text-center">
-        <div class="text-emerald-300 font-bold mb-1">🌐 Domains</div>
-        <div id="domainList" class="text-left text-xs space-y-1 mt-2"></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="grid lg:grid-cols-2 gap-6">
-    <section class="node">
-      <h2 class="font-semibold text-white mb-3">Deployment status</h2>
-      <pre id="statusPanel" class="text-xs overflow-auto max-h-64 text-slate-400">Loading…</pre>
-    </section>
-
-    <section class="node">
-      <h2 class="font-semibold text-white mb-3">Tenant boxes (realms2riches.tech)</h2>
-      <form id="tenantForm" class="flex gap-2 mb-3">
-        <input id="tenantName" class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm" placeholder="Company name" required />
-        <button type="submit" class="bg-sky-700 hover:bg-sky-600 px-4 py-2 rounded text-sm font-semibold">Register</button>
-      </form>
-      <ul id="tenantList" class="text-sm space-y-2 max-h-48 overflow-auto"></ul>
-    </section>
-
-    <section class="node lg:col-span-2">
-      <h2 class="font-semibold text-white mb-3">Build sprint</h2>
-      <textarea id="prompt" class="w-full h-24 bg-slate-900 border border-slate-700 rounded p-3 text-sm mb-2" placeholder="Project vibe…"></textarea>
-      <div class="flex gap-2">
-        <select id="stack" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm">
-          <option>FastAPI + React + PostgreSQL</option>
-          <option>Node.js + Tailwind + MongoDB</option>
-        </select>
-        <button id="buildBtn" class="bg-emerald-700 hover:bg-emerald-600 px-6 py-2 rounded font-semibold text-sm">Initiate sprint</button>
-      </div>
-      <div id="logs" class="mt-3 text-xs text-sky-500/80 max-h-32 overflow-auto"></div>
-    </section>
+  <!-- ── Tab navigation ─────────────────────────────────────────────────── -->
+  <div class="flex overflow-x-auto border-b border-slate-800 mb-6 gap-0">
+    <button class="tab active" data-main-tab="overview">Overview</button>
+    <button class="tab" data-main-tab="companies">Companies</button>
+    <button class="tab" data-main-tab="deployments">Deployments</button>
+    <button class="tab" data-main-tab="tenants">Tenants</button>
+    <button class="tab" data-main-tab="notifications">Notifications</button>
+    <button class="tab" data-main-tab="ops">Operations</button>
   </div>
 
-  <script>
-    const API = () => window.SWARM_API_BASE || "";
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB: OVERVIEW
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-overview" class="tab-panel active">
+    <!-- System status cards -->
+    <div class="grid sm:grid-cols-3 gap-4 mb-6">
+      <div class="node">
+        <div class="text-xs text-slate-500 mb-1">API Status</div>
+        <div id="ovApiStatus" class="skeleton h-6 w-20 mb-1"></div>
+        <div id="ovApiVersion" class="text-xs text-slate-500"></div>
+      </div>
+      <div class="node">
+        <div class="text-xs text-slate-500 mb-1">Database</div>
+        <div id="ovDbStatus" class="skeleton h-6 w-20"></div>
+      </div>
+      <div class="node">
+        <div class="text-xs text-slate-500 mb-1">Redis</div>
+        <div id="ovRedisStatus" class="skeleton h-6 w-20"></div>
+      </div>
+    </div>
 
-    async function api(path, opts = {}) {
-      const r = await fetch(API() + path, { headers: { "Content-Type": "application/json" }, ...opts });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(data.detail || r.statusText);
-      return data;
-    }
+    <div class="grid lg:grid-cols-2 gap-6">
+      <!-- Architecture -->
+      <section class="node">
+        <h2 class="font-semibold text-white mb-3">Architecture</h2>
+        <div class="grid grid-cols-1 gap-3 text-sm">
+          <div class="flex items-start gap-3 p-3 bg-slate-900 rounded">
+            <div class="text-sky-300 font-bold w-28 shrink-0">💻 Laptop</div>
+            <div>
+              <div>ollama serve :11434</div>
+              <div id="ollamaStatus" class="mt-1 text-xs text-slate-400">checking…</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-slate-900 rounded">
+            <div class="text-violet-300 font-bold w-28 shrink-0">🖥 Docker</div>
+            <div>
+              <div>backend · redis · caddy</div>
+              <div id="dockerHint" class="mt-1 text-xs text-slate-400">OLLAMA_URL → host</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-slate-900 rounded">
+            <div class="text-emerald-300 font-bold w-28 shrink-0">🌐 Domains</div>
+            <div id="domainList" class="text-xs space-y-1"></div>
+          </div>
+        </div>
+      </section>
 
-    function log(msg, cls = "") {
-      const el = document.getElementById("logs");
-      el.innerHTML += `<div class="${cls}">> ${msg}</div>`;
-    }
+      <!-- Quick Actions -->
+      <section class="node">
+        <h2 class="font-semibold text-white mb-3">Quick Actions</h2>
+        <div class="space-y-3">
+          <!-- Build sprint -->
+          <div>
+            <label for="qaPrompt">Build Sprint — describe your project</label>
+            <textarea id="qaPrompt" class="input h-16 mb-2" placeholder="Full-stack SaaS with auth, payments, and a dashboard…"></textarea>
+            <div class="flex gap-2 flex-wrap">
+              <select id="qaStack" class="input" style="width:auto;flex:1;">
+                <option value="fastapi-react-postgres">FastAPI + React + PostgreSQL</option>
+                <option value="nodejs-tailwind-mongo">Node.js + Tailwind + MongoDB</option>
+                <option value="django-htmx-postgres">Django + HTMX + PostgreSQL</option>
+                <option value="nextjs-prisma-postgres">Next.js + Prisma + PostgreSQL</option>
+              </select>
+              <button id="qaBuildBtn" class="btn-primary">Initiate Sprint</button>
+            </div>
+          </div>
+          <div id="qaBuildLog" class="text-xs text-sky-500/80 max-h-24 overflow-auto space-y-1"></div>
 
-    async function refreshStatus() {
-      try {
-        const s = await api("/api/ops/status");
-        document.getElementById("statusPanel").textContent = JSON.stringify(s, null, 2);
-        const domains = s.domains || {};
-        document.getElementById("domainList").innerHTML = Object.entries(domains)
-          .map(([k, v]) => `<div><span class="text-slate-500">${k}:</span> ${v}</div>`).join("");
-        const o = s.ollama || {};
-        document.getElementById("ollamaStatus").innerHTML = o.reachable
-          ? `<span class="ok">● Ollama OK</span> (${o.models || 0} models)`
-          : `<span class="bad">● Ollama unreachable</span>`;
-        if (s.laptop_ollama_host) {
-          document.getElementById("dockerHint").textContent = `LAPTOP_OLLAMA_HOST=${s.laptop_ollama_host}`;
-        }
-        renderTenants(s.tenants?.items || []);
-      } catch (e) {
-        document.getElementById("statusPanel").textContent = "API unreachable: " + e.message;
+          <hr class="border-slate-800" />
+
+          <div class="flex gap-2">
+            <button id="ovHealBtn" class="btn-ghost text-xs">🔧 Run Self-Heal</button>
+            <button id="ovRefreshBtn" class="btn-ghost text-xs">🔄 Refresh Status</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB: COMPANIES
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-companies" class="tab-panel">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <h2 class="font-semibold text-white text-lg">Generated Companies</h2>
+      <button id="generateCompanyBtn" class="btn-primary">+ Generate Company</button>
+    </div>
+
+    <!-- Generate Company Modal trigger content -->
+    <div id="generateCompanyForm" class="modal-backdrop" style="display:none;">
+      <div class="modal">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-semibold text-white">Generate New Company</h3>
+          <button id="closeGenerateForm" class="text-slate-500 hover:text-white text-xl leading-none">&times;</button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="genName">Company Name <span class="text-red-400">*</span></label>
+            <input id="genName" class="input" placeholder="AcmeCorp" />
+            <span id="genNameErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div>
+            <label for="genDesc">Description <span class="text-red-400">*</span></label>
+            <textarea id="genDesc" class="input h-20" placeholder="A SaaS platform for automating…"></textarea>
+            <span id="genDescErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div>
+            <label for="genStack">Tech Stack</label>
+            <select id="genStack" class="input">
+              <option value="fastapi-react-postgres">FastAPI + React + PostgreSQL</option>
+              <option value="nodejs-tailwind-mongo">Node.js + Tailwind + MongoDB</option>
+              <option value="django-htmx-postgres">Django + HTMX + PostgreSQL</option>
+              <option value="nextjs-prisma-postgres">Next.js + Prisma + PostgreSQL</option>
+            </select>
+          </div>
+          <div>
+            <label for="genFeatures">Features (comma-separated)</label>
+            <input id="genFeatures" class="input" placeholder="auth, payments, dashboard" />
+          </div>
+          <div id="genGlobalErr" class="text-sm text-red-400" style="display:none;"></div>
+          <div class="flex justify-end gap-3">
+            <button id="cancelGenerateForm" class="btn-ghost">Cancel</button>
+            <button id="submitGenerateForm" class="btn-primary">Generate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company filters -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <select id="companyFilter" class="input" style="width:auto;">
+        <option value="">All Statuses</option>
+        <option value="completed">Completed</option>
+        <option value="generating_tickets">Generating</option>
+        <option value="failed">Failed</option>
+      </select>
+      <button id="refreshCompanies" class="btn-ghost text-xs">Refresh</button>
+    </div>
+
+    <div id="companiesList">
+      <!-- Skeleton -->
+      <div class="space-y-3">
+        <div class="node skeleton h-16"></div>
+        <div class="node skeleton h-16"></div>
+        <div class="node skeleton h-16"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB: DEPLOYMENTS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-deployments" class="tab-panel">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <h2 class="font-semibold text-white text-lg">Deployments</h2>
+      <button id="createDeploymentBtn" class="btn-primary">+ New Deployment</button>
+    </div>
+
+    <!-- Create Deployment Modal -->
+    <div id="createDeploymentForm" class="modal-backdrop" style="display:none;">
+      <div class="modal">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-semibold text-white">New Deployment</h3>
+          <button id="closeDeployForm" class="text-slate-500 hover:text-white text-xl">&times;</button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="depCompanyId">Company ID <span class="text-red-400">*</span></label>
+            <input id="depCompanyId" class="input" placeholder="company-uuid" />
+            <span id="depCompanyIdErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div>
+            <label for="depTenantName">Tenant Name <span class="text-red-400">*</span></label>
+            <input id="depTenantName" class="input" placeholder="my-company" />
+            <span id="depTenantNameErr" class="field-error" style="display:none;"></span>
+          </div>
+          <div>
+            <label for="depSubdomain">Subdomain <span class="text-red-400">*</span></label>
+            <input id="depSubdomain" class="input" placeholder="mycompany" />
+            <div class="text-xs text-slate-500 mt-1">Will deploy to: <span id="depSubdomainPreview" class="text-sky-400">mycompany.realms2riches.tech</span></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label for="depMemory">Memory (MB)</label>
+              <input id="depMemory" type="number" class="input" value="4096" min="2048" max="32768" />
+            </div>
+            <div>
+              <label for="depCpu">CPU Cores</label>
+              <input id="depCpu" type="number" class="input" value="2" min="1" max="16" />
+            </div>
+            <div>
+              <label for="depDisk">Disk (GB)</label>
+              <input id="depDisk" type="number" class="input" value="50" min="20" max="500" />
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="depAutoStart" checked class="w-4 h-4 accent-sky-500" />
+              <span class="text-slate-300">Auto-start</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="depBackup" checked class="w-4 h-4 accent-sky-500" />
+              <span class="text-slate-300">Enable backups</span>
+            </label>
+          </div>
+          <div id="depGlobalErr" class="text-sm text-red-400" style="display:none;"></div>
+          <div class="flex justify-end gap-3">
+            <button id="cancelDeployForm" class="btn-ghost">Cancel</button>
+            <button id="submitDeployForm" class="btn-primary">Create Deployment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deployment status filter -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <select id="deploymentFilter" class="input" style="width:auto;">
+        <option value="">All Statuses</option>
+        <option value="running">Running</option>
+        <option value="stopped">Stopped</option>
+        <option value="creating">Creating</option>
+        <option value="failed">Failed</option>
+      </select>
+      <button id="refreshDeployments" class="btn-ghost text-xs">Refresh</button>
+    </div>
+
+    <div id="deploymentsList">
+      <div class="space-y-3">
+        <div class="node skeleton h-20"></div>
+        <div class="node skeleton h-20"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB: TENANTS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-tenants" class="tab-panel">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <h2 class="font-semibold text-white text-lg">Tenant Boxes</h2>
+    </div>
+    <form id="tenantForm" class="node mb-4">
+      <h3 class="font-medium text-white mb-3 text-sm">Register Tenant Box</h3>
+      <div class="flex gap-2 flex-wrap">
+        <div class="flex-1" style="min-width:180px;">
+          <input id="tenantName" class="input" placeholder="Company name" required aria-label="Tenant company name" />
+          <span id="tenantNameErr" class="field-error" style="display:none;"></span>
+        </div>
+        <div style="width:160px;">
+          <input id="tenantSlug" class="input" placeholder="slug (optional)" aria-label="Tenant slug" />
+        </div>
+        <button type="submit" class="btn-primary">Register</button>
+      </div>
+    </form>
+    <div id="tenantsList">
+      <div class="space-y-2">
+        <div class="node skeleton h-12"></div>
+        <div class="node skeleton h-12"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB: NOTIFICATIONS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-notifications" class="tab-panel">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <h2 class="font-semibold text-white text-lg">Notifications</h2>
+      <div class="flex gap-2">
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+          <input type="checkbox" id="unreadOnly" class="accent-sky-500" />
+          <span class="text-slate-400">Unread only</span>
+        </label>
+        <button id="markAllReadBtn" class="btn-ghost text-xs">Mark all read</button>
+        <button id="refreshNotifications" class="btn-ghost text-xs">Refresh</button>
+      </div>
+    </div>
+    <div id="notificationsList">
+      <div class="space-y-2">
+        <div class="node skeleton h-12"></div>
+        <div class="node skeleton h-12"></div>
+        <div class="node skeleton h-12"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB: OPERATIONS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-ops" class="tab-panel">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <h2 class="font-semibold text-white text-lg">Operations</h2>
+      <div class="flex gap-2">
+        <button id="opsHealBtn" class="btn-ghost text-xs">🔧 Run Self-Heal</button>
+        <button id="opsRefreshBtn" class="btn-ghost text-xs">🔄 Refresh</button>
+      </div>
+    </div>
+    <div id="opsStatusPanel" class="node">
+      <div class="skeleton h-64"></div>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="mt-12 pt-4 border-t border-slate-800 text-center text-xs text-slate-600">
+    SwarmOS v2.0.0 · RWV Techsolutions LLC · <a class="hover:text-slate-400" href="mailto:robertdemottojr50@gmail.com">robertdemottojr50@gmail.com</a>
+    · <a href="http://localhost:8000/docs" target="_blank" class="hover:text-slate-400">API Docs</a>
+    · <a href="/dashboard/privacy-policy.html" class="hover:text-slate-400">Privacy</a>
+    · <a href="/dashboard/terms.html" class="hover:text-slate-400">Terms</a>
+  </footer>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// SwarmOS Dashboard — main UI controller
+// ══════════════════════════════════════════════════════════════════════════
+const API = window.SwarmAPI;
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function badge(status) {
+  const s = (status || "unknown").toLowerCase().replace(/[\s_]+/g, "-");
+  const valid = ["running","stopped","failed","pending","creating","healthy","unhealthy","unknown","completed","initializing"];
+  const cls = valid.includes(s) ? "badge-" + s : "badge-unknown";
+  return `<span class="badge ${cls}">${status || "unknown"}</span>`;
+}
+
+function timeAgo(iso) {
+  if (!iso) return "";
+  const d = new Date(iso), now = Date.now(), diff = now - d;
+  if (diff < 60000) return "just now";
+  if (diff < 3600000) return Math.floor(diff/60000) + "m ago";
+  if (diff < 86400000) return Math.floor(diff/3600000) + "h ago";
+  return Math.floor(diff/86400000) + "d ago";
+}
+
+function emptyState(msg, actionHtml = "") {
+  return `<div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p class="text-sm mb-3">${msg}</p>${actionHtml}
+  </div>`;
+}
+
+function skeletonRows(n, h = "h-16") {
+  return Array.from({length:n}, () => `<div class="node skeleton ${h} mb-3"></div>`).join("");
+}
+
+function confirmAction(title, msg) {
+  return new Promise(resolve => {
+    document.getElementById("confirmTitle").textContent = title;
+    document.getElementById("confirmMsg").textContent = msg;
+    document.getElementById("confirmDialog").style.display = "flex";
+    document.getElementById("confirmOk").onclick = () => {
+      document.getElementById("confirmDialog").style.display = "none";
+      resolve(true);
+    };
+    document.getElementById("confirmCancel").onclick = () => {
+      document.getElementById("confirmDialog").style.display = "none";
+      resolve(false);
+    };
+  });
+}
+
+function showFieldError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? "block" : "none";
+  const inputId = id.replace("Err", "");
+  const inp = document.getElementById(inputId);
+  if (inp) inp.classList.toggle("error", !!msg);
+}
+
+function clearFieldErrors(...ids) { ids.forEach(id => showFieldError(id, "")); }
+
+function setLoading(btnId, loading, loadingText = "Loading…") {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  if (loading) { btn._origText = btn.textContent; btn.textContent = loadingText; }
+  else if (btn._origText) btn.textContent = btn._origText;
+}
+
+// ── Tab management ─────────────────────────────────────────────────────────
+(function initTabs() {
+  // Auth overlay tabs
+  document.getElementById("authTabs").addEventListener("click", e => {
+    const tab = e.target.dataset.tab;
+    if (!tab) return;
+    document.querySelectorAll("#authTabs .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+    document.getElementById("loginPanel").classList.toggle("active", tab === "login");
+    document.getElementById("registerPanel").classList.toggle("active", tab === "register");
+  });
+
+  // Main tabs
+  document.querySelectorAll("[data-main-tab]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.mainTab;
+      document.querySelectorAll("[data-main-tab]").forEach(b => b.classList.toggle("active", b.dataset.mainTab === target));
+      document.querySelectorAll(".tab-panel[id^='tab-']").forEach(p => p.classList.toggle("active", p.id === "tab-" + target));
+      loadTab(target);
+    });
+  });
+})();
+
+// ── Auth management ────────────────────────────────────────────────────────
+function updateAuthUI() {
+  const loggedIn = API.auth.isAuthenticated();
+  const user = API.auth.currentUser();
+  document.getElementById("loginNavBtn").style.display = loggedIn ? "none" : "";
+  document.getElementById("logoutBtn").style.display = loggedIn ? "" : "none";
+  const badge = document.getElementById("userBadge");
+  if (loggedIn && user) {
+    badge.style.display = "";
+    badge.textContent = user.email || "authenticated";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+document.getElementById("loginNavBtn").onclick = () => {
+  document.getElementById("authOverlay").style.display = "flex";
+};
+document.getElementById("skipAuthBtn").onclick = () => {
+  document.getElementById("authOverlay").style.display = "none";
+};
+
+document.getElementById("logoutBtn").onclick = async () => {
+  await API.auth.logout();
+  updateAuthUI();
+  API.toast.info("Signed out.");
+};
+
+document.getElementById("loginBtn").onclick = async () => {
+  clearFieldErrors("loginEmailErr", "loginPasswordErr");
+  document.getElementById("loginGlobalErr").style.display = "none";
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  let valid = true;
+  if (!email) { showFieldError("loginEmailErr", "Email is required"); valid = false; }
+  if (!password) { showFieldError("loginPasswordErr", "Password is required"); valid = false; }
+  if (!valid) return;
+  setLoading("loginBtn", true, "Signing in…");
+  try {
+    await API.auth.login(email, password);
+    document.getElementById("authOverlay").style.display = "none";
+    updateAuthUI();
+    API.toast.success("Welcome back!");
+    loadTab("overview");
+  } catch (e) {
+    document.getElementById("loginGlobalErr").textContent = e.message;
+    document.getElementById("loginGlobalErr").style.display = "block";
+  } finally {
+    setLoading("loginBtn", false);
+  }
+};
+
+document.getElementById("loginPassword").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("loginBtn").click();
+});
+
+document.getElementById("registerBtn").onclick = async () => {
+  document.getElementById("regGlobalErr").style.display = "none";
+  clearFieldErrors("regPasswordErr");
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value;
+  if (password.length < 8) { showFieldError("regPasswordErr", "Password must be at least 8 characters"); return; }
+  setLoading("registerBtn", true, "Creating…");
+  try {
+    await API.auth.register(email, password, name);
+    document.getElementById("authOverlay").style.display = "none";
+    updateAuthUI();
+    API.toast.success("Account created — welcome!");
+    loadTab("overview");
+  } catch (e) {
+    document.getElementById("regGlobalErr").textContent = e.message;
+    document.getElementById("regGlobalErr").style.display = "block";
+  } finally {
+    setLoading("registerBtn", false);
+  }
+};
+
+window.addEventListener("swarm:auth:expired", () => {
+  updateAuthUI();
+  API.toast.warning("Session expired — please sign in again.");
+  document.getElementById("authOverlay").style.display = "flex";
+});
+
+// ── WebSocket / notification indicator ───────────────────────────────────
+let _wsNotifConnected = false;
+function connectNotificationWS() {
+  const user = API.auth.currentUser();
+  if (!user) return;
+  API.wsManager.connect(
+    "notifications:" + user.id,
+    "/ws/notifications/" + user.id,
+    (data) => {
+      // Show toast for incoming notification
+      API.toast.info((data.title || data.message || "New notification"));
+      // Reload notifications panel if active
+      if (document.getElementById("tab-notifications").classList.contains("active")) {
+        loadNotifications();
       }
+    },
+    (status) => {
+      _wsNotifConnected = status === "connected";
+      updateWSIndicator(status);
     }
+  );
+}
 
-    function renderTenants(items) {
-      const ul = document.getElementById("tenantList");
-      if (!items.length) { ul.innerHTML = "<li class='text-slate-500'>No tenants yet</li>"; return; }
-      ul.innerHTML = items.map(t => `
-        <li class="flex justify-between items-center border-b border-slate-800 py-1">
-          <span>${t.name} <span class="text-slate-500 text-xs">${t.slug}</span></span>
-          <span class="text-xs ${t.status === 'running' ? 'ok' : 'text-amber-400'}">${t.status}</span>
-          <button data-id="${t.id}" class="provision text-xs bg-slate-700 px-2 py-1 rounded">Deploy box</button>
-        </li>`).join("");
-      ul.querySelectorAll(".provision").forEach(btn => {
-        btn.onclick = async () => {
-          await api(`/api/tenants/${btn.dataset.id}/provision`, { method: "POST", body: JSON.stringify({ use_vm: false }) });
-          refreshStatus();
-        };
-      });
+function updateWSIndicator(status) {
+  const dot = document.querySelector("#wsIndicator .ws-dot");
+  const label = document.querySelector("#wsIndicator .ws-label");
+  if (!dot) return;
+  dot.className = "ws-dot";
+  if (status === "connected") { dot.classList.add("ws-connected"); label.textContent = "live"; }
+  else if (status === "reconnecting") { dot.classList.add("ws-reconnecting"); label.textContent = "reconnecting…"; }
+  else { dot.classList.add("ws-disconnected"); label.textContent = "offline"; }
+}
+
+window.addEventListener("swarm:auth:login", connectNotificationWS);
+window.addEventListener("swarm:auth:logout", () => {
+  API.wsManager.disconnectAll();
+  updateWSIndicator("disconnected");
+});
+
+// ── Tab data loaders ───────────────────────────────────────────────────────
+async function loadTab(tab) {
+  if (tab === "overview")       await loadOverview();
+  if (tab === "companies")      await loadCompanies();
+  if (tab === "deployments")    await loadDeployments();
+  if (tab === "tenants")        await loadTenants();
+  if (tab === "notifications")  await loadNotifications();
+  if (tab === "ops")            await loadOps();
+}
+
+// ── Overview ──────────────────────────────────────────────────────────────
+async function loadOverview() {
+  try {
+    const h = await API.health.check();
+    document.getElementById("ovApiStatus").innerHTML = badge(h.status);
+    document.getElementById("ovApiVersion").textContent = "v" + (h.version || "");
+    document.getElementById("ovDbStatus").innerHTML = badge(h.checks?.db === "ok" ? "healthy" : "unhealthy");
+    document.getElementById("ovRedisStatus").innerHTML = badge(h.checks?.redis === "ok" ? "healthy" : "unhealthy");
+  } catch {
+    ["ovApiStatus","ovDbStatus","ovRedisStatus"].forEach(id => {
+      document.getElementById(id).innerHTML = badge("unhealthy");
+    });
+  }
+
+  try {
+    const s = await API.ops.status();
+    const domains = s.domains || {};
+    document.getElementById("domainList").innerHTML = Object.entries(domains)
+      .map(([k,v]) => `<div><span class="text-slate-500">${k}:</span> <span class="text-slate-300">${v}</span></div>`).join("") || "<div class='text-slate-500'>No domain info</div>";
+    const o = s.ollama || {};
+    document.getElementById("ollamaStatus").innerHTML = o.reachable
+      ? `<span class="text-green-400">● Ollama OK</span> (${o.models || 0} models)`
+      : `<span class="text-red-400">● Ollama unreachable</span>`;
+    if (s.laptop_ollama_host) {
+      document.getElementById("dockerHint").textContent = "LAPTOP_OLLAMA_HOST=" + s.laptop_ollama_host;
     }
+  } catch {}
+}
 
-    document.getElementById("tenantForm").onsubmit = async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("tenantName").value;
-      await api("/api/tenants/register", { method: "POST", body: JSON.stringify({ name }) });
-      document.getElementById("tenantName").value = "";
-      const list = await api("/api/tenants");
-      renderTenants(list.tenants || []);
-    };
+// ── Quick action: build sprint ─────────────────────────────────────────────
+function qaBuildLog(msg, cls = "") {
+  const el = document.getElementById("qaBuildLog");
+  const div = document.createElement("div");
+  div.className = cls;
+  div.textContent = "> " + msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
 
-    document.getElementById("buildBtn").onclick = async () => {
-      const vibe = document.getElementById("prompt").value;
-      const stack = document.getElementById("stack").value;
-      log("Board convened…");
-      const data = await api("/api/build", {
-        method: "POST",
-        body: JSON.stringify({ name: "AutoProject", description: vibe, stack }),
-      });
-      log(`Project ${data.project_id} started`, "text-green-400");
-    };
+document.getElementById("qaBuildBtn").onclick = async () => {
+  const vibe = document.getElementById("qaPrompt").value.trim();
+  const stack = document.getElementById("qaStack").value;
+  if (!vibe) { API.toast.warning("Please describe your project first."); return; }
+  setLoading("qaBuildBtn", true, "Initiating…");
+  qaBuildLog("Board convened…");
+  try {
+    const data = await API.build.trigger("AutoProject", vibe, stack);
+    qaBuildLog("Project " + data.project_id + " started", "text-green-400");
+    API.toast.success("Build sprint initiated: " + data.project_id);
+  } catch (e) {
+    qaBuildLog("Error: " + e.message, "text-red-400");
+    API.toast.error(e.message);
+  } finally {
+    setLoading("qaBuildBtn", false);
+  }
+};
 
-    document.getElementById("healBtn").onclick = async () => {
-      log("Self-heal triggered…", "text-amber-300");
-      await api("/api/ops/heal", { method: "POST" });
-      log("Heal cycle queued", "text-green-400");
-    };
+document.getElementById("ovHealBtn").onclick = async () => {
+  setLoading("ovHealBtn", true, "Healing…");
+  try {
+    await API.ops.heal();
+    API.toast.success("Self-heal cycle queued.");
+  } catch (e) {
+    API.toast.error(e.message);
+  } finally {
+    setLoading("ovHealBtn", false);
+  }
+};
 
-    refreshStatus();
-    setInterval(refreshStatus, 30000);
-  </script>
+document.getElementById("ovRefreshBtn").onclick = () => loadOverview();
+
+// ── Companies ─────────────────────────────────────────────────────────────
+async function loadCompanies() {
+  const filter = document.getElementById("companyFilter").value;
+  document.getElementById("companiesList").innerHTML = skeletonRows(3);
+  try {
+    const items = await API.companies.list(0, 100, filter || null);
+    renderCompanies(Array.isArray(items) ? items : []);
+  } catch (e) {
+    document.getElementById("companiesList").innerHTML =
+      `<div class="text-red-400 text-sm p-4">${e.message}</div>`;
+  }
+}
+
+function renderCompanies(items) {
+  const el = document.getElementById("companiesList");
+  if (!items.length) {
+    el.innerHTML = emptyState("No companies yet.", `<button onclick="document.getElementById('generateCompanyBtn').click()" class="btn-primary text-sm">Generate your first company</button>`);
+    return;
+  }
+  el.innerHTML = items.map(c => `
+    <div class="node mb-3" id="company-${c.id}">
+      <div class="flex flex-wrap justify-between items-start gap-2">
+        <div>
+          <div class="font-medium text-white">${escHtml(c.name)} <span class="text-slate-500 text-xs">${escHtml(c.slug)}</span></div>
+          <div class="text-xs text-slate-500">${escHtml(c.tech_stack)} · ${timeAgo(c.created_at)}</div>
+        </div>
+        <div class="flex items-center gap-2">
+          ${badge(c.status)}
+          <button onclick="pollCompanyStatus('${c.id}')" class="btn-ghost text-xs" title="Check status">⟳</button>
+          <button onclick="downloadCompany('${c.id}', '${escHtml(c.name)}')" class="btn-ghost text-xs ${c.status !== 'completed' ? 'opacity-40 cursor-not-allowed' : ''}" ${c.status !== 'completed' ? 'disabled' : ''} title="Download">⬇</button>
+          <button onclick="deleteCompany('${c.id}', '${escHtml(c.name)}')" class="btn-ghost text-xs text-red-400 hover:text-red-300" title="Delete">🗑</button>
+        </div>
+      </div>
+      <div id="company-progress-${c.id}" class="mt-2" style="display:none;">
+        <div class="progress-track mt-1"><div class="progress-bar" id="cpbar-${c.id}" style="width:0%"></div></div>
+        <div id="cpmsg-${c.id}" class="text-xs text-slate-400 mt-1"></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function escHtml(s) {
+  return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// Company generation form
+document.getElementById("generateCompanyBtn").onclick = () => {
+  document.getElementById("generateCompanyForm").style.display = "flex";
+};
+["closeGenerateForm","cancelGenerateForm"].forEach(id => {
+  document.getElementById(id).onclick = () => {
+    document.getElementById("generateCompanyForm").style.display = "none";
+  };
+});
+
+document.getElementById("submitGenerateForm").onclick = async () => {
+  clearFieldErrors("genNameErr","genDescErr");
+  document.getElementById("genGlobalErr").style.display = "none";
+  const name = document.getElementById("genName").value.trim();
+  const desc = document.getElementById("genDesc").value.trim();
+  const stack = document.getElementById("genStack").value;
+  const featStr = document.getElementById("genFeatures").value;
+  const features = featStr ? featStr.split(",").map(f => f.trim()).filter(Boolean) : [];
+  let valid = true;
+  if (!name) { showFieldError("genNameErr", "Company name is required"); valid = false; }
+  if (!desc) { showFieldError("genDescErr", "Description is required"); valid = false; }
+  if (!valid) return;
+  setLoading("submitGenerateForm", true, "Generating…");
+  try {
+    const result = await API.companies.generate(name, desc, stack, features);
+    document.getElementById("generateCompanyForm").style.display = "none";
+    API.toast.success("Company generation started: " + (result.company_id || result.id || name));
+    document.getElementById("genName").value = "";
+    document.getElementById("genDesc").value = "";
+    document.getElementById("genFeatures").value = "";
+    await loadCompanies();
+    if (result.company_id) {
+      // Switch to companies tab and watch progress
+      document.querySelector("[data-main-tab='companies']").click();
+      startCompanyProgressWatch(result.company_id);
+    }
+  } catch (e) {
+    document.getElementById("genGlobalErr").textContent = e.message;
+    document.getElementById("genGlobalErr").style.display = "block";
+  } finally {
+    setLoading("submitGenerateForm", false);
+  }
+};
+
+function startCompanyProgressWatch(companyId) {
+  const statusMap = {
+    "initializing": 10, "generating_tickets": 30, "executing_tickets": 60,
+    "packaging": 90, "completed": 100, "failed": 0,
+  };
+  const interval = setInterval(async () => {
+    try {
+      const s = await API.companies.status(companyId);
+      const row = document.getElementById("company-" + companyId);
+      if (!row) { clearInterval(interval); return; }
+      const progress = statusMap[s.status] ?? 0;
+      document.getElementById("company-progress-" + companyId).style.display = "block";
+      document.getElementById("cpbar-" + companyId).style.width = progress + "%";
+      document.getElementById("cpmsg-" + companyId).textContent = s.message || s.status;
+      // Update badge
+      const badgeEl = row.querySelector(".badge");
+      if (badgeEl) badgeEl.outerHTML = badge(s.status);
+      if (s.status === "completed" || s.status === "failed") {
+        clearInterval(interval);
+        const t = s.status === "completed" ? "success" : "error";
+        API.toast[t]("Company " + companyId + ": " + s.status);
+        await loadCompanies();
+      }
+    } catch { clearInterval(interval); }
+  }, 3000);
+}
+
+async function pollCompanyStatus(id) {
+  try {
+    const s = await API.companies.status(id);
+    API.toast.info(s.status + (s.progress_percent != null ? " (" + s.progress_percent + "%)" : ""));
+  } catch (e) { API.toast.error(e.message); }
+}
+
+async function downloadCompany(id, name) {
+  try {
+    const data = await API.companies.download(id);
+    if (data.download_url) window.open(data.download_url, "_blank");
+    else API.toast.info("Download URL: " + JSON.stringify(data));
+  } catch (e) { API.toast.error(e.message); }
+}
+
+async function deleteCompany(id, name) {
+  const ok = await confirmAction("Delete Company", `Delete "${name}"? This cannot be undone.`);
+  if (!ok) return;
+  try {
+    await API.companies.delete(id);
+    API.toast.success("Company deleted.");
+    await loadCompanies();
+  } catch (e) { API.toast.error(e.message); }
+}
+
+document.getElementById("refreshCompanies").onclick = loadCompanies;
+document.getElementById("companyFilter").onchange = loadCompanies;
+
+// ── Deployments ───────────────────────────────────────────────────────────
+async function loadDeployments() {
+  const filter = document.getElementById("deploymentFilter").value;
+  document.getElementById("deploymentsList").innerHTML = skeletonRows(2, "h-20");
+  try {
+    const items = await API.deployments.list(filter || null);
+    renderDeployments(Array.isArray(items) ? items : []);
+  } catch (e) {
+    document.getElementById("deploymentsList").innerHTML =
+      `<div class="text-red-400 text-sm p-4">${e.message}</div>`;
+  }
+}
+
+function renderDeployments(items) {
+  const el = document.getElementById("deploymentsList");
+  if (!items.length) {
+    el.innerHTML = emptyState("No deployments yet.", `<button onclick="document.getElementById('createDeploymentBtn').click()" class="btn-primary text-sm">Create first deployment</button>`);
+    return;
+  }
+  el.innerHTML = items.map(d => `
+    <div class="node mb-3" id="deploy-${d.id}">
+      <div class="flex flex-wrap justify-between items-start gap-2">
+        <div>
+          <div class="font-medium text-white">${escHtml(d.tenant_name)}
+            <span class="text-slate-500 text-xs ml-1">${escHtml(d.subdomain)}.realms2riches.tech</span>
+          </div>
+          <div class="text-xs text-slate-500">${escHtml(d.vm_name)} · ${timeAgo(d.created_at)}</div>
+          ${d.url ? `<a href="${escHtml(d.url)}" target="_blank" class="text-xs text-sky-400 hover:underline">${escHtml(d.url)}</a>` : ""}
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          ${badge(d.status)} ${badge(d.health_status)}
+          <button onclick="startDeploy('${d.id}')" class="btn-ghost text-xs" title="Start" ${d.status==='running'?'disabled':''}>▶</button>
+          <button onclick="stopDeploy('${d.id}', '${escHtml(d.tenant_name)}')" class="btn-ghost text-xs" title="Stop" ${d.status!=='running'?'disabled':''}>⏹</button>
+          <button onclick="restartDeploy('${d.id}')" class="btn-ghost text-xs" title="Restart">↺</button>
+          <button onclick="viewDeployLogs('${d.id}')" class="btn-ghost text-xs" title="Logs">📄</button>
+          <button onclick="deleteDeploy('${d.id}', '${escHtml(d.tenant_name)}')" class="btn-ghost text-xs text-red-400" title="Delete">🗑</button>
+        </div>
+      </div>
+      <div id="deploy-logs-${d.id}" class="mt-2 text-xs font-mono text-slate-400 bg-slate-950 rounded p-2 max-h-32 overflow-auto" style="display:none;"></div>
+      <div id="deploy-ws-${d.id}" class="mt-1 flex items-center text-xs text-slate-500" style="display:none;">
+        <span class="ws-dot ws-disconnected mr-1"></span><span>Watching…</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+// Deployment form
+document.getElementById("createDeploymentBtn").onclick = () => {
+  document.getElementById("createDeploymentForm").style.display = "flex";
+};
+["closeDeployForm","cancelDeployForm"].forEach(id => {
+  document.getElementById(id).onclick = () => {
+    document.getElementById("createDeploymentForm").style.display = "none";
+  };
+});
+
+document.getElementById("depSubdomain").addEventListener("input", function() {
+  document.getElementById("depSubdomainPreview").textContent = (this.value || "mycompany") + ".realms2riches.tech";
+});
+
+document.getElementById("submitDeployForm").onclick = async () => {
+  clearFieldErrors("depCompanyIdErr","depTenantNameErr");
+  document.getElementById("depGlobalErr").style.display = "none";
+  const company_id = document.getElementById("depCompanyId").value.trim();
+  const tenant_name = document.getElementById("depTenantName").value.trim();
+  const subdomain = document.getElementById("depSubdomain").value.trim();
+  const memory_mb = parseInt(document.getElementById("depMemory").value) || 4096;
+  const cpu_cores = parseInt(document.getElementById("depCpu").value) || 2;
+  const disk_size_gb = parseInt(document.getElementById("depDisk").value) || 50;
+  const auto_start = document.getElementById("depAutoStart").checked;
+  const backup_enabled = document.getElementById("depBackup").checked;
+
+  let valid = true;
+  if (!company_id) { showFieldError("depCompanyIdErr", "Company ID is required"); valid = false; }
+  if (!tenant_name) { showFieldError("depTenantNameErr", "Tenant name is required"); valid = false; }
+  if (!valid) return;
+
+  setLoading("submitDeployForm", true, "Creating…");
+  try {
+    const dep = await API.deployments.create({
+      company_id, tenant_name, subdomain, memory_mb, cpu_cores, disk_size_gb, auto_start, backup_enabled,
+    });
+    document.getElementById("createDeploymentForm").style.display = "none";
+    API.toast.success("Deployment created: " + dep.id);
+    document.getElementById("depCompanyId").value = "";
+    document.getElementById("depTenantName").value = "";
+    document.getElementById("depSubdomain").value = "";
+    await loadDeployments();
+    // Watch live status updates
+    watchDeploymentCard(dep.id);
+  } catch (e) {
+    document.getElementById("depGlobalErr").textContent = e.message;
+    document.getElementById("depGlobalErr").style.display = "block";
+  } finally {
+    setLoading("submitDeployForm", false);
+  }
+};
+
+function watchDeploymentCard(deploymentId) {
+  const wsEl = document.getElementById("deploy-ws-" + deploymentId);
+  if (!wsEl) return;
+  wsEl.style.display = "flex";
+  const stop = API.watchDeployment(deploymentId, (data) => {
+    const card = document.getElementById("deploy-" + deploymentId);
+    if (card && data.status) {
+      const badges = card.querySelectorAll(".badge");
+      if (badges[0]) badges[0].outerHTML = badge(data.status);
+    }
+    if (data.status === "running" || data.status === "failed") {
+      wsEl.querySelector(".ws-dot").className = "ws-dot " + (data.status === "running" ? "ws-connected" : "ws-disconnected");
+      wsEl.querySelector("span:last-child").textContent = data.status === "running" ? "Live" : "Stopped";
+      if (data.status === "running") API.toast.success("Deployment " + deploymentId + " is now running!");
+    }
+  }, (s) => {
+    const dot = wsEl.querySelector(".ws-dot");
+    if (dot) dot.className = "ws-dot ws-" + s;
+  });
+}
+
+async function startDeploy(id) {
+  try { await API.deployments.start(id); API.toast.success("Starting…"); await loadDeployments(); }
+  catch (e) { API.toast.error(e.message); }
+}
+async function stopDeploy(id, name) {
+  const ok = await confirmAction("Stop Deployment", `Stop "${name}"?`);
+  if (!ok) return;
+  try { await API.deployments.stop(id); API.toast.success("Stopping…"); await loadDeployments(); }
+  catch (e) { API.toast.error(e.message); }
+}
+async function restartDeploy(id) {
+  try { await API.deployments.restart(id); API.toast.success("Restarting…"); await loadDeployments(); }
+  catch (e) { API.toast.error(e.message); }
+}
+async function viewDeployLogs(id) {
+  const el = document.getElementById("deploy-logs-" + id);
+  if (!el) return;
+  const showing = el.style.display !== "none";
+  if (showing) { el.style.display = "none"; return; }
+  el.style.display = "block";
+  el.textContent = "Loading logs…";
+  try {
+    const text = await API.deployments.logs(id, 100);
+    el.textContent = typeof text === "string" ? text : JSON.stringify(text, null, 2);
+  } catch (e) { el.textContent = "Error: " + e.message; }
+}
+async function deleteDeploy(id, name) {
+  const ok = await confirmAction("Delete Deployment", `Delete "${name}"? The VM will be destroyed.`);
+  if (!ok) return;
+  try { await API.deployments.delete(id); API.toast.success("Deployment deleted."); await loadDeployments(); }
+  catch (e) { API.toast.error(e.message); }
+}
+
+document.getElementById("refreshDeployments").onclick = loadDeployments;
+document.getElementById("deploymentFilter").onchange = loadDeployments;
+
+// ── Tenants ───────────────────────────────────────────────────────────────
+async function loadTenants() {
+  document.getElementById("tenantsList").innerHTML = skeletonRows(2, "h-12");
+  try {
+    const data = await API.tenants.list();
+    renderTenants(data.tenants || []);
+  } catch (e) {
+    document.getElementById("tenantsList").innerHTML =
+      `<div class="text-red-400 text-sm p-4">${e.message}</div>`;
+  }
+}
+
+function renderTenants(items) {
+  const el = document.getElementById("tenantsList");
+  if (!items.length) {
+    el.innerHTML = emptyState("No tenants yet. Register your first tenant box above.");
+    return;
+  }
+  el.innerHTML = items.map(t => `
+    <div class="node mb-2">
+      <div class="flex flex-wrap justify-between items-center gap-2">
+        <div>
+          <span class="font-medium text-white">${escHtml(t.name)}</span>
+          <span class="text-slate-500 text-xs ml-2">${escHtml(t.slug || t.id)}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          ${badge(t.status || "unknown")}
+          <button onclick="refreshTenantStatus('${t.id}')" class="btn-ghost text-xs" title="Refresh status">⟳</button>
+          <button onclick="provisionTenant('${t.id}', '${escHtml(t.name)}')" class="btn-ghost text-xs" title="Provision VM">Deploy box</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("tenantForm").onsubmit = async (e) => {
+  e.preventDefault();
+  clearFieldErrors("tenantNameErr");
+  const name = document.getElementById("tenantName").value.trim();
+  const slug = document.getElementById("tenantSlug").value.trim() || null;
+  if (!name) { showFieldError("tenantNameErr", "Name is required"); return; }
+  const btn = e.submitter;
+  btn.disabled = true; btn.textContent = "Registering…";
+  try {
+    await API.tenants.register(name, slug);
+    document.getElementById("tenantName").value = "";
+    document.getElementById("tenantSlug").value = "";
+    API.toast.success("Tenant registered: " + name);
+    await loadTenants();
+  } catch (err) {
+    API.toast.error(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Register";
+  }
+};
+
+async function refreshTenantStatus(id) {
+  try {
+    const t = await API.tenants.status(id);
+    API.toast.info("Status: " + (t.status || "unknown"));
+    await loadTenants();
+  } catch (e) { API.toast.error(e.message); }
+}
+
+async function provisionTenant(id, name) {
+  const ok = await confirmAction("Provision Tenant", `Provision box for "${name}"? This may take a few minutes.`);
+  if (!ok) return;
+  try {
+    await API.tenants.provision(id, false);
+    API.toast.info("Provisioning started for " + name);
+    await loadTenants();
+  } catch (e) { API.toast.error(e.message); }
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────
+async function loadNotifications() {
+  const unreadOnly = document.getElementById("unreadOnly").checked;
+  document.getElementById("notificationsList").innerHTML = skeletonRows(3, "h-12");
+  try {
+    const data = await API.notifications.list(0, 50, unreadOnly);
+    renderNotifications(data.items || []);
+  } catch (e) {
+    document.getElementById("notificationsList").innerHTML =
+      `<div class="text-red-400 text-sm p-4">${e.message}</div>`;
+  }
+}
+
+function renderNotifications(items) {
+  const el = document.getElementById("notificationsList");
+  if (!items.length) {
+    el.innerHTML = emptyState("No notifications.");
+    return;
+  }
+  el.innerHTML = items.map(n => `
+    <div class="node mb-2 ${!n.is_read ? 'border-sky-900' : ''}" id="notif-${n.id}">
+      <div class="flex flex-wrap justify-between items-start gap-2">
+        <div>
+          ${!n.is_read ? '<span class="inline-block w-2 h-2 bg-sky-400 rounded-full mr-2 align-middle"></span>' : ''}
+          <span class="font-medium text-sm text-white">${escHtml(n.title || n.type || "Notification")}</span>
+          <span class="text-xs text-slate-500 ml-2">${timeAgo(n.created_at)}</span>
+          <div class="text-xs text-slate-400 mt-1">${escHtml(n.message || "")}</div>
+        </div>
+        <div class="flex gap-2">
+          ${!n.is_read ? `<button onclick="markNotifRead('${n.id}')" class="btn-ghost text-xs">Mark read</button>` : ""}
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function markNotifRead(id) {
+  try {
+    await API.notifications.markRead(id);
+    document.getElementById("notif-" + id)?.remove();
+  } catch (e) { API.toast.error(e.message); }
+}
+
+document.getElementById("markAllReadBtn").onclick = async () => {
+  try {
+    await API.notifications.markAllRead();
+    API.toast.success("All notifications marked as read.");
+    await loadNotifications();
+  } catch (e) { API.toast.error(e.message); }
+};
+
+document.getElementById("refreshNotifications").onclick = loadNotifications;
+document.getElementById("unreadOnly").onchange = loadNotifications;
+
+// ── Operations ────────────────────────────────────────────────────────────
+async function loadOps() {
+  const panel = document.getElementById("opsStatusPanel");
+  panel.innerHTML = `<div class="skeleton h-64"></div>`;
+  try {
+    const s = await API.ops.status();
+    panel.innerHTML = `
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <div class="text-xs text-slate-500 mb-1">Environment</div>
+          <div class="text-sm text-white">${escHtml(s.environment || "unknown")} / ${escHtml(s.deploy_profile || "")}</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 mb-1">Timestamp</div>
+          <div class="text-sm text-slate-300">${escHtml(s.timestamp || "")}</div>
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-4 mb-4">
+        <div class="p-3 bg-slate-900 rounded">
+          <div class="text-xs text-slate-500 mb-1">Ollama</div>
+          <div>${s.ollama?.reachable ? '<span class="text-green-400">● OK</span>' : '<span class="text-red-400">● Unreachable</span>'}
+            ${s.ollama?.models != null ? `<span class="text-xs text-slate-500"> (${s.ollama.models} models)</span>` : ""}</div>
+        </div>
+        <div class="p-3 bg-slate-900 rounded">
+          <div class="text-xs text-slate-500 mb-1">Redis</div>
+          <div>${s.redis?.reachable ? '<span class="text-green-400">● OK</span>' : '<span class="text-red-400">● Unreachable</span>'}</div>
+        </div>
+        <div class="p-3 bg-slate-900 rounded">
+          <div class="text-xs text-slate-500 mb-1">Tenants</div>
+          <div class="text-sm text-white">${s.tenants?.total ?? 0} total, ${s.tenants?.running ?? 0} running</div>
+        </div>
+      </div>
+      <details class="text-xs">
+        <summary class="cursor-pointer text-slate-500 hover:text-white">Raw status JSON</summary>
+        <pre class="mt-2 bg-slate-950 p-3 rounded overflow-auto max-h-64 text-slate-300">${escHtml(JSON.stringify(s, null, 2))}</pre>
+      </details>
+    `;
+  } catch (e) {
+    panel.innerHTML = `<div class="text-red-400 text-sm p-4">${e.message}</div>`;
+  }
+}
+
+document.getElementById("opsHealBtn").onclick = async () => {
+  setLoading("opsHealBtn", true, "Healing…");
+  try {
+    await API.ops.heal();
+    API.toast.success("Self-heal cycle queued.");
+  } catch (e) { API.toast.error(e.message); }
+  finally { setLoading("opsHealBtn", false); }
+};
+document.getElementById("opsRefreshBtn").onclick = loadOps;
+
+// ── Keyboard nav ──────────────────────────────────────────────────────────
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".modal-backdrop").forEach(m => { m.style.display = "none"; });
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+(async function init() {
+  updateAuthUI();
+
+  // Show auth overlay if not logged in (after a short delay to allow API check)
+  if (!API.auth.isAuthenticated()) {
+    // Try a guest health check first — if the API is publicly readable show overview anyway
+    try {
+      await API.health.check();
+    } catch {}
+    // Show sign-in overlay for protected actions (but load overview in background)
+  } else {
+    connectNotificationWS();
+  }
+
+  // Load overview data (works for unauthenticated users if endpoint is open)
+  await loadOverview();
+})();
+</script>
 </body>
 </html>

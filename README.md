@@ -1,6 +1,10 @@
 # SwarmEnterprise v2 🚀
-**The 100% Autonomous Digital Factory Platform**  
+**The 100% Autonomous Digital Factory Platform**
 *RWV Techsolutions LLC — robertdemottojr50@gmail.com*
+
+[![CI](https://github.com/rwv-techsolutions/swarmenterprise-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/rwv-techsolutions/swarmenterprise-v2/actions/workflows/ci.yml)
+[![CD](https://github.com/rwv-techsolutions/swarmenterprise-v2/actions/workflows/deploy.yml/badge.svg)](https://github.com/rwv-techsolutions/swarmenterprise-v2/actions/workflows/deploy.yml)
+[![Coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)](docs/launch_readiness.md)
 
 ---
 
