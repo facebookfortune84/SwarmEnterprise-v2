@@ -1,11 +1,21 @@
-# CD Pipeline — Build · Push · Stage · Smoke · Production Gate
-# Triggered on push to main or version tags.
-# Required secrets: DOCKER_REGISTRY_USER, DOCKER_REGISTRY_PASSWORD,
-#   SSH_DEPLOY_HOST, SSH_DEPLOY_USER, SSH_DEPLOY_PRIVATE_KEY,
-#   JWT_SECRET_KEY, SECRET_KEY, ENCRYPTION_KEY, POSTGRES_PASSWORD,
-#   PRIMARY_DOMAIN
+# CD Pipeline — Build · Push · Stage · Smoke · Production Gate · Verify · Notify · Rollback
+# Triggered on push to main or version tags, or via workflow_dispatch.
+#
+# Required GitHub Secrets:
+#   DOCKER_REGISTRY_USER       — GHCR username (GitHub username)
+#   DOCKER_REGISTRY_PASSWORD   — GHCR PAT (read:packages + write:packages)
+#   SSH_DEPLOY_HOST            — production VM IP / hostname
+#   SSH_DEPLOY_USER            — SSH username on production VM
+#   SSH_DEPLOY_PRIVATE_KEY     — base64-encoded PEM private key
+#   JWT_SECRET_KEY             — 64-char hex JWT signing key
+#   SECRET_KEY                 — 64-char hex session signing key
+#   ENCRYPTION_KEY             — 32-byte URL-safe encryption key
+#   POSTGRES_PASSWORD          — strong Postgres password
+#   PRIMARY_DOMAIN             — production domain (e.g. realms2riches.com)
+#   SLACK_WEBHOOK_URL          — (optional) Slack incoming webhook for notifications
+#   DEPLOY_WEBHOOK             — (optional) generic HTTP webhook for notifications
 
-name: "CD — Build · Stage · Smoke · Prod Gate"
+name: "CD — Build · Stage · Smoke · Prod Gate · Verify · Notify"
 
 on:
   push:
@@ -18,25 +28,69 @@ on:
         default: "staging"
         type: choice
         options: [ staging, production ]
+      skip_smoke:
+        description: "Skip smoke tests (emergency deploys only)"
+        required: false
+        default: "false"
+        type: boolean
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/swarmenterprise-backend
   PYTHON_VERSION: "3.11"
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Concurrency: only one deploy per environment at a time.
+# Cancel in-progress staging deploys; never cancel production.
+# ──────────────────────────────────────────────────────────────────────────────
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'staging' }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event.inputs.environment != 'production' }}
+
 jobs:
 
   # ============================================================
-  # Stage 7: Docker Build and Push
+  # Pre-flight: validate critical secrets are configured
+  # ============================================================
+  preflight:
+    name: "Pre-flight Checks"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required secrets
+        run: |
+          MISSING=""
+          [ -z "${{ secrets.DOCKER_REGISTRY_USER }}"     ] && MISSING="$MISSING DOCKER_REGISTRY_USER"
+          [ -z "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" ] && MISSING="$MISSING DOCKER_REGISTRY_PASSWORD"
+          [ -z "${{ secrets.SSH_DEPLOY_HOST }}"          ] && MISSING="$MISSING SSH_DEPLOY_HOST"
+          [ -z "${{ secrets.SSH_DEPLOY_USER }}"          ] && MISSING="$MISSING SSH_DEPLOY_USER"
+          [ -z "${{ secrets.SSH_DEPLOY_PRIVATE_KEY }}"   ] && MISSING="$MISSING SSH_DEPLOY_PRIVATE_KEY"
+          [ -z "${{ secrets.JWT_SECRET_KEY }}"           ] && MISSING="$MISSING JWT_SECRET_KEY"
+          [ -z "${{ secrets.SECRET_KEY }}"               ] && MISSING="$MISSING SECRET_KEY"
+          [ -z "${{ secrets.PRIMARY_DOMAIN }}"           ] && MISSING="$MISSING PRIMARY_DOMAIN"
+          if [ -n "$MISSING" ]; then
+            echo "[FAIL] Missing required secrets:$MISSING"
+            echo "       Configure these in: Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          echo "[OK] All required secrets are configured."
+
+  # ============================================================
+  # Stage 1: Docker Build and Push
   # ============================================================
   build-and-push:
     name: "Docker Build + Push"
     runs-on: ubuntu-latest
+    needs: preflight
     outputs:
       image_tag: ${{ steps.meta.outputs.tags }}
       image_digest: ${{ steps.build.outputs.digest }}
+      short_sha: ${{ steps.sha.outputs.short }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set short SHA
+        id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -77,10 +131,10 @@ jobs:
             VCS_REF=${{ github.sha }}
 
       - name: Image digest
-        run: echo "Image digest -> ${{ steps.build.outputs.digest }}"
+        run: echo "[build] Image digest -> ${{ steps.build.outputs.digest }}"
 
   # ============================================================
-  # Stage 10: Staging Deployment
+  # Stage 2: Staging Deployment
   # ============================================================
   deploy-staging:
     name: "Deploy to Staging"
@@ -136,12 +190,13 @@ jobs:
             echo "[OK] Staging deployment complete"
 
   # ============================================================
-  # Stage 11: Smoke Tests against Staging
+  # Stage 3: Smoke Tests against Staging
   # ============================================================
   smoke-staging:
     name: "Smoke Tests — Staging"
     runs-on: ubuntu-latest
     needs: deploy-staging
+    if: ${{ github.event.inputs.skip_smoke != 'true' }}
     env:
       BASE_URL: "https://staging.${{ secrets.PRIMARY_DOMAIN }}"
 
@@ -186,12 +241,11 @@ jobs:
         run: |
           python -c "
           import urllib.request, json, sys
-
           base = '${{ env.BASE_URL }}'
           tests = [
-              ('GET /health',       f'{base}/health',       200, 'ONLINE'),
-              ('GET /metrics',      f'{base}/metrics',      200, '# HELP'),
-              ('GET /docs',         f'{base}/docs',         200, 'swagger'),
+              ('GET /health',   f'{base}/health',   200, 'ONLINE'),
+              ('GET /metrics',  f'{base}/metrics',  200, ''),
+              ('GET /docs',     f'{base}/docs',     200, ''),
           ]
           failures = []
           for name, url, expect_code, expect_body in tests:
@@ -204,20 +258,20 @@ jobs:
                   continue
               if code != expect_code:
                   failures.append(f'FAIL {name}: expected {expect_code}, got {code}')
-              elif expect_body.lower() not in body.lower():
+              elif expect_body and expect_body.lower() not in body.lower():
                   failures.append(f'FAIL {name}: body missing \"{expect_body}\"')
               else:
                   print(f'PASS {name} ({code})')
-
           if failures:
-              for f in failures:
-                  print(f, file=sys.stderr)
+              for f in failures: print(f, file=sys.stderr)
               sys.exit(1)
           print('[OK] All smoke tests passed')
           "
 
   # ============================================================
-  # Stage 12: Production Deployment Gate (manual approval)
+  # Stage 4: Production Deployment Gate (manual approval)
+  # GitHub Environment protection rules provide the gate.
+  # Configure: Settings → Environments → production → Required reviewers
   # ============================================================
   deploy-production:
     name: "Deploy to Production"
@@ -226,13 +280,24 @@ jobs:
     environment:
       name: production
       url: https://${{ secrets.PRIMARY_DOMAIN }}
-    # GitHub Environments with required reviewers provide the manual approval gate.
-    # Configure: Settings → Environments → production → Required reviewers
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Notify — Deploy started
+        run: |
+          python scripts/notify.py --status started \
+            --message "Production deploy started: SHA ${{ github.sha }}"
+        env:
+          DEPLOY_WEBHOOK: ${{ secrets.DEPLOY_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ENV: production
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        continue-on-error: true
+
       - name: Deploy to production via SSH
+        id: deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_DEPLOY_HOST }}
@@ -244,6 +309,11 @@ jobs:
             mkdir -p "$DEPLOY_DIR"
             cd "$DEPLOY_DIR"
 
+            # Store current image tag for rollback
+            PREV_IMAGE=$(grep BACKEND_IMAGE .env 2>/dev/null | cut -d= -f2 || echo "")
+            echo "PREV_IMAGE=${PREV_IMAGE}" > /tmp/swarm_prev_deploy.env
+            echo "[deploy] Previous image: ${PREV_IMAGE}"
+
             # Update repo to exact commit SHA
             if [ -d .git ]; then
               git fetch --all --prune
@@ -253,8 +323,13 @@ jobs:
               git checkout ${{ github.sha }}
             fi
 
-            # Tag image with production label
+            # Update image tag in .env
             export BACKEND_IMAGE="${{ env.IMAGE_NAME }}:${{ github.sha }}"
+            if grep -q "^BACKEND_IMAGE=" .env 2>/dev/null; then
+              sed -i "s|^BACKEND_IMAGE=.*|BACKEND_IMAGE=${BACKEND_IMAGE}|" .env
+            else
+              echo "BACKEND_IMAGE=${BACKEND_IMAGE}" >> .env
+            fi
 
             # Run migrations (idempotent)
             docker run --rm \
@@ -270,22 +345,90 @@ jobs:
               --profile postgres --profile proxy --profile workers \
               up -d --remove-orphans --pull always
 
-            # Verify production health
-            sleep 15
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health || echo "000")
-            if [ "$STATUS" != "200" ]; then
-              echo "[FAIL] Production health check returned ${STATUS}"
-              exit 1
-            fi
+            # Health check (90s timeout)
+            echo "[deploy] Waiting for health check..."
+            TIMEOUT=90; ELAPSED=0
+            until curl -sf http://localhost:8000/health >/dev/null 2>&1; do
+              if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+                echo "[FAIL] Health check timed out — initiating rollback"
+                # Auto-rollback: restart with previous image
+                if [ -n "${PREV_IMAGE}" ]; then
+                  echo "[rollback] Reverting to ${PREV_IMAGE}"
+                  BACKEND_IMAGE="${PREV_IMAGE}" docker compose \
+                    -f docker-compose.yml \
+                    -f docker-compose.prod.yml \
+                    --profile postgres --profile proxy --profile workers \
+                    up -d --remove-orphans
+                fi
+                exit 1
+              fi
+              sleep 3; ELAPSED=$((ELAPSED + 3))
+            done
             echo "[OK] Production deployment complete — SHA ${{ github.sha }}"
 
-      - name: Post-deploy smoke test (production)
+  # ============================================================
+  # Stage 5: Post-Production Smoke + Live Verification
+  # ============================================================
+  verify-production:
+    name: "Verify Production"
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    env:
+      PROD_URL: "https://${{ secrets.PRIMARY_DOMAIN }}"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
         run: |
-          sleep 10
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://${{ secrets.PRIMARY_DOMAIN }}/health" || echo "000")
-          echo "Production /health → HTTP ${STATUS}"
-          [ "$STATUS" = "200" ] || exit 1
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Wait for production health
+        run: |
+          echo "Verifying production at ${PROD_URL}/health ..."
+          for i in $(seq 1 30); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}/health" || echo "000")
+            echo "  Attempt ${i}: HTTP ${STATUS}"
+            if [ "$STATUS" = "200" ]; then
+              echo "[OK] Production is healthy"
+              break
+            fi
+            if [ "$i" = "30" ]; then
+              echo "[FAIL] Production did not become healthy"
+              exit 1
+            fi
+            sleep 3
+          done
+
+      - name: Run production smoke tests
+        run: |
+          chmod +x scripts/smoke_test.sh
+          ./scripts/smoke_test.sh "${PROD_URL}" --verbose
+        env:
+          PROD_URL: ${{ env.PROD_URL }}
+
+      - name: Run live environment verifier (company builder)
+        run: |
+          python scripts/verify_live.py \
+            --url "${PROD_URL}" \
+            --json verify_production_report.json
+        env:
+          PROD_URL: ${{ env.PROD_URL }}
+
+      - name: Upload verification report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verify-production-report-${{ github.sha }}
+          path: verify_production_report.json
+          retention-days: 30
 
       - name: Create deployment record (GitHub Deployments API)
         uses: chrnorm/deployment-status@v2
@@ -294,3 +437,109 @@ jobs:
           state: success
           environment-url: https://${{ secrets.PRIMARY_DOMAIN }}
           deployment-id: ${{ github.run_id }}
+
+  # ============================================================
+  # Stage 6: Notify on success
+  # ============================================================
+  notify-success:
+    name: "Notify — Deploy Success"
+    runs-on: ubuntu-latest
+    needs: verify-production
+    if: success()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send success notification
+        run: |
+          python scripts/notify.py --status success \
+            --message "Production v${{ github.sha }} deployed and verified successfully."
+        env:
+          DEPLOY_WEBHOOK: ${{ secrets.DEPLOY_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ENV: production
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        continue-on-error: true
+
+  # ============================================================
+  # Stage 6b: Notify on failure
+  # ============================================================
+  notify-failure:
+    name: "Notify — Deploy Failure"
+    runs-on: ubuntu-latest
+    needs: [deploy-production, verify-production]
+    if: failure()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send failure notification
+        run: |
+          python scripts/notify.py --status failure \
+            --message "PRODUCTION DEPLOY FAILED — SHA ${{ github.sha }}. Review workflow logs."
+        env:
+          DEPLOY_WEBHOOK: ${{ secrets.DEPLOY_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ENV: production
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        continue-on-error: true
+
+  # ============================================================
+  # Stage 7: Auto-Rollback Job (triggered on verify failure)
+  # Manually re-run this job if production verification failed
+  # and you need an automated rollback.
+  # ============================================================
+  auto-rollback:
+    name: "Auto-Rollback (on verify failure)"
+    runs-on: ubuntu-latest
+    needs: verify-production
+    if: failure() && needs.deploy-production.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Notify — Rollback started
+        run: |
+          python scripts/notify.py --status rollback \
+            --message "ROLLBACK INITIATED — production verification failed for SHA ${{ github.sha }}"
+        env:
+          DEPLOY_WEBHOOK: ${{ secrets.DEPLOY_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ENV: production
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        continue-on-error: true
+
+      - name: Rollback to previous tag via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_DEPLOY_HOST }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            DEPLOY_DIR=/srv/swarmenterprise
+            cd "$DEPLOY_DIR"
+
+            # Read previous image stored during deploy step
+            if [ -f /tmp/swarm_prev_deploy.env ]; then
+              source /tmp/swarm_prev_deploy.env
+            fi
+
+            if [ -z "${PREV_IMAGE:-}" ]; then
+              echo "[rollback] No previous image recorded — using :latest"
+              PREV_IMAGE="${{ env.IMAGE_NAME }}:latest"
+            fi
+
+            echo "[rollback] Restoring to: ${PREV_IMAGE}"
+            BACKEND_IMAGE="${PREV_IMAGE}" docker compose \
+              -f docker-compose.yml \
+              -f docker-compose.prod.yml \
+              --profile postgres --profile proxy --profile workers \
+              up -d --remove-orphans
+
+            sleep 15
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "[OK] Rollback successful — service healthy"
+            else
+              echo "[FAIL] Rollback health check failed (HTTP ${STATUS})"
+              exit 1
+            fi

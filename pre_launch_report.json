@@ -1,0 +1,113 @@
+{
+  "timestamp": "2026-06-30T22:56:52.827103+00:00",
+  "pass_count": 15,
+  "warning_count": 4,
+  "critical_count": 0,
+  "results": [
+    {
+      "level": "PASS",
+      "category": "Environment",
+      "message": "All required environment variables are set"
+    },
+    {
+      "level": "PASS",
+      "category": "Environment",
+      "message": "JWT_SECRET_KEY strength OK (64 chars)"
+    },
+    {
+      "level": "PASS",
+      "category": "Environment",
+      "message": "SECRET_KEY strength OK (64 chars)"
+    },
+    {
+      "level": "PASS",
+      "category": "Docker",
+      "message": "Docker daemon is running"
+    },
+    {
+      "level": "PASS",
+      "category": "Docker",
+      "message": "Docker Compose available: Docker Compose version v5.1.4"
+    },
+    {
+      "level": "PASS",
+      "category": "Compose Files",
+      "message": "docker-compose.yml + docker-compose.prod.yml present"
+    },
+    {
+      "level": "PASS",
+      "category": "Compose Files",
+      "message": "Compose file syntax is valid"
+    },
+    {
+      "level": "WARNING",
+      "category": "Database",
+      "message": "Database connection failed (start Docker first?): (psycopg2.OperationalError) connection to server at \"localhost\" (::1), port 5432 failed: Connection refused (0x0000274D/"
+    },
+    {
+      "level": "WARNING",
+      "category": "Redis",
+      "message": "Redis not reachable (may be offline for local dev): Error 11001 connecting to redis:6379. getaddrinfo failed."
+    },
+    {
+      "level": "WARNING",
+      "category": "Migrations",
+      "message": "alembic current failed: Traceback (most recent call last):\r\n  File \"C:\\SwarmEnterprise-v2\\venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 145, in __init__\r\n    self._dbapi_connection = engine.raw_connection()\r\n      "
+    },
+    {
+      "level": "INFO",
+      "category": "TLS / Domain",
+      "message": "ENV=development \u2014 TLS check skipped (only for production)"
+    },
+    {
+      "level": "WARNING",
+      "category": "Stripe",
+      "message": "STRIPE_API_KEY not configured"
+    },
+    {
+      "level": "INFO",
+      "category": "SMTP",
+      "message": "SMTP not configured (optional for local dev)"
+    },
+    {
+      "level": "PASS",
+      "category": "Git Safety",
+      "message": ".env is listed in .gitignore"
+    },
+    {
+      "level": "PASS",
+      "category": "Git Safety",
+      "message": ".env is not tracked by git"
+    },
+    {
+      "level": "PASS",
+      "category": "Backup",
+      "message": "backup_postgres.sh + backup_config.sh present"
+    },
+    {
+      "level": "PASS",
+      "category": "Ollama (AI)",
+      "message": "Ollama accessible at http://host.docker.internal:11434"
+    },
+    {
+      "level": "PASS",
+      "category": "Docker Image",
+      "message": "backend/Dockerfile present"
+    },
+    {
+      "level": "PASS",
+      "category": "Docker Image",
+      "message": "Dockerfile syntax passes buildx --check"
+    },
+    {
+      "level": "PASS",
+      "category": "Seed Data",
+      "message": "Seed script present"
+    },
+    {
+      "level": "PASS",
+      "category": "Caddy Proxy",
+      "message": "deploy/Caddyfile present"
+    }
+  ]
+}

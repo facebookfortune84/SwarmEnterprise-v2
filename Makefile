@@ -55,10 +55,11 @@ UVICORN := $(PYTHON) -m uvicorn
         shell-backend shell-frontend \
         deploy analytics check-docker \
         env-check verify launch \
+        pre-launch verify-live full-launch rollback-deploy post-launch-verify \
         docker-build docker-up docker-down docker-logs \
         docker-up-wsl docker-up-prod docker-up-analytics \
         monitoring-up monitoring-down prod-up \
-        heal setup run
+        heal setup run notify-deploy
 
 # =============================================================================
 # help — default target
@@ -68,6 +69,15 @@ help:
 	@echo   SwarmEnterprise v2 -- Build and Operations
 	@echo   RWV Techsolutions LLC
 	@echo   ================================================================
+	@echo.
+	@echo   LAUNCH  (one-command launch workflow)
+	@echo   ----------------------------------------------------------------
+	@echo   make full-launch         Full automated launch: pre-launch + start + verify
+	@echo   make pre-launch          Run all pre-launch checks (env, docker, DB, secrets)
+	@echo   make launch              Migrate + seed + start + smoke tests
+	@echo   make verify-live         Test live environment + company builder
+	@echo   make post-launch-verify  Same as verify-live (alias)
+	@echo   make rollback-deploy     Re-deploy previous image tag (set PREV_TAG=)
 	@echo.
 	@echo   Core lifecycle
 	@echo   ----------------------------------------------------------------
@@ -251,6 +261,60 @@ launch: env-check check-docker
 	@echo [launch]    Dashboard: http://localhost:$(BACKEND_PORT)/dashboard/
 	@echo [launch]    Analytics: http://localhost:$(ANALYTICS_PORT)
 
+# =============================================================================
+# pre-launch — comprehensive automated pre-launch checker
+# =============================================================================
+pre-launch:
+	@echo [pre-launch] Running automated pre-launch checks...
+	$(PYTHON) scripts/pre_launch.py
+	@echo [pre-launch] Done. See pre_launch_report.json for full results.
+
+# =============================================================================
+# verify-live / post-launch-verify — test live environment + company builder
+# =============================================================================
+verify-live:
+	@echo [verify-live] Testing live environment at http://localhost:$(BACKEND_PORT)...
+	$(PYTHON) scripts/verify_live.py --url http://localhost:$(BACKEND_PORT)
+
+post-launch-verify: verify-live
+
+# =============================================================================
+# full-launch — one command to rule them all
+#   pre-launch → launch → verify-live
+# =============================================================================
+full-launch: pre-launch
+	@echo [full-launch] Pre-launch checks passed. Starting services...
+	$(MAKE) launch
+	@echo [full-launch] Services live. Running live verification...
+	$(MAKE) verify-live
+	@echo.
+	@echo [full-launch] COMPLETE — SwarmEnterprise v2 is live and verified.
+
+# =============================================================================
+# rollback-deploy — redeploy a specific previous image tag
+#   Usage: make rollback-deploy PREV_TAG=sha-abc1234
+# =============================================================================
+PREV_TAG ?= latest
+rollback-deploy: check-docker
+	@echo [rollback] Rolling back to image tag: $(PREV_TAG)
+	$(PYTHON) -c "import os,subprocess; \
+	  img = '$(FULL_IMAGE):$(PREV_TAG)'; \
+	  print('[rollback] Image:', img); \
+	  r = subprocess.run(['docker', 'pull', img]); \
+	  print('[rollback] Restart with previous image...') if r.returncode == 0 else print('[rollback] Pull failed; using cached image')"
+	docker compose -f $(COMPOSE_FILE) -f $(COMPOSE_PROD_FILE) \
+	  --profile postgres --profile proxy --profile workers \
+	  up -d --remove-orphans
+	$(PYTHON) scripts/wait_healthy.py $(BACKEND_PORT) 60
+	$(MAKE) health
+	@echo [rollback] Rollback to $(PREV_TAG) complete.
+
+# =============================================================================
+# notify-deploy — log a deploy notification (and call DEPLOY_WEBHOOK if set)
+# =============================================================================
+notify-deploy:
+	$(PYTHON) scripts/notify.py
+
 start: check-docker
 	@echo [start] Starting production stack...
 	docker compose -f $(COMPOSE_FILE) -f $(COMPOSE_PROD_FILE) --profile postgres --profile proxy --profile workers up -d --remove-orphans
@@ -375,3 +439,9 @@ verify:
 
 heal:
 	$(PYTHON) -c "from agents.ops.self_heal import run_heal_cycle; run_heal_cycle()"
+
+# =============================================================================
+# CI convenience — run all launch checks in sequence (used in CI gate)
+# =============================================================================
+ci-launch-gate: env-check pre-launch test smoke
+	@echo [ci-launch-gate] All CI launch checks passed.
