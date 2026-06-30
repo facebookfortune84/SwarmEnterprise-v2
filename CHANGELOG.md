@@ -1,3 +1,9 @@
+## [v2.1.0] — 2026-06-30
+
+### Features
+- enhance merge automation with intelligent reporting and quality checks
+
+
 ## [v2.0.17] — 2026-06-30
 
 ### Bug Fixes
