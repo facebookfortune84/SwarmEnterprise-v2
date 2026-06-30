@@ -35,7 +35,7 @@ on:
         type: boolean
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/swarmenterprise-backend
+  IMAGE_NAME: ghcr.io/facebookfortune84/swarmenterprise-backend
   PYTHON_VERSION: "3.11"
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -147,6 +147,63 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ── Inject GitHub Secrets into staging .env before restart ─────────────
+      - name: Write staging secrets to server .env
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          S_JWT_SECRET_KEY:         ${{ secrets.JWT_SECRET_KEY }}
+          S_SECRET_KEY:             ${{ secrets.SECRET_KEY }}
+          S_ENCRYPTION_KEY:         ${{ secrets.ENCRYPTION_KEY }}
+          S_POSTGRES_PASSWORD:      ${{ secrets.POSTGRES_PASSWORD }}
+          S_STRIPE_API_KEY:         ${{ secrets.STRIPE_API_KEY }}
+          S_STRIPE_WEBHOOK_SECRET:  ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          S_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          S_SMTP_USER:              ${{ secrets.SMTP_USER }}
+          S_SMTP_PASS:              ${{ secrets.SMTP_PASS }}
+          S_SMTP_SERVER:            ${{ secrets.SMTP_SERVER }}
+          S_FLOWER_USER:            ${{ secrets.FLOWER_USER }}
+          S_FLOWER_PASSWORD:        ${{ secrets.FLOWER_PASSWORD }}
+          S_ADMIN_PASSWORD:         ${{ secrets.ADMIN_PASSWORD }}
+        with:
+          host: ${{ secrets.SSH_DEPLOY_HOST }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY }}
+          envs: S_JWT_SECRET_KEY,S_SECRET_KEY,S_ENCRYPTION_KEY,S_POSTGRES_PASSWORD,S_STRIPE_API_KEY,S_STRIPE_WEBHOOK_SECRET,S_STRIPE_PUBLISHABLE_KEY,S_SMTP_USER,S_SMTP_PASS,S_SMTP_SERVER,S_FLOWER_USER,S_FLOWER_PASSWORD,S_ADMIN_PASSWORD
+          script: |
+            set -euo pipefail
+            DEPLOY_DIR=/srv/swarmenterprise-staging
+            mkdir -p "$DEPLOY_DIR"
+            ENV_FILE="${DEPLOY_DIR}/.env"
+
+            upsert() {
+              local key="$1" val="$2"
+              [ -z "$val" ] && return
+              if grep -q "^${key}=" "${ENV_FILE}" 2>/dev/null; then
+                sed -i "s|^${key}=.*|${key}=${val}|" "${ENV_FILE}"
+              else
+                echo "${key}=${val}" >> "${ENV_FILE}"
+              fi
+            }
+
+            [ ! -f "${ENV_FILE}" ] && cp "${DEPLOY_DIR}/.env.example" "${ENV_FILE}" 2>/dev/null || touch "${ENV_FILE}"
+
+            upsert JWT_SECRET_KEY         "$S_JWT_SECRET_KEY"
+            upsert SECRET_KEY             "$S_SECRET_KEY"
+            upsert ENCRYPTION_KEY         "$S_ENCRYPTION_KEY"
+            upsert POSTGRES_PASSWORD      "$S_POSTGRES_PASSWORD"
+            upsert STRIPE_API_KEY         "$S_STRIPE_API_KEY"
+            upsert STRIPE_WEBHOOK_SECRET  "$S_STRIPE_WEBHOOK_SECRET"
+            upsert STRIPE_PUBLISHABLE_KEY "$S_STRIPE_PUBLISHABLE_KEY"
+            upsert SMTP_USER              "$S_SMTP_USER"
+            upsert SMTP_PASS              "$S_SMTP_PASS"
+            upsert SMTP_SERVER            "$S_SMTP_SERVER"
+            upsert FLOWER_USER            "$S_FLOWER_USER"
+            upsert FLOWER_PASSWORD        "$S_FLOWER_PASSWORD"
+            upsert ADMIN_PASSWORD         "$S_ADMIN_PASSWORD"
+
+            chmod 600 "${ENV_FILE}"
+            echo "[OK] Staging secrets written to ${ENV_FILE}"
+
       - name: Deploy to staging via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -167,14 +224,17 @@ jobs:
               git clone https://github.com/${{ github.repository }} .
             fi
 
-            # Pull new image
+            # Pull new image and write tag into .env
             export BACKEND_IMAGE="${{ env.IMAGE_NAME }}:${{ github.sha }}"
-            echo "BACKEND_IMAGE=${BACKEND_IMAGE}" >> .env.staging
+            if grep -q "^BACKEND_IMAGE=" .env 2>/dev/null; then
+              sed -i "s|^BACKEND_IMAGE=.*|BACKEND_IMAGE=${BACKEND_IMAGE}|" .env
+            else
+              echo "BACKEND_IMAGE=${BACKEND_IMAGE}" >> .env
+            fi
 
             # Run migrations before restart
             docker run --rm \
-              --env-file .env.staging \
-              -e DATABASE_URL="${DATABASE_URL}" \
+              --env-file .env \
               -e PYTHONPATH=/app \
               "${BACKEND_IMAGE}" \
               alembic upgrade head
@@ -183,7 +243,6 @@ jobs:
             docker compose \
               -f docker-compose.yml \
               -f docker-compose.prod.yml \
-              --env-file .env.staging \
               --profile postgres --profile workers \
               up -d --remove-orphans --pull always
 
@@ -295,6 +354,78 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
         continue-on-error: true
+
+      # ── Write all secrets into the server .env before restart ──────────────
+      # The production server reads .env at runtime via --env-file.
+      # GitHub Secrets are injected here so the server file is always complete
+      # without requiring manual editing on the server.
+      - name: Write production secrets to server .env
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          S_JWT_SECRET_KEY:         ${{ secrets.JWT_SECRET_KEY }}
+          S_SECRET_KEY:             ${{ secrets.SECRET_KEY }}
+          S_ENCRYPTION_KEY:         ${{ secrets.ENCRYPTION_KEY }}
+          S_POSTGRES_PASSWORD:      ${{ secrets.POSTGRES_PASSWORD }}
+          S_STRIPE_API_KEY:         ${{ secrets.STRIPE_API_KEY }}
+          S_STRIPE_WEBHOOK_SECRET:  ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          S_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          S_SMTP_USER:              ${{ secrets.SMTP_USER }}
+          S_SMTP_PASS:              ${{ secrets.SMTP_PASS }}
+          S_SMTP_SERVER:            ${{ secrets.SMTP_SERVER }}
+          S_FLOWER_USER:            ${{ secrets.FLOWER_USER }}
+          S_FLOWER_PASSWORD:        ${{ secrets.FLOWER_PASSWORD }}
+          S_SENTRY_DSN:             ${{ secrets.SENTRY_DSN }}
+          S_SLACK_WEBHOOK_URL:      ${{ secrets.SLACK_WEBHOOK_URL }}
+          S_ADMIN_PASSWORD:         ${{ secrets.ADMIN_PASSWORD }}
+          S_UMAMI_APP_SECRET:       ${{ secrets.UMAMI_APP_SECRET }}
+        with:
+          host: ${{ secrets.SSH_DEPLOY_HOST }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY }}
+          envs: S_JWT_SECRET_KEY,S_SECRET_KEY,S_ENCRYPTION_KEY,S_POSTGRES_PASSWORD,S_STRIPE_API_KEY,S_STRIPE_WEBHOOK_SECRET,S_STRIPE_PUBLISHABLE_KEY,S_SMTP_USER,S_SMTP_PASS,S_SMTP_SERVER,S_FLOWER_USER,S_FLOWER_PASSWORD,S_SENTRY_DSN,S_SLACK_WEBHOOK_URL,S_ADMIN_PASSWORD,S_UMAMI_APP_SECRET
+          script: |
+            set -euo pipefail
+            DEPLOY_DIR=/srv/swarmenterprise
+            mkdir -p "$DEPLOY_DIR"
+            ENV_FILE="${DEPLOY_DIR}/.env"
+
+            # ── helper: upsert a KEY=VALUE line in .env ──────────────────────
+            upsert() {
+              local key="$1" val="$2"
+              [ -z "$val" ] && return   # skip if the secret was not configured
+              if grep -q "^${key}=" "${ENV_FILE}" 2>/dev/null; then
+                sed -i "s|^${key}=.*|${key}=${val}|" "${ENV_FILE}"
+              else
+                echo "${key}=${val}" >> "${ENV_FILE}"
+              fi
+            }
+
+            # Ensure .env exists (first deploy: copy from repo template)
+            if [ ! -f "${ENV_FILE}" ]; then
+              cp "${DEPLOY_DIR}/.env.example" "${ENV_FILE}" 2>/dev/null || touch "${ENV_FILE}"
+            fi
+
+            # Write every secret from GitHub Secrets into .env
+            upsert JWT_SECRET_KEY        "$S_JWT_SECRET_KEY"
+            upsert SECRET_KEY            "$S_SECRET_KEY"
+            upsert ENCRYPTION_KEY        "$S_ENCRYPTION_KEY"
+            upsert POSTGRES_PASSWORD     "$S_POSTGRES_PASSWORD"
+            upsert STRIPE_API_KEY        "$S_STRIPE_API_KEY"
+            upsert STRIPE_WEBHOOK_SECRET "$S_STRIPE_WEBHOOK_SECRET"
+            upsert STRIPE_PUBLISHABLE_KEY "$S_STRIPE_PUBLISHABLE_KEY"
+            upsert SMTP_USER             "$S_SMTP_USER"
+            upsert SMTP_PASS             "$S_SMTP_PASS"
+            upsert SMTP_SERVER           "$S_SMTP_SERVER"
+            upsert FLOWER_USER           "$S_FLOWER_USER"
+            upsert FLOWER_PASSWORD       "$S_FLOWER_PASSWORD"
+            upsert SENTRY_DSN            "$S_SENTRY_DSN"
+            upsert SLACK_WEBHOOK_URL     "$S_SLACK_WEBHOOK_URL"
+            upsert ADMIN_PASSWORD        "$S_ADMIN_PASSWORD"
+            upsert UMAMI_APP_SECRET      "$S_UMAMI_APP_SECRET"
+
+            # Tighten permissions so only the deploy user can read .env
+            chmod 600 "${ENV_FILE}"
+            echo "[OK] Secrets written to ${ENV_FILE}"
 
       - name: Deploy to production via SSH
         id: deploy

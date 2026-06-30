@@ -9,9 +9,10 @@ ENV                 ?= development
 REGISTRY            ?= ghcr.io
 IMAGE_NAME          ?= swarmenterprise-backend
 IMAGE_TAG           ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
+GHCR_OWNER          ?= facebookfortune84
 
 # Cross-platform lowercase — uses Python so `tr` is never needed on Windows.
-FULL_IMAGE          := $(REGISTRY)/$(shell python -c "print('$(IMAGE_NAME)'.lower())" 2>/dev/null || echo $(IMAGE_NAME))
+FULL_IMAGE          := $(REGISTRY)/$(GHCR_OWNER)/$(shell python -c "print('$(IMAGE_NAME)'.lower())" 2>/dev/null || echo $(IMAGE_NAME))
 
 COMPOSE_FILE        := docker-compose.yml
 COMPOSE_PROD_FILE   := docker-compose.prod.yml

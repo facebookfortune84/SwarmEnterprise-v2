@@ -66,17 +66,15 @@ GROUPS: dict[str, list[VarSpec]] = {
         VarSpec("REDIS_URL", True, "Redis connection URL"),
     ],
     "Stripe (Payments)": [
-        VarSpec("STRIPE_API_KEY", True, "Stripe secret key (sk_live_... or sk_test_...)"),
-        VarSpec("STRIPE_WEBHOOK_SECRET", True, "Stripe webhook signing secret (whsec_...)"),
-        VarSpec(
-            "STRIPE_PUBLISHABLE_KEY", True, "Stripe publishable key (pk_live_... or pk_test_...)"
-        ),
+        VarSpec("STRIPE_API_KEY", False, "Stripe secret key (sk_live_... or sk_test_...) — required before taking payments"),
+        VarSpec("STRIPE_WEBHOOK_SECRET", False, "Stripe webhook signing secret (whsec_...) — required before taking payments"),
+        VarSpec("STRIPE_PUBLISHABLE_KEY", False, "Stripe publishable key (pk_live_... or pk_test_...) — required before taking payments"),
     ],
     "SMTP (Email)": [
-        VarSpec("SMTP_USER", True, "SMTP login username / email address"),
-        VarSpec("SMTP_PASS", True, "SMTP login password or app password"),
-        VarSpec("SMTP_SERVER", True, "SMTP host (e.g. smtp.gmail.com)"),
-        VarSpec("SMTP_PORT", True, "SMTP port (587=STARTTLS, 465=SSL)"),
+        VarSpec("SMTP_USER", False, "SMTP login username / email address — required for outbound email"),
+        VarSpec("SMTP_PASS", False, "SMTP login password or app password — required for outbound email"),
+        VarSpec("SMTP_SERVER", False, "SMTP host (e.g. smtp.gmail.com) — required for outbound email"),
+        VarSpec("SMTP_PORT", False, "SMTP port (587=STARTTLS, 465=SSL)"),
     ],
     "JWT / Auth (Security)": [
         VarSpec("JWT_SECRET_KEY", True, "64-char hex secret for JWT signing"),
@@ -216,15 +214,23 @@ def main() -> int:
             print("  {}*{} {}".format(RED, RESET, k))
         print()
     if optional_missing:
-        print("{}Optional variables unset ({}):{} ".format(YELLOW, len(optional_missing), RESET))
+        print("{}Optional variables unset ({}) — add to GitHub Secrets when ready:{} ".format(
+            YELLOW, len(optional_missing), RESET))
         for k in optional_missing:
             print("  {}-{} {}".format(YELLOW, RESET, k))
         print()
 
-    print(
-        "Run {}python scripts/generate_secrets.py{} to generate secure values.".format(BOLD, RESET)
-    )
-    print("See docs/guides/SECRETS_MANAGEMENT.md for setup instructions.")
+    if critical_missing:
+        print(
+            "Run {}python scripts/generate_secrets.py{} to generate secure values.".format(BOLD, RESET)
+        )
+        print("See docs/guides/SECRETS_MANAGEMENT.md for setup instructions.")
+    else:
+        print("{}{}All critical variables are set. System is ready to launch.{}{}".format(
+            GREEN, BOLD, " [OK]", RESET))
+        if optional_missing:
+            print("{}Add the optional variables above to GitHub Secrets (Settings -> Secrets -> Actions).{}".format(
+                YELLOW, RESET))
 
     return 1 if any_critical_fail else 0
 

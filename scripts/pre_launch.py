@@ -198,11 +198,18 @@ def check_database() -> None:
     except ImportError:
         _record(WARNING, cat, "sqlalchemy not installed; skipping DB connectivity check")
     except Exception as e:
-        # In production, a DB connection failure is critical.
-        # In local dev, DB is often started by Docker Compose — warn, don't block.
-        level = CRITICAL if env == "production" else WARNING
         short = str(e).split("\n")[0][:120]
-        _record(level, cat, f"Database connection failed (start Docker first?): {short}")
+        # If the hostname cannot be resolved it is a Docker-internal service name
+        # (e.g. "postgres") that is only reachable from inside a container.
+        # This is expected when running pre_launch.py on the host machine.
+        # Treat it as a warning regardless of ENV so it doesn't block local runs.
+        is_dns_error = any(kw in short.lower() for kw in (
+            "no such host", "name or service not known",
+            "could not translate", "getaddrinfo", "nodename nor servname"
+        ))
+        level = WARNING if is_dns_error else (CRITICAL if env == "production" else WARNING)
+        hint = "(Docker service hostname — only reachable inside containers)" if is_dns_error else "(start Docker first?)"
+        _record(level, cat, f"Database connection failed {hint}: {short}")
 
 
 def check_redis() -> None:

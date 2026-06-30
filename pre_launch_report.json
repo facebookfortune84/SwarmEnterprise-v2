@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-06-30T22:56:52.827103+00:00",
-  "pass_count": 15,
-  "warning_count": 4,
+  "timestamp": "2026-06-30T23:21:31.425821+00:00",
+  "pass_count": 16,
+  "warning_count": 6,
   "critical_count": 0,
   "results": [
     {
@@ -42,7 +42,7 @@
     {
       "level": "WARNING",
       "category": "Database",
-      "message": "Database connection failed (start Docker first?): (psycopg2.OperationalError) connection to server at \"localhost\" (::1), port 5432 failed: Connection refused (0x0000274D/"
+      "message": "Database connection failed (Docker service hostname \u2014 only reachable inside containers): (psycopg2.OperationalError) could not translate host name \"postgres\" to address: No such host is known. "
     },
     {
       "level": "WARNING",
@@ -55,9 +55,14 @@
       "message": "alembic current failed: Traceback (most recent call last):\r\n  File \"C:\\SwarmEnterprise-v2\\venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 145, in __init__\r\n    self._dbapi_connection = engine.raw_connection()\r\n      "
     },
     {
-      "level": "INFO",
+      "level": "PASS",
       "category": "TLS / Domain",
-      "message": "ENV=development \u2014 TLS check skipped (only for production)"
+      "message": "PRIMARY_DOMAIN=realms2riches.com"
+    },
+    {
+      "level": "PASS",
+      "category": "TLS / Domain",
+      "message": "ACME_EMAIL=robertdemottojr50@gmail.com"
     },
     {
       "level": "WARNING",
@@ -65,9 +70,9 @@
       "message": "STRIPE_API_KEY not configured"
     },
     {
-      "level": "INFO",
+      "level": "WARNING",
       "category": "SMTP",
-      "message": "SMTP not configured (optional for local dev)"
+      "message": "ENV=production but SMTP_SERVER not configured \u2014 outreach emails will fail"
     },
     {
       "level": "PASS",
@@ -85,9 +90,9 @@
       "message": "backup_postgres.sh + backup_config.sh present"
     },
     {
-      "level": "PASS",
+      "level": "WARNING",
       "category": "Ollama (AI)",
-      "message": "Ollama accessible at http://host.docker.internal:11434"
+      "message": "Ollama at http://host.docker.internal:11434 not responding (HTTP None) \u2014 local AI unavailable"
     },
     {
       "level": "PASS",
