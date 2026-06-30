@@ -1,0 +1,19 @@
+{
+  "timestamp": "/mnt/c/SwarmEnterprise-v2",
+  "passed_count": 2,
+  "failed_count": 4,
+  "warning_count": 2,
+  "checks": {
+    "passed": [
+      "Environment variables",
+      "Secret strength"
+    ],
+    "failed": [
+      "Docker daemon",
+      "Docker Compose",
+      "Docker Compose validation",
+      "Database: No module named 'sqlalchemy'"
+    ],
+    "warnings": []
+  }
+}

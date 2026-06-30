@@ -1,0 +1,313 @@
+"""
+Production Monitoring Configuration for SwarmEnterprise v2
+Prometheus scrape config + alert rules for production deployment.
+
+Deploy to: deploy/docker/prometheus.yml
+"""
+
+# Prometheus Configuration
+---
+global:
+  scrape_interval: 15s  # Scrape every 15 seconds
+  evaluation_interval: 15s
+  external_labels:
+    monitor: "swarmenterprise-prod"
+
+# Alertmanager configuration (optional; requires separate Alertmanager instance)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+rule_files:
+  - "alert_rules.yml"  # See below
+
+scrape_configs:
+  # ========================================================================
+  # BACKEND API SERVICE
+  # ========================================================================
+  - job_name: "backend"
+    static_configs:
+      - targets: ["backend:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 15s
+    scrape_timeout: 5s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "backend"
+
+  # ========================================================================
+  # DATABASE (PostgreSQL)
+  # ========================================================================
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres-exporter:9187"]  # Requires postgres_exporter sidecar
+    scrape_interval: 30s
+
+  # ========================================================================
+  # REDIS
+  # ========================================================================
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]  # Requires redis_exporter sidecar
+    scrape_interval: 30s
+
+  # ========================================================================
+  # CELERY WORKERS
+  # ========================================================================
+  - job_name: "celery"
+    static_configs:
+      - targets: ["worker:8555"]  # Requires celery-prometheus-exporter
+    scrape_interval: 30s
+
+  # ========================================================================
+  # DOCKER DAEMON (Optional)
+  # ========================================================================
+  - job_name: "docker"
+    static_configs:
+      - targets: ["cadvisor:8080"]  # Requires cAdvisor container
+    scrape_interval: 30s
+
+
+---
+# Alert Rules
+# File: deploy/docker/alert_rules.yml
+
+groups:
+  - name: swarmOS_backend
+    interval: 15s
+    rules:
+      # ====================================================================
+      # BACKEND HEALTH
+      # ====================================================================
+      - alert: BackendHealthCheckFailure
+        expr: 'up{job="backend"} == 0'
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend health check failed for > 2 min"
+          description: "Backend is not responding to scrape requests. Check logs immediately."
+
+      - alert: BackendHighErrorRate
+        expr: 'rate(http_requests_total{job="backend", status=~"5.."}[5m]) > 0.05'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backend error rate > 5% for 5 min"
+          description: "HTTP 5xx errors are elevated. Check `/metrics` and logs."
+
+      - alert: BackendHighLatency
+        expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="backend"}[5m])) > 1.0'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backend p95 latency > 1s for 5 min"
+          description: "Response times are slow. Check database and Redis connectivity."
+
+      # ====================================================================
+      # DATABASE (PostgreSQL)
+      # ====================================================================
+      - alert: PostgresConnectionError
+        expr: 'up{job="postgres"} == 0'
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL connection failed"
+          description: "Unable to scrape Postgres metrics. Database may be down."
+
+      - alert: PostgresHighConnections
+        expr: 'pg_stat_activity_count{state="active"} > 80'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL connection count > 80"
+          description: "Database may be approaching connection limit. Consider scaling."
+
+      - alert: PostgresDiskSpace
+        expr: 'pg_database_size_bytes / (1024^3) > 50'  # > 50GB
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL disk usage > 50GB"
+          description: "Database is consuming significant disk. Review and archive old data."
+
+      # ====================================================================
+      # REDIS
+      # ====================================================================
+      - alert: RedisConnectionError
+        expr: 'up{job="redis"} == 0'
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis connection failed"
+          description: "Unable to scrape Redis metrics. Redis may be down."
+
+      - alert: RedisHighMemory
+        expr: 'redis_memory_used_bytes / (1024^3) > 0.4'  # > 400MB out of 512MB default
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage > 400MB"
+          description: "Redis is approaching memory limit. Review cache eviction policy."
+
+      - alert: RedisHighKeyEvictions
+        expr: 'rate(redis_evicted_keys_total[5m]) > 10'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis evicting > 10 keys/sec"
+          description: "Keys are being evicted due to memory pressure. Increase max memory or reduce cache."
+
+      # ====================================================================
+      # CELERY WORKERS
+      # ====================================================================
+      - alert: CeleryQueueDepthHigh
+        expr: 'celery_queue_length > 500'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Celery queue depth > 500 tasks"
+          description: "Task queue is backing up. Consider scaling workers."
+
+      - alert: CeleryWorkerOffline
+        expr: 'celery_worker_pool_size == 0'
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Celery worker is offline"
+          description: "No active workers. Async tasks will not process. Restart worker service."
+
+      - alert: CeleryTaskFailureRate
+        expr: 'rate(celery_task_failed_total[5m]) > 0.1'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Celery task failure rate > 10%"
+          description: "Many tasks are failing. Check worker logs and task code."
+
+      # ====================================================================
+      # SYSTEM-WIDE
+      # ====================================================================
+      - alert: HighMemoryUsage
+        expr: 'node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.2'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "System memory < 20% available"
+          description: "VM is running low on memory. Kill non-essential containers or expand."
+
+      - alert: HighCPUUsage
+        expr: '100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80'
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU usage > 80% for 10 min"
+          description: "System CPU is sustained high. Check for runaway processes or scale."
+
+      - alert: DiskSpaceLow
+        expr: 'node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.1'
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Root disk < 10% free"
+          description: "Disk space is critical. Delete logs, Docker images, or expand partition."
+
+
+---
+# Grafana Dashboard JSON
+# File: deploy/docker/grafana/dashboards/swarmos-prod.json
+# Import via Grafana UI: Dashboards → Import → Paste JSON below
+
+{
+  "dashboard": {
+    "title": "SwarmOS Production Dashboard",
+    "panels": [
+      {
+        "title": "Backend Response Time (p95)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))"
+          }
+        ]
+      },
+      {
+        "title": "Backend Error Rate",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) * 100"
+          }
+        ]
+      },
+      {
+        "title": "PostgreSQL Connections",
+        "targets": [
+          {
+            "expr": "pg_stat_activity_count{state=\"active\"}"
+          }
+        ]
+      },
+      {
+        "title": "Redis Memory Usage",
+        "targets": [
+          {
+            "expr": "redis_memory_used_bytes / (1024^3)"
+          }
+        ]
+      },
+      {
+        "title": "Celery Queue Depth",
+        "targets": [
+          {
+            "expr": "celery_queue_length"
+          }
+        ]
+      },
+      {
+        "title": "Celery Active Tasks",
+        "targets": [
+          {
+            "expr": "celery_task_current"
+          }
+        ]
+      },
+      {
+        "title": "System CPU Usage",
+        "targets": [
+          {
+            "expr": "100 - (avg(irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)"
+          }
+        ]
+      },
+      {
+        "title": "System Memory Usage",
+        "targets": [
+          {
+            "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100"
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timezone": "UTC"
+  }
+}
