@@ -6,7 +6,6 @@
     "@google/gemini-cli": "^0.49.0"
   },
   "scripts": {
-    "gemini": "gemini",
-    "start:frontend": "python -m http.server 8001 --directory frontend/public"
+    "gemini": "gemini"
   }
 }

@@ -335,6 +335,35 @@ try:
 except Exception:
     logger.debug("Outreach router not available")
 
+# Outreach Pipeline — Sequencer, Inbox, Reporting, CRM Sync
+try:
+    from backend.api.sequencer import router as sequencer_router
+
+    app.include_router(sequencer_router)
+except Exception:
+    logger.debug("Sequencer router not available")
+
+try:
+    from backend.api.reply_handler import router as reply_handler_router
+
+    app.include_router(reply_handler_router)
+except Exception:
+    logger.debug("Reply handler router not available")
+
+try:
+    from backend.api.reporting import router as reporting_router
+
+    app.include_router(reporting_router)
+except Exception:
+    logger.debug("Reporting router not available")
+
+try:
+    from backend.api.crm_sync import router as crm_sync_router
+
+    app.include_router(crm_sync_router)
+except Exception:
+    logger.debug("CRM sync router not available")
+
 try:
     from backend.api.tenants import router as tenants_router
 

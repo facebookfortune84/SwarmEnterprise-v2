@@ -75,6 +75,12 @@ class Lead(Base):
     status = Column(String, default="NEW")
     metadata_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    # Phase 3: outreach-pipeline extensions
+    website = Column(String, nullable=True)
+    linkedin_url = Column(String, nullable=True)
+    intent_score = Column(Integer, nullable=True)
+    needs_review = Column(Boolean, default=False)
+    email_invalid = Column(Boolean, default=False)
 
 
 class UsageEvent(Base):

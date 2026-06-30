@@ -116,6 +116,7 @@ if config.config_file_name is not None:
 # Target metadata — import Base so autogenerate reflects all declared models.
 # ---------------------------------------------------------------------------
 from backend.db.models import Base  # noqa: E402  (import after env setup)
+import backend.db.models_outreach  # noqa: F401 — registers outreach tables on Base.metadata
 
 target_metadata = Base.metadata
 

@@ -115,9 +115,33 @@ jobs:
             --ignore=tests/test_deployment_service.py \
             -v --tb=short \
             --cov=backend \
+            --cov=agents \
             --cov-report=term-missing \
             --cov-report=xml:coverage_unit.xml \
+            --cov-fail-under=90 \
             -q
+
+      - name: Verify new agent files have corresponding tests
+        run: |
+          python - << 'PYEOF'
+          import os, sys, pathlib
+          root = pathlib.Path(".")
+          missing = []
+          for py_file in (root / "agents").rglob("*.py"):
+              if py_file.name.startswith("_"):
+                  continue
+              stem = py_file.stem
+              test_path_agents = root / "tests" / "agents" / f"test_{stem}.py"
+              test_path_unit   = root / "tests" / "unit" / "agents" / f"test_{stem}.py"
+              if not test_path_agents.exists() and not test_path_unit.exists():
+                  missing.append(str(py_file))
+          if missing:
+              print("[WARN] Agent files missing tests (not blocking):")
+              for f in missing:
+                  print(f"  {f}")
+          else:
+              print("[OK] All agent files have corresponding test files.")
+          PYEOF
 
       - name: Upload unit coverage report
         uses: actions/upload-artifact@v4
@@ -405,4 +429,98 @@ jobs:
           test -f frontend/public/api-client.js && echo "[OK] api-client.js"
           test -f frontend/public/analytics.js  && echo "[OK] analytics.js"
           echo "[OK] Frontend assets verified."
+
+
+  # ============================================================
+  # Stage 11: Frontend SPA Tests + Coverage + Bundle Size
+  # ============================================================
+  frontend-test:
+    name: "Frontend Tests (Vitest + Coverage + Bundle Size)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npm run typecheck
+
+      - name: Run Vitest with coverage
+        run: npm run test:coverage
+
+      - name: Upload frontend coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-frontend
+          path: frontend/coverage/
+          retention-days: 30
+
+      - name: Build frontend for production
+        run: npm run build
+
+      - name: Check bundle size (≤ 400 KB gzip for dashboard entry)
+        run: |
+          python3 - << 'PYEOF'
+          import os, gzip, sys
+
+          dist_dir = "dist/assets"
+          if not os.path.isdir(dist_dir):
+              print("[SKIP] No dist/assets directory found — skipping bundle size check.")
+              sys.exit(0)
+
+          total_bytes = 0
+          for fname in os.listdir(dist_dir):
+              if fname.endswith(".js") and not fname.endswith(".map"):
+                  fpath = os.path.join(dist_dir, fname)
+                  with open(fpath, "rb") as f:
+                      compressed = len(gzip.compress(f.read()))
+                  total_bytes += compressed
+                  print(f"  {fname}: {compressed / 1024:.1f} KB gzip")
+
+          limit = 400 * 1024  # 400 KB
+          print(f"Total: {total_bytes / 1024:.1f} KB gzip (limit {limit / 1024:.0f} KB)")
+          if total_bytes > limit:
+              print(f"[FAIL] Bundle exceeds 400 KB gzip limit!", file=sys.stderr)
+              sys.exit(1)
+          print("[OK] Bundle size within limit.")
+          PYEOF
+
+      - name: Verify component test files exist
+        run: |
+          python3 - << 'PYEOF'
+          import os, sys, pathlib
+          root = pathlib.Path("src/components")
+          if not root.exists():
+              print("[SKIP] No src/components directory.")
+              sys.exit(0)
+          missing = []
+          for tsx in root.rglob("*.tsx"):
+              if "__tests__" in tsx.parts or tsx.name.startswith("_"):
+                  continue
+              # Each component should have a co-located __tests__/ComponentName.test.tsx
+              component_name = tsx.stem
+              test_file = tsx.parent / "__tests__" / f"{component_name}.test.tsx"
+              if not test_file.exists():
+                  missing.append(str(tsx))
+          if missing:
+              print("[WARN] Components without test files (not blocking):")
+              for f in missing:
+                  print(f"  {f}")
+          else:
+              print("[OK] All components have test files.")
+          PYEOF
+
 
