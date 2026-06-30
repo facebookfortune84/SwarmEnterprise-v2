@@ -3,9 +3,20 @@
     "@dwmkerr/terminal-ai": "^0.14.0"
   },
   "devDependencies": {
-    "@google/gemini-cli": "^0.49.0"
+    "@google/gemini-cli": "^0.49.0",
+    "husky": "^9.1.6",
+    "knip": "^5.30.6"
   },
   "scripts": {
-    "gemini": "gemini"
+    "gemini": "gemini",
+    "prepare": "husky",
+    "merge:report": "node scripts/merge-report.js",
+    "merge:quality": "node scripts/merge-quality.js",
+    "merge:todos": "node scripts/harvest-todos.js",
+    "merge:type-coverage": "node scripts/type-coverage.js",
+    "merge:bundle-size": "node scripts/bundle-size-check.js",
+    "merge:bundle-baseline": "node scripts/bundle-size-check.js --write-baseline",
+    "merge:dead-code": "knip --reporter compact",
+    "merge:dead-code-json": "knip --reporter json"
   }
 }

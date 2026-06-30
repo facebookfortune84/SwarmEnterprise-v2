@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-06-30T22:38:10.731Z",
+  "baselineKb": 500.5,
+  "currentKb": 500.5,
+  "deltaKb": 0,
+  "deltaPct": 0,
+  "topChunks": [
+    {
+      "name": "charts-B71eK3AE.js",
+      "kb": 171.2
+    },
+    {
+      "name": "vendor-q6Obh21y.js",
+      "kb": 159.2
+    },
+    {
+      "name": "query-D0b-lUGc.js",
+      "kb": 41.2
+    },
+    {
+      "name": "index-DfGHrU2R.js",
+      "kb": 29.5
+    },
+    {
+      "name": "index-BLYaVoAT.css",
+      "kb": 26.4
+    }
+  ]
+}

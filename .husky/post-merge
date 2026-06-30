@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+/**
+ * .husky/post-merge   (executed by Git as a post-merge hook)
+ * -----------------------------------------------------------
+ * Runs the full merge quality suite locally after every `git merge`.
+ * Output is visible in the terminal but is non-blocking (exit 0 always)
+ * so it never prevents a successful merge from landing.
+ *
+ * This file must be executable on Unix/macOS:
+ *   chmod +x .husky/post-merge
+ *
+ * On Windows, Git runs hooks via the bundled sh/bash interpreter so the
+ * shebang is honoured.  Alternatively husky will call it directly.
+ */
+
+'use strict';
+
+const { spawnSync } = require('child_process');
+const path          = require('path');
+
+const ROOT   = path.resolve(__dirname, '..');
+const script = path.join(ROOT, 'scripts', 'merge-quality.js');
+
+console.log('\n┌─────────────────────────────────────────┐');
+console.log('│  🔀  Post-Merge Quality Suite starting  │');
+console.log('└─────────────────────────────────────────┘\n');
+
+const result = spawnSync(process.execPath, [script], {
+  cwd   : ROOT,
+  stdio : 'inherit',
+  env   : { ...process.env },
+});
+
+if (result.error) {
+  console.error(`[post-merge] Hook error: ${result.error.message}`);
+}
+
+// Always exit 0 — post-merge hooks cannot abort the merge itself.
+process.exit(0);

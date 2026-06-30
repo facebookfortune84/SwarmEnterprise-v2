@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-06-30T22:37:43.816Z",
+  "totalBytes": 512526,
+  "files": [
+    {
+      "name": "charts-B71eK3AE.js",
+      "bytes": 175300
+    },
+    {
+      "name": "vendor-q6Obh21y.js",
+      "bytes": 163070
+    },
+    {
+      "name": "query-D0b-lUGc.js",
+      "bytes": 42199
+    },
+    {
+      "name": "index-DfGHrU2R.js",
+      "bytes": 30190
+    },
+    {
+      "name": "index-BLYaVoAT.css",
+      "bytes": 26985
+    },
+    {
+      "name": "dashboard-CinjNG68.js",
+      "bytes": 11343
+    },
+    {
+      "name": "index-BTaNaBJA.js",
+      "bytes": 8051
+    },
+    {
+      "name": "index-D5VSYs_Q.js",
+      "bytes": 7768
+    },
+    {
+      "name": "builder-DC6f3Uvs.js",
+      "bytes": 5717
+    },
+    {
+      "name": "tickets-Cw0vNtM2.js",
+      "bytes": 4589
+    },
+    {
+      "name": "analytics-COcmDU8e.js",
+      "bytes": 4585
+    },
+    {
+      "name": "AppLayout-Dg_qx1ro.js",
+      "bytes": 4146
+    },
+    {
+      "name": "index-B76vSy_m.js",
+      "bytes": 3854
+    },
+    {
+      "name": "profile-M2OBE1nF.js",
+      "bytes": 3839
+    },
+    {
+      "name": "leads-Dxkv_D7b.js",
+      "bytes": 3036
+    },
+    {
+      "name": "login-BvxIRYIe.js",
+      "bytes": 3021
+    },
+    {
+      "name": "register-DqOr6_iG.js",
+      "bytes": 2894
+    },
+    {
+      "name": "deployments-Ciu7ObuU.js",
+      "bytes": 2831
+    },
+    {
+      "name": "tenants-CoJxPDnW.js",
+      "bytes": 2352
+    },
+    {
+      "name": "_id_-D_FkxOTC.js",
+      "bytes": 2347
+    },
+    {
+      "name": "admin-BZ7bPyCP.js",
+      "bytes": 2221
+    },
+    {
+      "name": "index-DgIJ9uxt.js",
+      "bytes": 1633
+    },
+    {
+      "name": "Toast-Bfh5pxu_.js",
+      "bytes": 555
+    }
+  ]
+}

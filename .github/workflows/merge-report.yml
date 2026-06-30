@@ -1,0 +1,174 @@
+name: "Merge Intelligence — Quality Report"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Triggered on every push to main (i.e. after any merge).
+# Produces MERGE_REPORT.md, TODO_REPORT.md, type-coverage-report.json, and
+# bundle-size-report.json, then commits them back to the repo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────────
+  # Frontend build (needed for bundle-size-check)
+  # ───────────────────────────────────────────────────────────────────────────
+  frontend-build:
+    name: "Frontend Build (bundle snapshot)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend (production)
+        run: npm run build
+
+      - name: Upload dist artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 1
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Main quality report job
+  # ───────────────────────────────────────────────────────────────────────────
+  merge-report:
+    name: "Merge Quality Report"
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    # Skip if this push is itself a report commit (prevents infinite loops)
+    if: "!startsWith(github.event.head_commit.message, 'chore(merge-report):')"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download frontend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      # ── 1. TODO / FIXME harvest ──────────────────────────────────────────
+      - name: Harvest TODO / FIXME annotations
+        run: node scripts/harvest-todos.js
+
+      # ── 2. TypeScript type coverage ──────────────────────────────────────
+      - name: Report TypeScript type coverage
+        run: node scripts/type-coverage.js
+        continue-on-error: true   # non-blocking
+
+      # ── 3. Bundle size diff ───────────────────────────────────────────────
+      - name: Bundle size check / diff
+        run: node scripts/bundle-size-check.js
+        continue-on-error: true   # warn only
+
+      # ── 4. Dependency vulnerability summary (npm audit) ──────────────────
+      - name: npm audit (root)
+        run: |
+          npm audit --json > npm-audit-report.json 2>/dev/null || true
+          npm audit --audit-level=high || true
+        continue-on-error: true
+
+      # ── 5. Dead-code analysis via knip ────────────────────────────────────
+      - name: Dead-code detection (knip)
+        run: |
+          npx --yes knip --reporter json > knip-report.json 2>&1 || true
+          echo "Knip summary:"
+          npx knip --reporter compact 2>&1 | head -40 || true
+        continue-on-error: true
+
+      # ── 6. Generate MERGE_REPORT.md ───────────────────────────────────────
+      - name: Generate MERGE_REPORT.md
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          BASE="${{ github.event.before }}"
+          node scripts/merge-report.js --branch "$BRANCH" --base "$BASE"
+
+      # ── 7. Commit all generated reports back to main ──────────────────────
+      - name: Commit generated reports
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add \
+            MERGE_REPORT.md \
+            TODO_REPORT.md \
+            type-coverage-report.json \
+            bundle-size-report.json \
+            merge-report.json \
+            npm-audit-report.json \
+            knip-report.json \
+            bundle-size-baseline.json \
+            2>/dev/null || true
+
+          git diff --staged --quiet \
+            && echo "[merge-report] No changes to commit" \
+            && exit 0
+
+          git commit -m "chore(merge-report): automated quality reports [skip ci]"
+          git push origin main
+          echo "[merge-report] Reports committed and pushed"
+
+      # ── 8. Upload all artefacts ───────────────────────────────────────────
+      - name: Upload merge quality artefacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: merge-quality-reports-${{ github.sha }}
+          path: |
+            MERGE_REPORT.md
+            TODO_REPORT.md
+            type-coverage-report.json
+            bundle-size-report.json
+            merge-report.json
+            npm-audit-report.json
+            knip-report.json
+          retention-days: 90
+
+      # ── 9. Post score as commit status comment ────────────────────────────
+      - name: Post quality score summary
+        if: always()
+        run: |
+          if [ -f merge-report.json ]; then
+            SCORE=$(node -e "const r=require('./merge-report.json'); console.log(r.score)")
+            LABEL=$(node -e "const r=require('./merge-report.json'); console.log(r.scoreLabel)")
+            COMMITS=$(node -e "const r=require('./merge-report.json'); console.log(r.commitCount)")
+            FILES=$(node -e "const r=require('./merge-report.json'); console.log(r.filesChanged)")
+            TODOS=$(node -e "const r=require('./merge-report.json'); console.log(r.todoCount)")
+            echo "::notice title=Merge Quality Score::${SCORE}/100 — ${LABEL} | ${COMMITS} commits | ${FILES} files | ${TODOS} TODOs"
+          fi
