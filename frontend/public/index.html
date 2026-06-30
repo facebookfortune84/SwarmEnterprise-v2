@@ -8,6 +8,7 @@
   <script src="/dashboard/config.js"></script>
   <script src="/dashboard/api-client.js"></script>
   <script src="/dashboard/analytics.js"></script>
+  <script src="/dashboard/outreach-hub.js"></script>
   <style>
     /* ── Base ─────────────────────────────────────────────────── */
     body { background:#030712; color:#e2e8f0; font-family:system-ui,sans-serif; }
@@ -51,6 +52,25 @@
       display:flex; align-items:center; justify-content:center; padding:1rem; }
     .modal { background:#0f172a; border:1px solid #1e3a5f; border-radius:10px;
       width:100%; max-width:520px; max-height:90vh; overflow-y:auto; padding:1.5rem; }
+
+    /* ── Premium visual polish ─────────────────────────────────── */
+    .node {
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 20px 45px rgba(2,6,23,0.36);
+      background:linear-gradient(135deg, rgba(15,23,42,0.97), rgba(2,6,23,0.96));
+    }
+    .node::before {
+      content:"";
+      position:absolute; inset:0;
+      background:radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 42%);
+      pointer-events:none;
+    }
+    .glass-panel {
+      border:1px solid rgba(56,189,248,0.24);
+      background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(2,6,23,0.92));
+      box-shadow:0 24px 60px rgba(2,6,23,0.5);
+    }
 
     /* ── Responsive nav ───────────────────────────────────────── */
     @media(max-width:640px) { .hide-mobile { display:none !important; } }
@@ -159,7 +179,7 @@
   <header class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-sky-400">SwarmOS Deployment Command</h1>
-      <p class="text-sm text-slate-500">realms2riches.com · corp · api</p>
+      <p class="text-sm text-slate-500">Landing: realms2riches.com · Corp: corp.realms2riches.com · Dedicated hosting: realms2riches.tech</p>
     </div>
     <nav class="flex flex-wrap items-center gap-2 text-sm">
       <span id="wsIndicator" class="flex items-center text-xs text-slate-500">
@@ -187,6 +207,8 @@
        TAB: OVERVIEW
   ═══════════════════════════════════════════════════════════════════════════ -->
   <div id="tab-overview" class="tab-panel active">
+    <div id="growthHero" class="node mb-6"></div>
+
     <!-- System status cards -->
     <div class="grid sm:grid-cols-3 gap-4 mb-6">
       <div class="node">
@@ -472,6 +494,33 @@
        TAB: OPERATIONS
   ═══════════════════════════════════════════════════════════════════════════ -->
   <div id="tab-ops" class="tab-panel">
+    <div class="node mb-6">
+      <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+        <div>
+          <h3 class="font-semibold text-white">Growth & Outreach</h3>
+          <p class="text-sm text-slate-400">Compose polished campaigns and queue them automatically through the same reliable backend engine.</p>
+        </div>
+      </div>
+      <form id="campaignComposer" class="space-y-4">
+        <div>
+          <label for="campaignSubject">Subject</label>
+          <input id="campaignSubject" class="input" placeholder="A tailored note for your next campaign" />
+        </div>
+        <div>
+          <label for="campaignRecipients">Recipients</label>
+          <textarea id="campaignRecipients" class="input h-24" placeholder="lead1@example.com
+lead2@example.com"></textarea>
+        </div>
+        <div>
+          <label for="campaignBody">Message</label>
+          <textarea id="campaignBody" class="input h-32" placeholder="Tell your story in a way that feels personal and premium"></textarea>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div id="campaignStatus" class="text-sm text-sky-400"></div>
+          <button id="launchCampaignBtn" class="btn-primary">Launch Campaign</button>
+        </div>
+      </form>
+    </div>
     <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
       <h2 class="font-semibold text-white text-lg">Operations</h2>
       <div class="flex gap-2">

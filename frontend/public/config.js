@@ -26,4 +26,11 @@
   // SWARM_ANALYTICS_SITE_ID: Umami website ID (UUID from Umami admin dashboard)
   window.SWARM_ANALYTICS_URL     = window.SWARM_ANALYTICS_URL     || "";
   window.SWARM_ANALYTICS_SITE_ID = window.SWARM_ANALYTICS_SITE_ID || "";
+
+  window.SWARM_DOMAIN_CONFIG = {
+    landing: "realms2riches.com",
+    corp: "corp.realms2riches.com",
+    dedicated: "realms2riches.tech",
+    hostingNote: "Dedicated deployments and company hosting are available on realms2riches.tech for an additional cost.",
+  };
 })();

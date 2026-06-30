@@ -196,6 +196,22 @@
     },
   };
 
+  // ── Outreach API ─────────────────────────────────────────────────────────
+  const outreach = {
+    async send(payload) {
+      return _fetch("/api/outreach/", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
+    async campaign(payload) {
+      return _fetch("/api/outreach/campaign", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
+  };
+
   // ── WebSocket Manager ─────────────────────────────────────────────────────
   class WSManager {
     constructor() {
@@ -343,6 +359,7 @@
     health,
     ops,
     build,
+    outreach,
     wsManager,
     watchDeployment,
     toast,

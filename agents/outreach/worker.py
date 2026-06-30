@@ -2,6 +2,7 @@ import os
 import time
 import threading
 import logging
+from typing import Iterable
 from agents.outreach.email_engine import EmailTools
 from backend import queue as backend_queue
 
@@ -16,10 +17,28 @@ class OutreachTask:
         self.attempts = attempts
 
 
+def enqueue_campaign(recipients: Iterable[str], subject: str, body: str, from_name: str = "SwarmOS"):
+    """Queue an outreach campaign across one or more recipients."""
+    recipient_list = [recipient.strip() for recipient in recipients if recipient and recipient.strip()]
+    if not recipient_list:
+        logger.warning("Outreach campaign skipped because no recipients were provided")
+        return
+
+    for recipient in recipient_list:
+        payload = {
+            "to_email": recipient,
+            "subject": subject,
+            "body": body,
+            "attempts": 0,
+            "from_name": from_name,
+            "campaign": True,
+        }
+        backend_queue.enqueue_task(payload)
+        logger.info("Enqueued outreach campaign to %s", recipient)
+
+
 def enqueue_outreach(to_email: str, subject: str, body: str):
-    payload = {"to_email": to_email, "subject": subject, "body": body, "attempts": 0}
-    backend_queue.enqueue_task(payload)
-    logger.info(f"Enqueued outreach to {to_email}")
+    enqueue_campaign([to_email], subject, body)
 
 
 def _worker_loop(stop_event: threading.Event):
@@ -60,7 +79,7 @@ _stop_event = None
 
 def start_worker():
     global _worker_thread, _stop_event
-    if _worker_thread and _worker_thread.is_alive():
+    if _worker_thread and getattr(_worker_thread, "is_alive", lambda: False)():
         return
     _stop_event = threading.Event()
     _worker_thread = threading.Thread(target=_worker_loop, args=(_stop_event,), daemon=True)
