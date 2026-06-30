@@ -50,16 +50,17 @@ describe('SequenceBuilder validation', () => {
     )
   })
 
-  it('property: delay in [0, 365] with non-empty subject produces no errors', () => {
+  it('property: delay in [0, 365] with non-empty non-whitespace subject produces no errors', () => {
     fc.assert(
       fc.property(
         fc.integer({ min: 0, max: 365 }),
-        fc.string({ minLength: 1, maxLength: 100 }),
+        fc.string({ minLength: 1, maxLength: 100 }).filter((s) => s.trim().length > 0),
         (delay, subject) => {
           const errs = validateSequenceStep(delay, subject)
           return Object.keys(errs).length === 0
         },
       ),
+      { numRuns: 100 },
     )
   })
 })

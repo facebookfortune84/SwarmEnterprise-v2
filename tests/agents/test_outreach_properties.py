@@ -36,6 +36,36 @@ try:
 except ImportError:
     HYPOTHESIS_AVAILABLE = False
 
+    # Provide no-op stubs so module-level @given/@settings decorators
+    # don't raise NameError when hypothesis is not installed.
+    def given(*_args, **_kwargs):  # type: ignore[misc]
+        return lambda f: f
+
+    def settings(*_args, **_kwargs):  # type: ignore[misc]
+        return lambda f: f
+
+    def assume(_: bool) -> None:  # type: ignore[misc]
+        pass
+
+    class _StubStrategies:  # type: ignore[misc]
+        """No-op strategy stubs when hypothesis is not installed."""
+
+        def __class_getitem__(cls, item: object) -> object:
+            return None
+
+        def __getattr__(self, name: str) -> object:
+            return self._noop
+
+        @staticmethod
+        def _noop(*_a: object, **_kw: object) -> None:
+            return None
+
+        def __call__(self, *_a: object, **_kw: object) -> None:
+            return None
+
+    # Expose as `st` at module level exactly as hypothesis would
+    st = _StubStrategies()  # type: ignore[assignment]
+
 pytestmark = pytest.mark.skipif(
     not HYPOTHESIS_AVAILABLE, reason="hypothesis not installed"
 )

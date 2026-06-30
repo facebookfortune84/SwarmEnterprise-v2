@@ -344,7 +344,7 @@ class EnrichmentAgent:
         )
         result["homepage_ok"] = True
 
-        return result if (result.get("email") or result.get("company_name")) else None
+        return result if (result.get("email") or result.get("company_name") or result.get("linkedin_url")) else None
 
     # ------------------------------------------------------------------
     # Database persistence

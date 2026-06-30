@@ -18,6 +18,18 @@ try:
     HYPOTHESIS_AVAILABLE = True
 except ImportError:
     HYPOTHESIS_AVAILABLE = False
+    # Provide no-op stubs so module-level decorators don't raise NameError
+    def given(*_args, **_kwargs):  # type: ignore[misc]
+        return lambda f: f
+
+    def settings(*_args, **_kwargs):  # type: ignore[misc]
+        return lambda f: f
+
+    class _StubStrategies:  # type: ignore[misc]
+        def __getattr__(self, name: str) -> object:  # type: ignore[override]
+            return lambda *_a, **_kw: None
+
+    st = _StubStrategies()  # type: ignore[assignment]
 
 
 def normalise(email: str) -> str:

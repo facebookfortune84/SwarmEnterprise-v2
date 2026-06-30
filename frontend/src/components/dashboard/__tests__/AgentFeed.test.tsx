@@ -1,8 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { AgentFeed } from '@/components/dashboard/AgentFeed'
 import type { AgentEvent } from '@/types/api'
-import type { AgentFeedStatus } from '@/hooks/useAgentFeed'
 
 const makeEvent = (id: string, type: AgentEvent['type'] = 'info', message = 'test'): AgentEvent => ({
   id,

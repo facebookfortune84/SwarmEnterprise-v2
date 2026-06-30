@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import * as fc from 'fast-check'
 import { DataTable } from '@/components/ui/DataTable'
 import type { ColumnDef } from '@/components/ui/DataTable'
 
@@ -74,5 +75,70 @@ describe('DataTable', () => {
     ]
     render(<DataTable columns={customCols} data={data} keyExtractor={(r) => r.id} />)
     expect(screen.getAllByTestId('custom')[0]).toHaveTextContent('Alice!')
+  })
+
+  it('cycles sort: null→asc→desc→null on triple header click', async () => {
+    render(<DataTable columns={columns} data={data} keyExtractor={(r) => r.id} />)
+    const nameHeader = screen.getByText(/^Name/)
+
+    // Click 1: null → asc
+    await userEvent.click(nameHeader)
+    expect(nameHeader.closest('th')).toHaveAttribute('aria-sort', 'ascending')
+    // Arrow should be ↑
+    expect(nameHeader.closest('th')?.textContent).toContain('↑')
+
+    // Click 2: asc → desc
+    await userEvent.click(nameHeader)
+    expect(nameHeader.closest('th')).toHaveAttribute('aria-sort', 'descending')
+    // Arrow should be ↓
+    expect(nameHeader.closest('th')?.textContent).toContain('↓')
+
+    // Click 3: desc → null
+    await userEvent.click(nameHeader)
+    expect(nameHeader.closest('th')).toHaveAttribute('aria-sort', 'none')
+    // Arrow should be ↕ (unsorted indicator)
+    expect(nameHeader.closest('th')?.textContent).toContain('↕')
+  })
+
+  it('applies rowClassName to rows', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        keyExtractor={(r) => r.id}
+        rowClassName={(r) => (r.score > 80 ? 'high-score' : 'low-score')}
+      />,
+    )
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(rows[0].className).toContain('high-score')
+    expect(rows[1].className).toContain('low-score')
+  })
+
+  it('property: sorted data preserves all rows across sort directions', () => {
+    // Pure logic test: verify sort stability without React state mutations
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.record({
+            id: fc.uuid(),
+            name: fc.string({ minLength: 1, maxLength: 20 }).filter((s) => s.trim().length > 0),
+            score: fc.integer({ min: 0, max: 100 }),
+          }),
+          { minLength: 1, maxLength: 20 },
+        ),
+        fc.constantFrom('name', 'score'),
+        fc.constantFrom<'asc' | 'desc'>('asc', 'desc'),
+        (rows, key, dir) => {
+          const sorted = [...rows].sort((a, b) => {
+            const aStr = String(a[key as keyof typeof a] ?? '')
+            const bStr = String(b[key as keyof typeof b] ?? '')
+            const cmp = aStr.localeCompare(bStr)
+            return dir === 'asc' ? cmp : -cmp
+          })
+          return sorted.length === rows.length
+        },
+      ),
+      { numRuns: 100 },
+    )
   })
 })

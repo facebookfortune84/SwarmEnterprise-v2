@@ -17,9 +17,13 @@ def make_event(event_id="evt_test"):
 
 
 def test_stripe_webhook_idempotency(client, monkeypatch):
+    import uuid
+    # Use a unique event ID per test run to avoid cross-test DB state contamination
+    unique_evt_id = f"evt_test_{uuid.uuid4().hex}"
+
     # Patch stripe.Webhook.construct_event to return a deterministic event
     def _construct_event(payload, sig, secret):
-        return make_event("evt_123")
+        return make_event(unique_evt_id)
 
     monkeypatch.setattr(stripe.Webhook, "construct_event", staticmethod(_construct_event))
 
