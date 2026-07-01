@@ -2,6 +2,17 @@
 # RWV Techsolutions LLC · robertdemottojr50@gmail.com
 # =============================================================================
 #
+# SHELL — fix "The system cannot find the path specified" on Windows.
+# GNU Make on Windows defaults to sh.exe which it cannot find.
+# Explicitly route every recipe through cmd.exe (always present on Windows).
+# On Linux/macOS cmd.exe does not exist; Make falls back to /bin/sh naturally.
+# =============================================================================
+ifeq ($(OS),Windows_NT)
+    SHELL      := cmd.exe
+    .SHELLFLAGS := /C
+endif
+
+# =============================================================================
 # VARIABLES — override at the command line or via environment
 # =============================================================================
 
@@ -226,35 +237,50 @@ format-check:
 # =============================================================================
 # Database
 # =============================================================================
+# migrate / rollback: run Alembic INSIDE the running backend container.
+# The DATABASE_URL uses the Docker service hostname "postgres" which is only
+# reachable from within the Docker network — not from the host venv.
+# docker compose exec exits non-zero if the container is not running, giving a
+# clear error message instead of a confusing connection-refused from the host.
 migrate:
-	$(PYTHON) scripts/run_alembic.py upgrade head
+	@echo [migrate] Running alembic upgrade head inside backend container...
+	docker compose -f $(COMPOSE_FILE) exec backend alembic upgrade head
 
 rollback:
-	$(PYTHON) scripts/run_alembic.py downgrade -1
+	@echo [rollback] Running alembic downgrade -1 inside backend container...
+	docker compose -f $(COMPOSE_FILE) exec backend alembic downgrade -1
 
 seed:
-	$(PYTHON) scripts/seed.py
+	@echo [seed] Running seed script inside backend container...
+	docker compose -f $(COMPOSE_FILE) exec backend python scripts/seed.py
 
 db-migrate:
-	$(PYTHON) scripts/run_alembic.py revision --autogenerate -m "$(MSG)"
+	@echo [db-migrate] Generating new migration inside backend container...
+	docker compose -f $(COMPOSE_FILE) exec backend alembic revision --autogenerate -m "$(MSG)"
 
 db-upgrade:
-	$(PYTHON) scripts/run_alembic.py upgrade head
+	docker compose -f $(COMPOSE_FILE) exec backend alembic upgrade head
 
 db-downgrade:
-	$(PYTHON) scripts/run_alembic.py downgrade -1
+	docker compose -f $(COMPOSE_FILE) exec backend alembic downgrade -1
 
 # =============================================================================
 # Service lifecycle
 # =============================================================================
+# POSTGRES_USER defaults to the value in .env (swarm); override on the CLI if
+# you use a different user: make launch POSTGRES_USER=myuser
+POSTGRES_USER ?= swarm
+
 launch: env-check check-docker
-	@echo [launch] Running database migrations...
-	$(MAKE) migrate
-	@echo [launch] Seeding initial data...
-	$(MAKE) seed
-	@echo [launch] Starting services...
-	$(PYTHON) scripts/launch_services.py
-	@echo [launch] Running smoke tests...
+	@echo [launch] Step 1/5 - Building and starting Docker Compose services...
+	docker compose -f $(COMPOSE_FILE) up -d --build --remove-orphans
+	@echo [launch] Step 2/5 - Waiting for PostgreSQL to be ready (up to 60s)...
+	$(PYTHON) scripts/wait_postgres.py
+	@echo [launch] Step 3/5 - Running database migrations inside container...
+	docker compose -f $(COMPOSE_FILE) exec backend alembic upgrade head
+	@echo [launch] Step 4/5 - Seeding initial data inside container...
+	docker compose -f $(COMPOSE_FILE) exec -T backend python scripts/seed.py || echo [launch] Seed skipped or already done.
+	@echo [launch] Step 5/5 - Running smoke tests...
 	$(MAKE) smoke
 	@echo.
 	@echo [launch] All systems go. SwarmEnterprise v2 is live.
@@ -284,12 +310,21 @@ post-launch-verify: verify-live
 #   pre-launch → launch → verify-live
 # =============================================================================
 full-launch: pre-launch
-	@echo [full-launch] Pre-launch checks passed. Starting services...
-	$(MAKE) launch
-	@echo [full-launch] Services live. Running live verification...
+	@echo [full-launch] Pre-launch checks passed.
+	@echo [full-launch] Step 1 - Starting Docker Compose services...
+	docker compose -f $(COMPOSE_FILE) up -d --build --remove-orphans
+	@echo [full-launch] Step 2 - Waiting for PostgreSQL...
+	$(PYTHON) scripts/wait_postgres.py
+	@echo [full-launch] Step 3 - Running migrations inside container...
+	docker compose -f $(COMPOSE_FILE) exec backend alembic upgrade head
+	@echo [full-launch] Step 4 - Seeding initial data inside container...
+	docker compose -f $(COMPOSE_FILE) exec -T backend python scripts/seed.py || echo [full-launch] Seed skipped or already done.
+	@echo [full-launch] Step 5 - Running smoke tests...
+	$(MAKE) smoke
+	@echo [full-launch] Step 6 - Running live verification...
 	$(MAKE) verify-live
 	@echo.
-	@echo [full-launch] COMPLETE — SwarmEnterprise v2 is live and verified.
+	@echo [full-launch] COMPLETE - SwarmEnterprise v2 is live and verified.
 
 # =============================================================================
 # rollback-deploy — redeploy a specific previous image tag

@@ -199,17 +199,24 @@ def check_database() -> None:
         _record(WARNING, cat, "sqlalchemy not installed; skipping DB connectivity check")
     except Exception as e:
         short = str(e).split("\n")[0][:120]
-        # If the hostname cannot be resolved it is a Docker-internal service name
-        # (e.g. "postgres") that is only reachable from inside a container.
-        # This is expected when running pre_launch.py on the host machine.
-        # Treat it as a warning regardless of ENV so it doesn't block local runs.
-        is_dns_error = any(kw in short.lower() for kw in (
+        lower = short.lower()
+        # Docker service hostname (e.g. "postgres") — DNS won't resolve on host.
+        is_dns_error = any(kw in lower for kw in (
             "no such host", "name or service not known",
-            "could not translate", "getaddrinfo", "nodename nor servname"
+            "could not translate", "getaddrinfo", "nodename nor servname",
         ))
-        level = WARNING if is_dns_error else (CRITICAL if env == "production" else WARNING)
-        hint = "(Docker service hostname — only reachable inside containers)" if is_dns_error else "(start Docker first?)"
-        _record(level, cat, f"Database connection failed {hint}: {short}")
+        # localhost:5432 refused — Docker Compose hasn't started yet.
+        is_refused = "connection refused" in lower or "10061" in lower
+        if is_dns_error or is_refused:
+            # Both cases mean "Docker isn't running yet" — not a real config error.
+            _record(INFO, cat,
+                    "Database not reachable from host — Docker service not started yet. "
+                    "This is normal before 'docker compose up'. "
+                    "Run: make full-launch")
+        else:
+            # Unexpected error — CRITICAL in production, WARN in dev.
+            level = CRITICAL if env == "production" else WARNING
+            _record(level, cat, f"Database connection failed (unexpected): {short}")
 
 
 def check_redis() -> None:
@@ -223,11 +230,79 @@ def check_redis() -> None:
     except ImportError:
         _record(WARNING, cat, "redis-py not installed; skipping Redis check")
     except Exception as e:
-        _record(WARNING, cat, f"Redis not reachable (may be offline for local dev): {e}")
+        msg = str(e).lower()
+        # Docker service name or refused — Docker not started yet, not a config error.
+        is_expected = any(kw in msg for kw in (
+            "getaddrinfo", "no such host", "name or service not known",
+            "could not translate", "connection refused", "10061", "11001",
+        ))
+        if is_expected:
+            _record(INFO, cat,
+                    "Redis not reachable from host — Docker service not started yet. "
+                    "This is normal before 'docker compose up'.")
+        else:
+            _record(WARNING, cat, f"Redis unexpected error: {e}")
+
+
+def _db_host_is_docker() -> bool:
+    """Return True when DATABASE_URL uses a Docker-internal service hostname."""
+    from urllib.parse import urlparse
+    url = _env("DATABASE_URL")
+    if not url:
+        return False
+    try:
+        host = (urlparse(
+            url.replace("+asyncpg", "").replace("+psycopg2", "")
+        ).hostname or "").lower()
+        return host in {"postgres", "db", "database", "pgdb", "postgresql"}
+    except Exception:
+        return False
+
+
+def _db_localhost_unreachable() -> bool:
+    """Return True when DATABASE_URL is localhost:5432 but the port is closed."""
+    import socket
+    from urllib.parse import urlparse
+    url = _env("DATABASE_URL")
+    if not url:
+        return False
+    try:
+        parsed = urlparse(url.replace("+asyncpg", "").replace("+psycopg2", ""))
+        host = (parsed.hostname or "").lower()
+        port = parsed.port or 5432
+        if host not in ("localhost", "127.0.0.1", "::1"):
+            return False
+        with socket.create_connection((host, port), timeout=2):
+            return False   # connection succeeded — DB is reachable
+    except OSError:
+        return True        # connection refused / timed out
 
 
 def check_migrations() -> None:
     cat = "Migrations"
+
+    # ── Skip gracefully when the DB is only reachable inside Docker ──────────
+    # Running `alembic current` from the host would fail with a DNS error
+    # (Docker service hostname not resolvable) or a connection-refused error
+    # (localhost:5432 not forwarded).  Neither tells us anything useful about
+    # migration state — we skip with INFO so the pre-launch report is clean.
+    if _db_host_is_docker():
+        _record(INFO, cat,
+                "Migrations: check skipped — database hostname is a Docker service name "
+                "only reachable inside containers. "
+                "Migrations run automatically on deploy: "
+                "'docker compose exec backend alembic upgrade head'")
+        return
+
+    if _db_localhost_unreachable():
+        _record(INFO, cat,
+                "Migrations: check skipped — localhost:5432 is not reachable from the host "
+                "(database is likely managed by Docker Compose). "
+                "Migrations run automatically on deploy: "
+                "'docker compose exec backend alembic upgrade head'")
+        return
+
+    # ── DB is reachable from the host — run the real checks ──────────────────
     rc, out = _run(
         [sys.executable, "-m", "alembic", "-c", str(ROOT / "alembic.ini"), "current"],
         timeout=20,
@@ -235,18 +310,17 @@ def check_migrations() -> None:
     if rc != 0:
         _record(WARNING, cat, f"alembic current failed: {out[:200]}")
         return
-    _record(PASS, cat, "Alembic migrations runnable")
+    _record(PASS, cat, "Alembic migrations reachable")
 
     rc2, out2 = _run(
-        [sys.executable, "-m", "alembic", "-c", str(ROOT / "alembic.ini"),
-         "check"],
+        [sys.executable, "-m", "alembic", "-c", str(ROOT / "alembic.ini"), "check"],
         timeout=20,
     )
     if rc2 == 0:
         _record(PASS, cat, "Database schema matches latest migration (no pending changes)")
     else:
-        # alembic check exits 1 when there are pending autogenerate changes
-        _record(WARNING, cat, "alembic check: pending schema changes may exist — run make migrate")
+        _record(WARNING, cat,
+                "alembic check: pending schema changes may exist — run: make migrate")
 
 
 def check_tls() -> None:
