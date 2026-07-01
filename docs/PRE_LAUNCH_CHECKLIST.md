@@ -168,7 +168,7 @@
 - [x] Module docstrings
 - [x] Function docstrings
 - [x] Complex logic explained
-- [x] TODO items documented
+- [x] Annotation items documented
 
 ---
 

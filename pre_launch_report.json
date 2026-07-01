@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-06-30T23:32:00.665936+00:00",
-  "pass_count": 14,
-  "warning_count": 2,
+  "timestamp": "2026-07-01T08:36:32.343282+00:00",
+  "pass_count": 15,
+  "warning_count": 1,
   "critical_count": 0,
   "results": [
     {
@@ -85,9 +85,9 @@
       "message": "backup_postgres.sh + backup_config.sh present"
     },
     {
-      "level": "WARNING",
+      "level": "PASS",
       "category": "Ollama (AI)",
-      "message": "Ollama at http://host.docker.internal:11434 not responding (HTTP None) \u2014 local AI unavailable"
+      "message": "Ollama accessible at http://host.docker.internal:11434"
     },
     {
       "level": "PASS",

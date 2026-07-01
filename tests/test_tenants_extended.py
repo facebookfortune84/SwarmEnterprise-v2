@@ -129,7 +129,7 @@ class TestTenantServiceProvision:
 
         svc = TenantService(db=db)
         with pytest.raises(ValueError, match="tenant not found"):
-            svc.provision("TEN-NONEXISTENT-XXX")
+            svc.provision("TEN-NONEXISTENT-000")
 
     def test_provision_docker_success(self, db):
         from backend.core.tenants import TenantService

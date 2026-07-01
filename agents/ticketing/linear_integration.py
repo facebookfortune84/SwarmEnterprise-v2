@@ -415,9 +415,64 @@ class LinearIntegration:
         return mapping.get(number, IssuePriority.NO_PRIORITY)
 
     async def _get_state_id(self, status: IssueStatus) -> str:
-        """Get Linear state ID for status"""
-        # TODO: Implement state ID lookup
-        return "state-id"
+        """Resolve the Linear workflow state ID for a given ``IssueStatus``.
+
+        Queries the Linear API for all workflow states of the first team
+        whose name matches (case-insensitive) the status value.  The result
+        is cached in ``self._state_cache`` to avoid redundant API calls.
+        If the lookup fails the status name is returned as a fallback so
+        that the caller can still attempt the update.
+        """
+        if not hasattr(self, "_state_cache"):
+            self._state_cache: dict = {}
+
+        cache_key = status.value
+        if cache_key in self._state_cache:
+            return self._state_cache[cache_key]
+
+        query = """
+        query {
+          workflowStates {
+            nodes {
+              id
+              name
+              type
+            }
+          }
+        }
+        """
+        try:
+            response = await self._execute_query(query, {})
+            nodes = (
+                response.get("data", {})
+                .get("workflowStates", {})
+                .get("nodes", [])
+            )
+            # Map status enum value → state ID using case-insensitive name match
+            status_name = status.value.replace("_", " ")
+            for node in nodes:
+                if node.get("name", "").lower() == status_name.lower():
+                    self._state_cache[cache_key] = node["id"]
+                    return node["id"]
+            # Fallback: use the first state of matching type (e.g. "completed" → done)
+            type_map = {
+                IssueStatus.DONE: "completed",
+                IssueStatus.CANCELED: "cancelled",
+                IssueStatus.IN_PROGRESS: "started",
+                IssueStatus.BACKLOG: "backlog",
+                IssueStatus.TODO: "unstarted",
+                IssueStatus.IN_REVIEW: "started",
+            }
+            target_type = type_map.get(status, "")
+            for node in nodes:
+                if node.get("type", "").lower() == target_type:
+                    self._state_cache[cache_key] = node["id"]
+                    return node["id"]
+        except Exception as exc:
+            logger.warning("State ID lookup failed (non-fatal): %s", exc)
+
+        # Last resort: return the status value so the caller can still proceed
+        return status.value
 
     async def _generate_description(self, title: str) -> str:
         """Generate AI-powered issue description"""

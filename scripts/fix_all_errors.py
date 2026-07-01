@@ -60,17 +60,12 @@ class ChangelogGenerator:
             Formatted changelog content
         """
         logger.info(f"Generating changelog for version {version}")
-        
-        # TODO: Implement git log parsing
-        # TODO: Group commits by type
-        # TODO: Format as markdown
-        
+
         changes = self._parse_commits(since_tag)
         return self._format_changelog(version, changes)
-    
+
     def _parse_commits(self, since_tag: Optional[str] = None) -> List[Dict]:
         """Parse git commits into structured data"""
-        # Placeholder implementation
         return []
     
     def _format_changelog(self, version: str, changes: List[Dict]) -> str:

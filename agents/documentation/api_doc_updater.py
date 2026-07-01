@@ -141,14 +141,50 @@ class APIDocUpdater:
                         # Check for auth
                         auth_required = "Depends(" in func_code or "auth" in func_code.lower()
 
+                        # Extract parameters from function signature
+                        params: List[Dict[str, Any]] = []
+                        param_match = re.search(
+                            rf"def\s+{func_name}\s*\(([^)]*)\)", func_code
+                        )
+                        if param_match:
+                            raw_params = param_match.group(1)
+                            for param_str in raw_params.split(","):
+                                param_str = param_str.strip()
+                                if not param_str or param_str in ("self", "request"):
+                                    continue
+                                # Skip Depends(...) injections
+                                if "Depends(" in param_str or param_str.startswith("db"):
+                                    continue
+                                name_part = param_str.split(":")[0].strip()
+                                type_part = (
+                                    param_str.split(":")[1].split("=")[0].strip()
+                                    if ":" in param_str
+                                    else "Any"
+                                )
+                                if name_part:
+                                    params.append({"name": name_part, "type": type_part})
+
+                        # Extract response types from return annotation or docstring
+                        responses: List[Dict[str, Any]] = []
+                        return_match = re.search(
+                            rf"def\s+{func_name}\s*\([^)]*\)\s*->\s*([^\n:]+)", func_code
+                        )
+                        if return_match:
+                            responses.append({
+                                "status": 200,
+                                "type": return_match.group(1).strip(),
+                            })
+                        # Always document 422 for FastAPI endpoints
+                        responses.append({"status": 422, "type": "ValidationError"})
+
                         self.endpoints.append(
                             APIEndpoint(
                                 path=path,
                                 method=method.upper(),
                                 function_name=func_name,
                                 description=description,
-                                parameters=[],  # TODO: Extract from function signature
-                                responses=[],  # TODO: Extract from code
+                                parameters=params,
+                                responses=responses,
                                 auth_required=auth_required,
                             )
                         )

@@ -49,18 +49,67 @@ class ChangelogGenerator:
         """
         logger.info(f"Generating changelog for version {version}")
 
-        # TODO: Implement git log parsing
-        # TODO: Group commits by type
-        # TODO: Format as markdown
-
         changes = self._parse_commits(since_tag)
         version_str = version or "Unreleased"
         return self._format_changelog(version_str, changes)
 
     def _parse_commits(self, since_tag: Optional[str] = None) -> List[Dict]:
-        """Parse git commits into structured data"""
-        # Placeholder implementation
-        return []
+        """Parse git commits into structured data using ``git log``.
+
+        Returns a list of dicts with keys: ``hash``, ``type``, ``scope``,
+        ``message``, ``breaking``, ``author``, ``date``.
+        """
+        import subprocess, re
+        cmd = ["git", "log", "--pretty=format:%H|%an|%ad|%s", "--date=short"]
+        if since_tag:
+            cmd.append(f"{since_tag}..HEAD")
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True,
+                cwd=self.repo_path, timeout=30,
+            )
+            if result.returncode != 0:
+                logger.warning("git log failed: %s", result.stderr.strip())
+                return []
+        except Exception as exc:
+            logger.warning("git log subprocess error: %s", exc)
+            return []
+
+        # Conventional commit pattern: type(scope)!: message
+        conv_re = re.compile(
+            r"^(?P<type>feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)"
+            r"(?:\((?P<scope>[^)]+)\))?"
+            r"(?P<breaking>!)?"
+            r":\s*(?P<message>.+)$"
+        )
+        commits = []
+        for line in result.stdout.splitlines():
+            parts = line.split("|", 3)
+            if len(parts) < 4:
+                continue
+            sha, author, date, subject = parts
+            m = conv_re.match(subject.strip())
+            if m:
+                commits.append({
+                    "hash":     sha[:8],
+                    "type":     m.group("type"),
+                    "scope":    m.group("scope") or "",
+                    "message":  m.group("message").strip(),
+                    "breaking": bool(m.group("breaking")),
+                    "author":   author,
+                    "date":     date,
+                })
+            else:
+                commits.append({
+                    "hash":     sha[:8],
+                    "type":     "other",
+                    "scope":    "",
+                    "message":  subject.strip(),
+                    "breaking": False,
+                    "author":   author,
+                    "date":     date,
+                })
+        return commits
 
     def _format_changelog(self, version: str, changes: List[Dict]) -> str:
         """Format changes as markdown"""

@@ -464,37 +464,91 @@ class PerformanceMonitor:
         index = int(len(sorted_values) * percentile / 100)
         return sorted_values[min(index, len(sorted_values) - 1)]
 
-    # Metric collection methods (TODO: Implement actual collection)
+    # ── Real metric collection via psutil + optional Prometheus ─────────────────
 
     async def _get_cpu_usage(self, deployment_id: str) -> float:
-        """Get CPU usage percentage"""
-        # TODO: Implement actual CPU metric collection
-        return 45.0
+        """Return host CPU utilisation (%) sampled over 0.1 s."""
+        import psutil
+        return psutil.cpu_percent(interval=0.1)
 
     async def _get_memory_usage(self, deployment_id: str) -> float:
-        """Get memory usage percentage"""
-        # TODO: Implement actual memory metric collection
-        return 60.0
+        """Return host virtual-memory utilisation (%)."""
+        import psutil
+        return psutil.virtual_memory().percent
 
     async def _get_disk_usage(self, deployment_id: str) -> float:
-        """Get disk usage percentage"""
-        # TODO: Implement actual disk metric collection
-        return 55.0
+        """Return root-partition disk utilisation (%)."""
+        import psutil
+        return psutil.disk_usage("/").percent
 
     async def _get_network_throughput(self, deployment_id: str) -> float:
-        """Get network throughput in Mbps"""
-        # TODO: Implement actual network metric collection
-        return 150.0
+        """Return approximate network throughput in Mbps.
+
+        Samples *bytes_sent + bytes_recv* over a 0.5 s window and converts
+        to megabits per second.
+        """
+        import psutil, asyncio as _asyncio
+        before = psutil.net_io_counters()
+        await _asyncio.sleep(0.5)
+        after  = psutil.net_io_counters()
+        bytes_delta = (after.bytes_sent + after.bytes_recv) - (before.bytes_sent + before.bytes_recv)
+        return round((bytes_delta * 8) / (0.5 * 1_000_000), 3)  # Mbps
 
     async def _get_latency(self, deployment_id: str) -> float:
-        """Get average latency in ms"""
-        # TODO: Implement actual latency metric collection
-        return 120.0
+        """Return the most recent average-latency sample for the deployment.
+
+        If Prometheus is configured (``PROMETHEUS_URL`` env var) the value is
+        fetched from the ``http_request_duration_seconds`` histogram.  Falls
+        back to the last recorded value from the in-memory ``metrics`` buffer.
+        """
+        import os
+        prom_url = os.getenv("PROMETHEUS_URL")
+        if prom_url:
+            try:
+                import httpx
+                async with httpx.AsyncClient(timeout=3.0) as client:
+                    resp = await client.get(
+                        f"{prom_url}/api/v1/query",
+                        params={"query": f'avg(http_request_duration_seconds{{deployment="{deployment_id}"}})'},
+                    )
+                    if resp.status_code == 200:
+                        result = resp.json().get("data", {}).get("result", [])
+                        if result:
+                            return float(result[0]["value"][1]) * 1000  # s → ms
+            except Exception:
+                pass
+        # Fallback: last buffered value
+        history = self.metrics.get(deployment_id, [])
+        if history:
+            return history[-1].value if hasattr(history[-1], "value") else 0.0
+        return 0.0
 
     async def _get_error_rate(self, deployment_id: str) -> float:
-        """Get error rate percentage"""
-        # TODO: Implement actual error rate collection
-        return 0.5
+        """Return error-rate percentage for the deployment.
+
+        Queries Prometheus (``rate(http_requests_total{status=~"5.."}[1m])`` /
+        ``rate(http_requests_total[1m])``) when available.  Falls back to 0.
+        """
+        import os
+        prom_url = os.getenv("PROMETHEUS_URL")
+        if prom_url:
+            try:
+                import httpx
+                async with httpx.AsyncClient(timeout=3.0) as client:
+                    query = (
+                        f'100 * sum(rate(http_requests_total{{deployment="{deployment_id}",status=~"5.."}}[1m])) '
+                        f'/ sum(rate(http_requests_total{{deployment="{deployment_id}"}}[1m]))'
+                    )
+                    resp = await client.get(
+                        f"{prom_url}/api/v1/query", params={"query": query}
+                    )
+                    if resp.status_code == 200:
+                        result = resp.json().get("data", {}).get("result", [])
+                        if result:
+                            return round(float(result[0]["value"][1]), 4)
+            except Exception:
+                pass
+        return 0.0
 
     async def cleanup(self) -> None:
         """Cleanup resources"""

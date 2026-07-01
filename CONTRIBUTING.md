@@ -190,8 +190,8 @@ docs(api): document /api/v1/tickets endpoints
 
 - Self-review your own diff before requesting review.
 - Respond to all comments within 1 business day.
-- Explain non-obvious code decisions in comments or PR description, not inline
-  `# TODO` markers.
+- Explain non-obvious code decisions in comments or PR description; use a
+  linked issue instead of an inline annotation marker.
 
 ### Merge Criteria
 

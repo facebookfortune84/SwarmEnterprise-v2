@@ -425,45 +425,139 @@ class CICDManager:
         return stdout.decode()
 
     def _find_artifacts(self, project_dir: str) -> List[str]:
-        """Find build artifacts"""
-        artifacts = []
-
-        # Common artifact patterns
-
-        # TODO: Implement artifact discovery
-
+        """Find build artifacts in common output directories."""
+        import os
+        artifacts: List[str] = []
+        artifact_patterns = [
+            ("dist", [".whl", ".tar.gz", ".zip", ".exe"]),
+            ("build", [".whl", ".tar.gz"]),
+            ("target", [".jar", ".war"]),
+            ("out", [".js", ".css"]),
+            ("frontend/dist", [".js", ".css", ".html"]),
+        ]
+        for subdir, extensions in artifact_patterns:
+            full_dir = os.path.join(project_dir, subdir)
+            if not os.path.isdir(full_dir):
+                continue
+            for root, _, files in os.walk(full_dir):
+                for fname in files:
+                    if any(fname.endswith(ext) for ext in extensions):
+                        artifacts.append(os.path.join(root, fname))
         return artifacts
 
     async def _parse_test_results(self, output: str) -> Dict[str, Any]:
-        """Parse test results from output"""
-        # Simple pytest output parsing
-        results = {
-            "total": 0,
-            "passed": 0,
-            "failed": 0,
-            "skipped": 0,
-        }
+        """Parse pytest / jest output into a structured summary."""
+        import re
+        results: Dict[str, Any] = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
 
-        # TODO: Implement proper test result parsing
+        # pytest summary line: "5 passed, 1 failed, 2 skipped in 3.14s"
+        pytest_match = re.search(
+            r"(\d+) passed(?:,\s*(\d+) failed)?(?:,\s*(\d+) skipped)?",
+            output,
+        )
+        if pytest_match:
+            results["passed"]  = int(pytest_match.group(1) or 0)
+            results["failed"]  = int(pytest_match.group(2) or 0)
+            results["skipped"] = int(pytest_match.group(3) or 0)
+            results["total"]   = results["passed"] + results["failed"] + results["skipped"]
+            return results
+
+        # jest summary line: "Tests: 2 failed, 5 passed, 7 total"
+        jest_match = re.search(
+            r"Tests:\s*(?:(\d+) failed,\s*)?(?:(\d+) passed,\s*)?(\d+) total",
+            output,
+        )
+        if jest_match:
+            results["failed"]  = int(jest_match.group(1) or 0)
+            results["passed"]  = int(jest_match.group(2) or 0)
+            results["total"]   = int(jest_match.group(3) or 0)
+            results["skipped"] = results["total"] - results["passed"] - results["failed"]
+            return results
 
         return results
 
     def _parse_bandit_results(self, output: str) -> List[Dict[str, Any]]:
-        """Parse bandit security scan results"""
-        issues = []
-        # TODO: Implement bandit result parsing
+        """Parse bandit JSON output into a list of security issues."""
+        import json as _json
+        issues: List[Dict[str, Any]] = []
+        try:
+            data = _json.loads(output)
+            for item in data.get("results", []):
+                issues.append({
+                    "severity":   item.get("issue_severity", "UNKNOWN"),
+                    "confidence": item.get("issue_confidence", "UNKNOWN"),
+                    "text":       item.get("issue_text", ""),
+                    "file":       item.get("filename", ""),
+                    "line":       item.get("line_number", 0),
+                    "test_id":    item.get("test_id", ""),
+                })
+        except (_json.JSONDecodeError, AttributeError):
+            pass
         return issues
 
     def _parse_safety_results(self, output: str) -> List[Dict[str, Any]]:
-        """Parse safety check results"""
-        issues = []
-        # TODO: Implement safety result parsing
+        """Parse ``safety check --json`` output into a list of vulnerability dicts."""
+        import json as _json
+        issues: List[Dict[str, Any]] = []
+        try:
+            data = _json.loads(output)
+            # safety 2.x returns {"vulnerabilities": [...]}
+            vulns = data.get("vulnerabilities") if isinstance(data, dict) else data
+            for vuln in (vulns or []):
+                if isinstance(vuln, dict):
+                    issues.append({
+                        "package":     vuln.get("package_name", vuln.get("name", "")),
+                        "installed":   vuln.get("analyzed_version", ""),
+                        "affected":    vuln.get("vulnerable_spec", ""),
+                        "advisory":    vuln.get("advisory", ""),
+                        "cve":         vuln.get("CVE", ""),
+                    })
+                elif isinstance(vuln, list) and len(vuln) >= 5:
+                    # safety 1.x list format: [package, spec, installed, advisory, id]
+                    issues.append({
+                        "package":   vuln[0],
+                        "affected":  vuln[1],
+                        "installed": vuln[2],
+                        "advisory":  vuln[3],
+                        "cve":       vuln[4] if len(vuln) > 4 else "",
+                    })
+        except (_json.JSONDecodeError, AttributeError):
+            pass
         return issues
 
     def _parse_npm_audit(self, output: str) -> List[Dict[str, Any]]:
-        """Parse npm audit results"""
-        issues = []
-        # TODO: Implement npm audit parsing
+        """Parse ``npm audit --json`` output into a list of vulnerability dicts."""
+        import json as _json
+        issues: List[Dict[str, Any]] = []
+        try:
+            data = _json.loads(output)
+            # npm audit --json schema: {"vulnerabilities": {name: {...}}}
+            vulns = data.get("vulnerabilities", {})
+            for pkg_name, info in vulns.items():
+                severity = info.get("severity", "unknown")
+                via = info.get("via", [])
+                advisories = [v for v in via if isinstance(v, dict)]
+                if advisories:
+                    for adv in advisories:
+                        issues.append({
+                            "package":  pkg_name,
+                            "severity": severity,
+                            "title":    adv.get("title", ""),
+                            "url":      adv.get("url", ""),
+                            "range":    adv.get("range", ""),
+                            "cve":      adv.get("cves", [None])[0] if adv.get("cves") else "",
+                        })
+                else:
+                    issues.append({
+                        "package":  pkg_name,
+                        "severity": severity,
+                        "title":    "",
+                        "url":      "",
+                        "range":    info.get("range", ""),
+                        "cve":      "",
+                    })
+        except (_json.JSONDecodeError, AttributeError):
+            pass
         return issues
 
     async def get_pipeline_status(self, pipeline_id: str) -> Dict[str, Any]:

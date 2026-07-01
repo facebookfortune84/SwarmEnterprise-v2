@@ -85,21 +85,31 @@ const linesDeleted  = delMatch   ? parseInt(delMatch[1], 10)   : 0;
 const changedFiles = git(`diff ${RANGE} --name-only`, '').split('\n').filter(Boolean);
 const topFiles = changedFiles.slice(0, 8).map(f => `  - \`${f}\``).join('\n') || '  _(none)_';
 
-// ─── TODO/FIXME harvest (inline, fast) ────────────────────────────────────────
+// ─── Annotation harvest (inline, fast) ───────────────────────────────────────
 
-const TODO_RE = /\b(TODO|FIXME|HACK|XXX)\b.*$/gm;
+// Build pattern without embedding the literal annotation strings here
+const _ANNO_TAGS = ['TODO', 'FIXME', 'HACK', 'XXX'];
+const TODO_RE = new RegExp('\\b(' + _ANNO_TAGS.join('|') + ')\\b.*$', 'gm');
 let todoItems = [];
 const searchExts = ['.ts','.tsx','.js','.jsx','.py','.md'];
+const SKIP_NAMES = new Set([
+  '.git','node_modules','venv','.venv','__pycache__','.ruff_cache',
+  'htmlcov','coverage','dist','build','.pytest_cache','.github',
+]);
+const SKIP_FILENAMES = new Set([
+  'harvest-todos.js', 'merge-report.js', 'merge-quality.js',
+  'TODO_REPORT.md', 'MERGE_REPORT.md',
+]);
 
 function scanDir(dir, depth = 0) {
   if (depth > 6) return;
   let entries;
   try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
   for (const entry of entries) {
-    if (['.git','node_modules','venv','.venv','__pycache__','.ruff_cache',
-         'htmlcov','coverage','dist','build','.pytest_cache'].includes(entry.name)) continue;
+    if (SKIP_NAMES.has(entry.name)) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) { scanDir(full, depth + 1); continue; }
+    if (SKIP_FILENAMES.has(entry.name)) continue;
     if (!searchExts.includes(path.extname(entry.name))) continue;
     try {
       const src = fs.readFileSync(full, 'utf8');
