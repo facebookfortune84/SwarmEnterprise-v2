@@ -1,0 +1,323 @@
+{
+    "generated_at": "2026-07-07T03:19:45.549408",
+    "agent_count": 3,
+    "agents": {
+        "memory_manager": {
+            "primary": {
+                "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager.json",
+                "score": 100,
+                "quality": "excellent"
+            },
+            "variants": [
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager.json",
+                    "score": 100,
+                    "quality": "excellent"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_03.json",
+                    "score": 100,
+                    "quality": "excellent"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_04.json",
+                    "score": 100,
+                    "quality": "excellent"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_06.json",
+                    "score": 100,
+                    "quality": "excellent"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_19.json",
+                    "score": 80,
+                    "quality": "good"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_05.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_23.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_32.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_34.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_02.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_07.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_08.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_09.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_10.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_11.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_12.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_13.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_14.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_15.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_16.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_17.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_18.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_20.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_21.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_22.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_24.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_25.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_26.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_27.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_29.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_30.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_31.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_33.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_35.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_36.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_37.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_38.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_39.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_40.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_41.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_42.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_43.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_44.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_45.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_46.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_47.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_48.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_49.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_50.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_51.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_52.json",
+                    "score": 60,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_28.json",
+                    "score": 50,
+                    "quality": "weak"
+                }
+            ]
+        },
+        "governance_director": {
+            "primary": {
+                "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director.json",
+                "score": 65,
+                "quality": "acceptable"
+            },
+            "variants": [
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director_02.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director_03.json",
+                    "score": 65,
+                    "quality": "acceptable"
+                }
+            ]
+        },
+        "architect": {
+            "primary": {
+                "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect.json",
+                "score": 75,
+                "quality": "good"
+            },
+            "variants": [
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect.json",
+                    "score": 75,
+                    "quality": "good"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect_02.json",
+                    "score": 75,
+                    "quality": "good"
+                },
+                {
+                    "file": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect_03.json",
+                    "score": 75,
+                    "quality": "good"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,1502 @@
+[
+    {
+        "chunk_id": 1,
+        "source": "goals.json",
+        "token_count": 65,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 2,
+        "source": "goals.json",
+        "token_count": 63,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 3,
+        "source": "goals.json",
+        "token_count": 64,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 4,
+        "source": "goals.json",
+        "token_count": 67,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 5,
+        "source": "goals.json",
+        "token_count": 69,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 6,
+        "source": "goals.json",
+        "token_count": 52,
+        "character_count": 726
+    },
+    {
+        "chunk_id": 7,
+        "source": "workflow_queue.json",
+        "token_count": 64,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 8,
+        "source": "workflow_queue.json",
+        "token_count": 67,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 9,
+        "source": "workflow_queue.json",
+        "token_count": 63,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 10,
+        "source": "workflow_queue.json",
+        "token_count": 67,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 11,
+        "source": "workflow_queue.json",
+        "token_count": 61,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 12,
+        "source": "workflow_queue.json",
+        "token_count": 69,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 13,
+        "source": "workflow_queue.json",
+        "token_count": 70,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 14,
+        "source": "workflow_queue.json",
+        "token_count": 64,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 15,
+        "source": "workflow_queue.json",
+        "token_count": 23,
+        "character_count": 278
+    },
+    {
+        "chunk_id": 16,
+        "source": "memory_store.json",
+        "token_count": 23,
+        "character_count": 316
+    },
+    {
+        "chunk_id": 17,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 18,
+        "source": "registry.json",
+        "token_count": 28,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 19,
+        "source": "registry.json",
+        "token_count": 28,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 20,
+        "source": "registry.json",
+        "token_count": 27,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 21,
+        "source": "registry.json",
+        "token_count": 38,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 22,
+        "source": "registry.json",
+        "token_count": 41,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 23,
+        "source": "registry.json",
+        "token_count": 27,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 24,
+        "source": "registry.json",
+        "token_count": 28,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 25,
+        "source": "registry.json",
+        "token_count": 27,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 26,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 27,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 28,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 29,
+        "source": "registry.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 30,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 31,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 32,
+        "source": "registry.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 33,
+        "source": "registry.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 34,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 35,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 36,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 37,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 38,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 39,
+        "source": "registry.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 40,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 41,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 42,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 43,
+        "source": "registry.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 44,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 45,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 46,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 47,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 48,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 49,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 50,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 51,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 52,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 53,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 54,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 55,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 56,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 57,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 58,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 59,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 60,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 61,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 62,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 63,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 64,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 65,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 66,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 67,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 68,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 69,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 70,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 71,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 72,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 73,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 74,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 75,
+        "source": "registry.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 76,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 77,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 78,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 79,
+        "source": "registry.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 80,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 81,
+        "source": "registry.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 82,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 83,
+        "source": "registry.json",
+        "token_count": 57,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 84,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 85,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 86,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 87,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 88,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 89,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 90,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 91,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 92,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 93,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 94,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 95,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 96,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 97,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 98,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 99,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 100,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 101,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 102,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 103,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 104,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 105,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 106,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 107,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 108,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 109,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 110,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 111,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 112,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 113,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 114,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 115,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 116,
+        "source": "registry.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 117,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 118,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 119,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 120,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 121,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 122,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 123,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 124,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 125,
+        "source": "registry.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 126,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 127,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 128,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 129,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 130,
+        "source": "registry.json",
+        "token_count": 47,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 131,
+        "source": "registry.json",
+        "token_count": 47,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 132,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 133,
+        "source": "registry.json",
+        "token_count": 45,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 134,
+        "source": "registry.json",
+        "token_count": 46,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 135,
+        "source": "registry.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 136,
+        "source": "registry.json",
+        "token_count": 47,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 137,
+        "source": "registry.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 138,
+        "source": "registry.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 139,
+        "source": "registry.json",
+        "token_count": 60,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 140,
+        "source": "registry.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 141,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 142,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 143,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 144,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 145,
+        "source": "registry.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 146,
+        "source": "registry.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 147,
+        "source": "registry.json",
+        "token_count": 37,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 148,
+        "source": "registry.json",
+        "token_count": 30,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 149,
+        "source": "registry.json",
+        "token_count": 39,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 150,
+        "source": "registry.json",
+        "token_count": 32,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 151,
+        "source": "registry.json",
+        "token_count": 26,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 152,
+        "source": "registry.json",
+        "token_count": 27,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 153,
+        "source": "registry.json",
+        "token_count": 27,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 154,
+        "source": "registry.json",
+        "token_count": 37,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 155,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 156,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 157,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 158,
+        "source": "registry.json",
+        "token_count": 26,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 159,
+        "source": "registry.json",
+        "token_count": 26,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 160,
+        "source": "registry.json",
+        "token_count": 24,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 161,
+        "source": "registry.json",
+        "token_count": 27,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 162,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 163,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 164,
+        "source": "registry.json",
+        "token_count": 29,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 165,
+        "source": "registry.json",
+        "token_count": 25,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 166,
+        "source": "registry.json",
+        "token_count": 26,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 167,
+        "source": "registry.json",
+        "token_count": 36,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 168,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 169,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 170,
+        "source": "registry.json",
+        "token_count": 24,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 171,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 172,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 173,
+        "source": "registry.json",
+        "token_count": 28,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 174,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 175,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 176,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 177,
+        "source": "registry.json",
+        "token_count": 29,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 178,
+        "source": "registry.json",
+        "token_count": 24,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 179,
+        "source": "registry.json",
+        "token_count": 29,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 180,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 181,
+        "source": "registry.json",
+        "token_count": 22,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 182,
+        "source": "registry.json",
+        "token_count": 26,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 183,
+        "source": "registry.json",
+        "token_count": 24,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 184,
+        "source": "registry.json",
+        "token_count": 21,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 185,
+        "source": "registry.json",
+        "token_count": 24,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 186,
+        "source": "registry.json",
+        "token_count": 5,
+        "character_count": 85
+    },
+    {
+        "chunk_id": 187,
+        "source": "asset_graph.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 188,
+        "source": "asset_graph.json",
+        "token_count": 60,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 189,
+        "source": "asset_graph.json",
+        "token_count": 58,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 190,
+        "source": "asset_graph.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 191,
+        "source": "asset_graph.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 192,
+        "source": "asset_graph.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 193,
+        "source": "asset_graph.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 194,
+        "source": "asset_graph.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 195,
+        "source": "asset_graph.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 196,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 197,
+        "source": "asset_graph.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 198,
+        "source": "asset_graph.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 199,
+        "source": "asset_graph.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 200,
+        "source": "asset_graph.json",
+        "token_count": 57,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 201,
+        "source": "asset_graph.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 202,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 203,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 204,
+        "source": "asset_graph.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 205,
+        "source": "asset_graph.json",
+        "token_count": 52,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 206,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 207,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 208,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 209,
+        "source": "asset_graph.json",
+        "token_count": 53,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 210,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 211,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 212,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 213,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 214,
+        "source": "asset_graph.json",
+        "token_count": 55,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 215,
+        "source": "asset_graph.json",
+        "token_count": 56,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 216,
+        "source": "asset_graph.json",
+        "token_count": 54,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 217,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 218,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 219,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 220,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 221,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 222,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 223,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 224,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 225,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 226,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 227,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 228,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 229,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 230,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 231,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 232,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 233,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 234,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 235,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 236,
+        "source": "asset_graph.json",
+        "token_count": 48,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 237,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 238,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 239,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 240,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 241,
+        "source": "asset_graph.json",
+        "token_count": 51,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 242,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 243,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 244,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 245,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 246,
+        "source": "asset_graph.json",
+        "token_count": 50,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 247,
+        "source": "asset_graph.json",
+        "token_count": 49,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 248,
+        "source": "asset_graph.json",
+        "token_count": 38,
+        "character_count": 709
+    },
+    {
+        "chunk_id": 249,
+        "source": "constitution_validation_report.json",
+        "token_count": 65,
+        "character_count": 1000
+    },
+    {
+        "chunk_id": 250,
+        "source": "constitution_validation_report.json",
+        "token_count": 13,
+        "character_count": 190
+    }
+]

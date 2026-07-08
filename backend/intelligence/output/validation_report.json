@@ -1,0 +1,24 @@
+{
+    "validated": 125,
+    "ai_calls": 0,
+    "categories": {
+        "governance": 72,
+        "constitution": 2,
+        "marketing": 10,
+        "monetization": 13,
+        "security": 10,
+        "technology": 18
+    },
+    "domain_sources": {
+        "fallback": 2,
+        "keyword": 73,
+        "prefix": 50
+    },
+    "asset_tiers": {
+        "5": 60,
+        "2": 1,
+        "1": 2,
+        "3": 54,
+        "4": 8
+    }
+}

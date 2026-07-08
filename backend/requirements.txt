@@ -1,26 +1,26 @@
-# Backend Docker Requirements
-# Minimal set for production container
-
+# Core
 fastapi==0.104.1
-uvicorn[standard]==0.24.0
+uvicorn==0.24.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-crewai==0.25.0
-langchain==0.3.0.dev1
-langchain-community==0.3.27
-langchain-openai==1.1.14
-ollama==0.1.0
+# CLEAN AI STACK (NO CONFLICTS)
+crewai==0.28.0
+langchain==0.1.20
+langchain-community==0.0.38
+langchain-core==0.1.52
 
-sqlalchemy==2.0.23
-aiosqlite==0.19.0
-chromadb==0.4.17
+# Database (UPDATED)
+sqlalchemy==2.0.30
+psycopg2-binary==2.9.9
+alembic==1.13.1
 
-python-dotenv==1.2.2
-requests==2.33.0
-stripe==6.7.0
-PyJWT==2.8.0
+# Utilities
+requests==2.31.0
+python-dotenv==1.0.0
 jinja2==3.1.2
-
 httpx==0.25.0
-aiofiles==23.2.1
+
+# Queue
+redis==5.0.0
+celery==5.3.1

@@ -1,0 +1,649 @@
+{
+    "summary": {
+        "generated_at": "2026-07-06T22:25:45.261713",
+        "goals": 5,
+        "workflows": 5,
+        "artifacts": 4,
+        "tests": 4,
+        "passed_tests": 4,
+        "approved": 2,
+        "rejected": 2,
+        "chunks": 250,
+        "embeddings": 250
+    },
+    "goals": [
+        {
+            "goal_id": "GOAL_001",
+            "priority": 1,
+            "epic": "governance",
+            "phase": "implementation",
+            "goal": "Build constitution_validator.py",
+            "goal_type": "implementation",
+            "status": "pending",
+            "category": "governance",
+            "assigned_agent": "governance_director",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/constitution_validator.py"
+            },
+            "dependencies": [],
+            "supporting_assets": [],
+            "required_inputs": [
+                "goals.json",
+                "workflow_queue.json"
+            ],
+            "deliverables": [
+                "constitution_validator.py"
+            ],
+            "success_criteria": [
+                "Validator file exists",
+                "Workflow validation succeeds",
+                "Goals can be evaluated"
+            ],
+            "next_goals": [],
+            "estimated_effort": "medium",
+            "estimated_value": 95,
+            "risk": "low",
+            "reason": "No governance enforcement layer exists.",
+            "generated_by": "goal_generator",
+            "created_at": "2026-07-06T05:20:34.686516",
+            "metadata": {
+                "domain": "governance",
+                "phase": "implementation"
+            }
+        },
+        {
+            "goal_id": "GOAL_002",
+            "priority": 2,
+            "epic": "memory_system",
+            "phase": "implementation",
+            "goal": "Build memory_manager.py",
+            "goal_type": "implementation",
+            "status": "pending",
+            "category": "technology",
+            "assigned_agent": "developer",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/memory_manager.py"
+            },
+            "dependencies": [],
+            "supporting_assets": [],
+            "required_inputs": [],
+            "deliverables": [
+                "memory_manager.py",
+                "memory_store.json"
+            ],
+            "success_criteria": [
+                "Memory persists",
+                "Memory reloads correctly",
+                "Memory updates successfully"
+            ],
+            "next_goals": [],
+            "estimated_effort": "medium",
+            "estimated_value": 100,
+            "risk": "low",
+            "reason": "Persistent memory layer is missing.",
+            "generated_by": "goal_generator",
+            "created_at": "2026-07-06T05:20:34.687554",
+            "metadata": {
+                "domain": "technology",
+                "phase": "implementation"
+            }
+        },
+        {
+            "goal_id": "GOAL_003",
+            "priority": 3,
+            "epic": "retrieval",
+            "phase": "implementation",
+            "goal": "Build rag_builder.py",
+            "goal_type": "implementation",
+            "status": "pending",
+            "category": "technology",
+            "assigned_agent": "developer",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/rag_builder.py"
+            },
+            "dependencies": [],
+            "supporting_assets": [],
+            "required_inputs": [],
+            "deliverables": [
+                "rag_builder.py",
+                "embeddings.json",
+                "chunks.json"
+            ],
+            "success_criteria": [
+                "Chunks generated",
+                "Embeddings generated",
+                "Searchable retrieval index created"
+            ],
+            "next_goals": [],
+            "estimated_effort": "medium",
+            "estimated_value": 90,
+            "risk": "low",
+            "reason": "Semantic retrieval does not exist.",
+            "generated_by": "goal_generator",
+            "created_at": "2026-07-06T05:20:34.688548",
+            "metadata": {
+                "domain": "technology",
+                "phase": "implementation"
+            }
+        },
+        {
+            "goal_id": "GOAL_004",
+            "priority": 4,
+            "epic": "dashboard",
+            "phase": "implementation",
+            "goal": "Build dashboard_api.py",
+            "goal_type": "implementation",
+            "status": "pending",
+            "category": "technology",
+            "assigned_agent": "developer",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/dashboard_api.py"
+            },
+            "dependencies": [],
+            "supporting_assets": [],
+            "required_inputs": [],
+            "deliverables": [
+                "dashboard_api.py"
+            ],
+            "success_criteria": [
+                "Metrics endpoint works",
+                "Registry endpoint works",
+                "Graph endpoint works"
+            ],
+            "next_goals": [],
+            "estimated_effort": "medium",
+            "estimated_value": 80,
+            "risk": "low",
+            "reason": "Dashboard service layer is missing.",
+            "generated_by": "goal_generator",
+            "created_at": "2026-07-06T05:20:34.689550",
+            "metadata": {
+                "domain": "technology",
+                "phase": "implementation"
+            }
+        },
+        {
+            "goal_id": "GOAL_005",
+            "priority": 20,
+            "epic": "optimization",
+            "phase": "optimization",
+            "goal": "Increase implementation assets",
+            "goal_type": "optimization",
+            "status": "pending",
+            "category": "technology",
+            "assigned_agent": "developer",
+            "target": {},
+            "dependencies": [],
+            "supporting_assets": [],
+            "required_inputs": [],
+            "deliverables": [
+                "Additional implementation assets"
+            ],
+            "success_criteria": [
+                "Technology asset count increases",
+                "Asset balance improves"
+            ],
+            "next_goals": [],
+            "estimated_effort": "high",
+            "estimated_value": 75,
+            "risk": "low",
+            "reason": "Governance assets significantly outweigh implementation assets.",
+            "generated_by": "goal_generator",
+            "created_at": "2026-07-06T05:20:34.689550",
+            "metadata": {
+                "domain": "technology",
+                "phase": "optimization"
+            }
+        }
+    ],
+    "workflows": [
+        {
+            "workflow_id": "WF_GOAL_001",
+            "goal_id": "GOAL_001",
+            "priority": 1,
+            "status": "pending",
+            "assigned_agent": "governance_director",
+            "goal": "Build constitution_validator.py",
+            "dependencies": [],
+            "workflow_state": {
+                "dependency_check": "pending",
+                "execution": "pending",
+                "validation": "pending",
+                "completion": "pending"
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "name": "analyze",
+                    "status": "pending"
+                },
+                {
+                    "step": 2,
+                    "name": "implement",
+                    "status": "pending"
+                },
+                {
+                    "step": 3,
+                    "name": "validate",
+                    "status": "pending"
+                },
+                {
+                    "step": 4,
+                    "name": "complete",
+                    "status": "pending"
+                }
+            ],
+            "category": "governance",
+            "epic": "governance",
+            "goal_type": "implementation",
+            "phase": "implementation",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/constitution_validator.py"
+            },
+            "deliverables": [
+                "constitution_validator.py"
+            ],
+            "required_inputs": [
+                "goals.json",
+                "workflow_queue.json"
+            ],
+            "success_criteria": [
+                "Validator file exists",
+                "Workflow validation succeeds",
+                "Goals can be evaluated"
+            ],
+            "estimated_effort": "medium",
+            "estimated_value": 95,
+            "risk": "low",
+            "reason": "No governance enforcement layer exists."
+        },
+        {
+            "workflow_id": "WF_GOAL_002",
+            "goal_id": "GOAL_002",
+            "priority": 2,
+            "status": "pending",
+            "assigned_agent": "developer",
+            "goal": "Build memory_manager.py",
+            "dependencies": [],
+            "workflow_state": {
+                "dependency_check": "pending",
+                "execution": "pending",
+                "validation": "pending",
+                "completion": "pending"
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "name": "analyze",
+                    "status": "pending"
+                },
+                {
+                    "step": 2,
+                    "name": "implement",
+                    "status": "pending"
+                },
+                {
+                    "step": 3,
+                    "name": "validate",
+                    "status": "pending"
+                },
+                {
+                    "step": 4,
+                    "name": "complete",
+                    "status": "pending"
+                }
+            ],
+            "category": "technology",
+            "epic": "memory_system",
+            "goal_type": "implementation",
+            "phase": "implementation",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/memory_manager.py"
+            },
+            "deliverables": [
+                "memory_manager.py",
+                "memory_store.json"
+            ],
+            "required_inputs": [],
+            "success_criteria": [
+                "Memory persists",
+                "Memory reloads correctly",
+                "Memory updates successfully"
+            ],
+            "estimated_effort": "medium",
+            "estimated_value": 100,
+            "risk": "low",
+            "reason": "Persistent memory layer is missing."
+        },
+        {
+            "workflow_id": "WF_GOAL_003",
+            "goal_id": "GOAL_003",
+            "priority": 3,
+            "status": "pending",
+            "assigned_agent": "developer",
+            "goal": "Build rag_builder.py",
+            "dependencies": [],
+            "workflow_state": {
+                "dependency_check": "pending",
+                "execution": "pending",
+                "validation": "pending",
+                "completion": "pending"
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "name": "analyze",
+                    "status": "pending"
+                },
+                {
+                    "step": 2,
+                    "name": "implement",
+                    "status": "pending"
+                },
+                {
+                    "step": 3,
+                    "name": "validate",
+                    "status": "pending"
+                },
+                {
+                    "step": 4,
+                    "name": "complete",
+                    "status": "pending"
+                }
+            ],
+            "category": "technology",
+            "epic": "retrieval",
+            "goal_type": "implementation",
+            "phase": "implementation",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/rag_builder.py"
+            },
+            "deliverables": [
+                "rag_builder.py",
+                "embeddings.json",
+                "chunks.json"
+            ],
+            "required_inputs": [],
+            "success_criteria": [
+                "Chunks generated",
+                "Embeddings generated",
+                "Searchable retrieval index created"
+            ],
+            "estimated_effort": "medium",
+            "estimated_value": 90,
+            "risk": "low",
+            "reason": "Semantic retrieval does not exist."
+        },
+        {
+            "workflow_id": "WF_GOAL_004",
+            "goal_id": "GOAL_004",
+            "priority": 4,
+            "status": "pending",
+            "assigned_agent": "developer",
+            "goal": "Build dashboard_api.py",
+            "dependencies": [],
+            "workflow_state": {
+                "dependency_check": "pending",
+                "execution": "pending",
+                "validation": "pending",
+                "completion": "pending"
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "name": "analyze",
+                    "status": "pending"
+                },
+                {
+                    "step": 2,
+                    "name": "implement",
+                    "status": "pending"
+                },
+                {
+                    "step": 3,
+                    "name": "validate",
+                    "status": "pending"
+                },
+                {
+                    "step": 4,
+                    "name": "complete",
+                    "status": "pending"
+                }
+            ],
+            "category": "technology",
+            "epic": "dashboard",
+            "goal_type": "implementation",
+            "phase": "implementation",
+            "target": {
+                "type": "file",
+                "path": "asset_processor/dashboard_api.py"
+            },
+            "deliverables": [
+                "dashboard_api.py"
+            ],
+            "required_inputs": [],
+            "success_criteria": [
+                "Metrics endpoint works",
+                "Registry endpoint works",
+                "Graph endpoint works"
+            ],
+            "estimated_effort": "medium",
+            "estimated_value": 80,
+            "risk": "low",
+            "reason": "Dashboard service layer is missing."
+        },
+        {
+            "workflow_id": "WF_GOAL_005",
+            "goal_id": "GOAL_005",
+            "priority": 20,
+            "status": "pending",
+            "assigned_agent": "developer",
+            "goal": "Increase implementation assets",
+            "dependencies": [],
+            "workflow_state": {
+                "dependency_check": "pending",
+                "execution": "pending",
+                "validation": "pending",
+                "completion": "pending"
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "name": "analyze",
+                    "status": "pending"
+                },
+                {
+                    "step": 2,
+                    "name": "implement",
+                    "status": "pending"
+                },
+                {
+                    "step": 3,
+                    "name": "validate",
+                    "status": "pending"
+                },
+                {
+                    "step": 4,
+                    "name": "complete",
+                    "status": "pending"
+                }
+            ],
+            "category": "technology",
+            "epic": "optimization",
+            "goal_type": "optimization",
+            "phase": "optimization",
+            "target": {},
+            "deliverables": [
+                "Additional implementation assets"
+            ],
+            "required_inputs": [],
+            "success_criteria": [
+                "Technology asset count increases",
+                "Asset balance improves"
+            ],
+            "estimated_effort": "high",
+            "estimated_value": 75,
+            "risk": "low",
+            "reason": "Governance assets significantly outweigh implementation assets."
+        }
+    ],
+    "artifacts": [
+        {
+            "artifact_id": "ART_GOAL_001",
+            "workflow_id": "WF_GOAL_001",
+            "goal_id": "GOAL_001",
+            "status": "created",
+            "output_file": "asset_processor\\constitution_validator.py",
+            "timestamp": "2026-07-06T22:01:57.413778"
+        },
+        {
+            "artifact_id": "ART_GOAL_002",
+            "workflow_id": "WF_GOAL_002",
+            "goal_id": "GOAL_002",
+            "status": "created",
+            "output_file": "asset_processor\\memory_manager.py",
+            "timestamp": "2026-07-06T22:01:57.414807"
+        },
+        {
+            "artifact_id": "ART_GOAL_003",
+            "workflow_id": "WF_GOAL_003",
+            "goal_id": "GOAL_003",
+            "status": "created",
+            "output_file": "asset_processor\\rag_builder.py",
+            "timestamp": "2026-07-06T22:01:57.415804"
+        },
+        {
+            "artifact_id": "ART_GOAL_004",
+            "workflow_id": "WF_GOAL_004",
+            "goal_id": "GOAL_004",
+            "status": "created",
+            "output_file": "asset_processor\\dashboard_api.py",
+            "timestamp": "2026-07-06T22:01:57.416786"
+        }
+    ],
+    "tests": [
+        {
+            "artifact_id": "ART_GOAL_001",
+            "goal_id": "GOAL_001",
+            "output_file": "asset_processor\\constitution_validator.py",
+            "file_exists": true,
+            "syntax_ok": true,
+            "import_ok": true,
+            "class_exists": true,
+            "classes": [
+                "ConstitutionValidator"
+            ],
+            "passed": true,
+            "errors": [],
+            "tested_at": "2026-07-06T22:01:57.566626"
+        },
+        {
+            "artifact_id": "ART_GOAL_002",
+            "goal_id": "GOAL_002",
+            "output_file": "asset_processor\\memory_manager.py",
+            "file_exists": true,
+            "syntax_ok": true,
+            "import_ok": true,
+            "class_exists": true,
+            "classes": [
+                "MemoryManager"
+            ],
+            "passed": true,
+            "errors": [],
+            "tested_at": "2026-07-06T22:01:57.586812"
+        },
+        {
+            "artifact_id": "ART_GOAL_003",
+            "goal_id": "GOAL_003",
+            "output_file": "asset_processor\\rag_builder.py",
+            "file_exists": true,
+            "syntax_ok": true,
+            "import_ok": true,
+            "class_exists": true,
+            "classes": [
+                "RagBuilder"
+            ],
+            "passed": true,
+            "errors": [],
+            "tested_at": "2026-07-06T22:01:57.605972"
+        },
+        {
+            "artifact_id": "ART_GOAL_004",
+            "goal_id": "GOAL_004",
+            "output_file": "asset_processor\\dashboard_api.py",
+            "file_exists": true,
+            "syntax_ok": true,
+            "import_ok": true,
+            "class_exists": true,
+            "classes": [
+                "DashboardApi"
+            ],
+            "passed": true,
+            "errors": [],
+            "tested_at": "2026-07-06T22:01:57.621561"
+        }
+    ],
+    "validation": [
+        {
+            "goal_id": "GOAL_001",
+            "artifact_id": "ART_GOAL_001",
+            "artifact_status": "created",
+            "approved": true,
+            "status": "approved",
+            "findings": [],
+            "validated_at": "2026-07-06T22:14:08.950643"
+        },
+        {
+            "goal_id": "GOAL_002",
+            "artifact_id": "ART_GOAL_002",
+            "artifact_status": "created",
+            "approved": false,
+            "status": "rejected",
+            "findings": [
+                "Missing deliverable: memory_store.json"
+            ],
+            "validated_at": "2026-07-06T22:14:08.950643"
+        },
+        {
+            "goal_id": "GOAL_003",
+            "artifact_id": "ART_GOAL_003",
+            "artifact_status": "created",
+            "approved": false,
+            "status": "rejected",
+            "findings": [
+                "Missing deliverable: embeddings.json",
+                "Missing deliverable: chunks.json"
+            ],
+            "validated_at": "2026-07-06T22:14:08.951141"
+        },
+        {
+            "goal_id": "GOAL_004",
+            "artifact_id": "ART_GOAL_004",
+            "artifact_status": "created",
+            "approved": true,
+            "status": "approved",
+            "findings": [],
+            "validated_at": "2026-07-06T22:14:08.951141"
+        }
+    ],
+    "memory": {
+        "system": {
+            "created_at": "2026-07-06T22:18:02.286608",
+            "last_updated": "2026-07-06T22:18:02.286608"
+        },
+        "completed_goals": [],
+        "rejected_goals": [],
+        "workflow_history": [],
+        "artifact_history": [],
+        "validation_history": [],
+        "agent_performance": {},
+        "custom": {}
+    }
+}

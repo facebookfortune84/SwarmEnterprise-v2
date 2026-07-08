@@ -1,0 +1,479 @@
+{
+    "generated_at": "2026-07-07T03:19:45.550441",
+    "processed": 58,
+    "failed": [],
+    "missing_agents": [
+        "builder",
+        "planner",
+        "researcher",
+        "reviewer",
+        "optimizer",
+        "executive"
+    ],
+    "agents": [
+        {
+            "source": "Agent CLI Prompt 2025-08-07_dna.json",
+            "classified_as": "memory_manager",
+            "score": 100,
+            "quality": "excellent",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager.json"
+        },
+        {
+            "source": "Agent loop_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_02.json"
+        },
+        {
+            "source": "Agent Prompt 2.0_dna.json",
+            "classified_as": "memory_manager",
+            "score": 100,
+            "quality": "excellent",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_03.json"
+        },
+        {
+            "source": "Agent Prompt 2025-09-03_dna.json",
+            "classified_as": "memory_manager",
+            "score": 100,
+            "quality": "excellent",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_04.json"
+        },
+        {
+            "source": "Agent Prompt v1.0_dna.json",
+            "classified_as": "memory_manager",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_05.json"
+        },
+        {
+            "source": "Agent Prompt v1.2_dna.json",
+            "classified_as": "memory_manager",
+            "score": 100,
+            "quality": "excellent",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_06.json"
+        },
+        {
+            "source": "Agent Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_07.json"
+        },
+        {
+            "source": "AI Studio vibe-coder_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_08.json"
+        },
+        {
+            "source": "Builder Prompt_dna.json",
+            "classified_as": "governance_director",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director.json"
+        },
+        {
+            "source": "Chat Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_09.json"
+        },
+        {
+            "source": "chat-titles_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_10.json"
+        },
+        {
+            "source": "Claude Code 2.0_dna.json",
+            "classified_as": "architect",
+            "score": 75,
+            "quality": "good",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect.json"
+        },
+        {
+            "source": "claude-4-sonnet-agent-prompts_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_11.json"
+        },
+        {
+            "source": "claude-4-sonnet_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_12.json"
+        },
+        {
+            "source": "claude-sonnet-4_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_13.json"
+        },
+        {
+            "source": "Craft Prompt_dna.json",
+            "classified_as": "architect",
+            "score": 75,
+            "quality": "good",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect_02.json"
+        },
+        {
+            "source": "DeepWiki Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_14.json"
+        },
+        {
+            "source": "Default Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_15.json"
+        },
+        {
+            "source": "DocumentAction_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_16.json"
+        },
+        {
+            "source": "Enterprise Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_17.json"
+        },
+        {
+            "source": "ExplainAction_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_18.json"
+        },
+        {
+            "source": "Fast Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 80,
+            "quality": "good",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_19.json"
+        },
+        {
+            "source": "gemini-2.5-pro_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_20.json"
+        },
+        {
+            "source": "gemini-cli-system-prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_21.json"
+        },
+        {
+            "source": "google-gemini-cli-system-prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_22.json"
+        },
+        {
+            "source": "gpt-4.1_dna.json",
+            "classified_as": "memory_manager",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_23.json"
+        },
+        {
+            "source": "gpt-4o_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_24.json"
+        },
+        {
+            "source": "gpt-5-agent-prompts_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_25.json"
+        },
+        {
+            "source": "gpt-5-mini_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_26.json"
+        },
+        {
+            "source": "gpt-5_dna.json",
+            "classified_as": "architect",
+            "score": 75,
+            "quality": "good",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\architect_03.json"
+        },
+        {
+            "source": "MessageAction_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_27.json"
+        },
+        {
+            "source": "MKT_006_IMAGE_GEN_PROMPTING_dna.json",
+            "classified_as": "memory_manager",
+            "score": 50,
+            "quality": "weak",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_28.json"
+        },
+        {
+            "source": "Mode_Clasifier_Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_29.json"
+        },
+        {
+            "source": "Modules_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_30.json"
+        },
+        {
+            "source": "nes-tab-completion_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_31.json"
+        },
+        {
+            "source": "openai-codex-cli-system-prompt-20250820_dna.json",
+            "classified_as": "memory_manager",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_32.json"
+        },
+        {
+            "source": "phase_mode_prompts_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_33.json"
+        },
+        {
+            "source": "planning-mode_dna.json",
+            "classified_as": "memory_manager",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_34.json"
+        },
+        {
+            "source": "PlaygroundAction_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_35.json"
+        },
+        {
+            "source": "Poke agent_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_36.json"
+        },
+        {
+            "source": "Poke_p1_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_37.json"
+        },
+        {
+            "source": "Poke_p2_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_38.json"
+        },
+        {
+            "source": "Poke_p3_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_39.json"
+        },
+        {
+            "source": "Poke_p4_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_40.json"
+        },
+        {
+            "source": "Poke_p5_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_41.json"
+        },
+        {
+            "source": "Poke_p6_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_42.json"
+        },
+        {
+            "source": "PreviewAction_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_43.json"
+        },
+        {
+            "source": "Prompt Wave 11_dna.json",
+            "classified_as": "governance_director",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director_02.json"
+        },
+        {
+            "source": "Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_44.json"
+        },
+        {
+            "source": "Prompts_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_45.json"
+        },
+        {
+            "source": "Quest Action_dna.json",
+            "classified_as": "governance_director",
+            "score": 65,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\governance_director_03.json"
+        },
+        {
+            "source": "Quest Design_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_46.json"
+        },
+        {
+            "source": "Sonnet 4.5 Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_47.json"
+        },
+        {
+            "source": "Spec_Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_48.json"
+        },
+        {
+            "source": "System Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_49.json"
+        },
+        {
+            "source": "System_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_50.json"
+        },
+        {
+            "source": "Tools Wave 11_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_51.json"
+        },
+        {
+            "source": "Vibe_Prompt_dna.json",
+            "classified_as": "memory_manager",
+            "score": 60,
+            "quality": "acceptable",
+            "missing_sections": [],
+            "output": "C:\\SymbioticOS\\asset_processor\\output\\validated_dna\\memory_manager_52.json"
+        }
+    ]
+}

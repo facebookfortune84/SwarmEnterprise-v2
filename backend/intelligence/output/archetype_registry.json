@@ -1,0 +1,309 @@
+{
+    "generated_at": "2026-07-07T03:34:00.487927",
+    "archetypes": {
+        "researcher": [
+            {
+                "file": "asset_processor\\output\\archetypes\\researcher\\Agent CLI Prompt 2025-08-07_dna.json",
+                "confidence": 24.56,
+                "source": "Agent CLI Prompt 2025-08-07_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\researcher\\DeepWiki Prompt_dna.json",
+                "confidence": 100.0,
+                "source": "DeepWiki Prompt_dna.json"
+            }
+        ],
+        "orchestrator": [
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Agent loop_dna.json",
+                "confidence": 100.0,
+                "source": "Agent loop_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Agent Prompt v1.0_dna.json",
+                "confidence": 16.67,
+                "source": "Agent Prompt v1.0_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Agent Prompt_dna.json",
+                "confidence": 16.67,
+                "source": "Agent Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\claude-4-sonnet-agent-prompts_dna.json",
+                "confidence": 16.67,
+                "source": "claude-4-sonnet-agent-prompts_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Default Prompt_dna.json",
+                "confidence": 100.0,
+                "source": "Default Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Enterprise Prompt_dna.json",
+                "confidence": 100.0,
+                "source": "Enterprise Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Modules_dna.json",
+                "confidence": 100.0,
+                "source": "Modules_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\Poke agent_dna.json",
+                "confidence": 16.67,
+                "source": "Poke agent_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\System Prompt_dna.json",
+                "confidence": 100.0,
+                "source": "System Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\orchestrator\\System_dna.json",
+                "confidence": 16.67,
+                "source": "System_dna.json"
+            }
+        ],
+        "architect": [
+            {
+                "file": "asset_processor\\output\\archetypes\\architect\\Agent Prompt 2.0_dna.json",
+                "confidence": 21.18,
+                "source": "Agent Prompt 2.0_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\architect\\Agent Prompt v1.2_dna.json",
+                "confidence": 21.18,
+                "source": "Agent Prompt v1.2_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\architect\\Craft Prompt_dna.json",
+                "confidence": 26.09,
+                "source": "Craft Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\architect\\Quest Design_dna.json",
+                "confidence": 100.0,
+                "source": "Quest Design_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\architect\\Spec_Prompt_dna.json",
+                "confidence": 100.0,
+                "source": "Spec_Prompt_dna.json"
+            }
+        ],
+        "planner": [
+            {
+                "file": "asset_processor\\output\\archetypes\\planner\\Agent Prompt 2025-09-03_dna.json",
+                "confidence": 27.63,
+                "source": "Agent Prompt 2025-09-03_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\planner\\Fast Prompt_dna.json",
+                "confidence": 25.81,
+                "source": "Fast Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\planner\\phase_mode_prompts_dna.json",
+                "confidence": 100.0,
+                "source": "phase_mode_prompts_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\planner\\planning-mode_dna.json",
+                "confidence": 100.0,
+                "source": "planning-mode_dna.json"
+            }
+        ],
+        "builder": [
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\AI Studio vibe-coder_dna.json",
+                "confidence": 100.0,
+                "source": "AI Studio vibe-coder_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Builder Prompt_dna.json",
+                "confidence": 100.0,
+                "source": "Builder Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Chat Prompt_dna.json",
+                "confidence": 17.65,
+                "source": "Chat Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\chat-titles_dna.json",
+                "confidence": 17.65,
+                "source": "chat-titles_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Claude Code 2.0_dna.json",
+                "confidence": 100.0,
+                "source": "Claude Code 2.0_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\claude-4-sonnet_dna.json",
+                "confidence": 22.22,
+                "source": "claude-4-sonnet_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\claude-sonnet-4_dna.json",
+                "confidence": 17.65,
+                "source": "claude-sonnet-4_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gemini-2.5-pro_dna.json",
+                "confidence": 100.0,
+                "source": "gemini-2.5-pro_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gemini-cli-system-prompt_dna.json",
+                "confidence": 100.0,
+                "source": "gemini-cli-system-prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\google-gemini-cli-system-prompt_dna.json",
+                "confidence": 100.0,
+                "source": "google-gemini-cli-system-prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gpt-4.1_dna.json",
+                "confidence": 100.0,
+                "source": "gpt-4.1_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gpt-4o_dna.json",
+                "confidence": 100.0,
+                "source": "gpt-4o_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gpt-5-agent-prompts_dna.json",
+                "confidence": 100.0,
+                "source": "gpt-5-agent-prompts_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gpt-5-mini_dna.json",
+                "confidence": 100.0,
+                "source": "gpt-5-mini_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\gpt-5_dna.json",
+                "confidence": 100.0,
+                "source": "gpt-5_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Mode_Classifier_Prompt_dna.json",
+                "confidence": 17.65,
+                "source": "Mode_Classifier_Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\nes-tab-completion_dna.json",
+                "confidence": 17.65,
+                "source": "nes-tab-completion_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\openai-codex-cli-system-prompt-20250820_dna.json",
+                "confidence": 100.0,
+                "source": "openai-codex-cli-system-prompt-20250820_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\PlaygroundAction_dna.json",
+                "confidence": 17.65,
+                "source": "PlaygroundAction_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Poke_p1_dna.json",
+                "confidence": 17.65,
+                "source": "Poke_p1_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Poke_p2_dna.json",
+                "confidence": 17.65,
+                "source": "Poke_p2_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Poke_p3_dna.json",
+                "confidence": 17.65,
+                "source": "Poke_p3_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Poke_p4_dna.json",
+                "confidence": 17.65,
+                "source": "Poke_p4_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Poke_p5_dna.json",
+                "confidence": 17.65,
+                "source": "Poke_p5_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Poke_p6_dna.json",
+                "confidence": 17.65,
+                "source": "Poke_p6_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Prompt_dna.json",
+                "confidence": 17.65,
+                "source": "Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Prompts_dna.json",
+                "confidence": 17.65,
+                "source": "Prompts_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Sonnet 4.5 Prompt_dna.json",
+                "confidence": 17.65,
+                "source": "Sonnet 4.5 Prompt_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Tools Wave 11_dna.json",
+                "confidence": 17.65,
+                "source": "Tools Wave 11_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\builder\\Vibe_Prompt_dna.json",
+                "confidence": 17.65,
+                "source": "Vibe_Prompt_dna.json"
+            }
+        ],
+        "reviewer": [
+            {
+                "file": "asset_processor\\output\\archetypes\\reviewer\\DocumentAction_dna.json",
+                "confidence": 100.0,
+                "source": "DocumentAction_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\reviewer\\ExplainAction_dna.json",
+                "confidence": 100.0,
+                "source": "ExplainAction_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\reviewer\\MessageAction_dna.json",
+                "confidence": 100.0,
+                "source": "MessageAction_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\reviewer\\PreviewAction_dna.json",
+                "confidence": 100.0,
+                "source": "PreviewAction_dna.json"
+            }
+        ],
+        "governance_director": [
+            {
+                "file": "asset_processor\\output\\archetypes\\governance_director\\MKT_006_IMAGE_GEN_PROMPTING_dna.json",
+                "confidence": 18.75,
+                "source": "MKT_006_IMAGE_GEN_PROMPTING_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\governance_director\\Prompt Wave 11_dna.json",
+                "confidence": 22.22,
+                "source": "Prompt Wave 11_dna.json"
+            },
+            {
+                "file": "asset_processor\\output\\archetypes\\governance_director\\Quest Action_dna.json",
+                "confidence": 22.22,
+                "source": "Quest Action_dna.json"
+            }
+        ]
+    }
+}

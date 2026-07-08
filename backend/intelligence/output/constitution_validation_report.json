@@ -1,0 +1,43 @@
+[
+    {
+        "goal_id": "GOAL_001",
+        "artifact_id": "ART_GOAL_001",
+        "artifact_status": "created",
+        "approved": true,
+        "status": "approved",
+        "findings": [],
+        "validated_at": "2026-07-06T22:14:08.950643"
+    },
+    {
+        "goal_id": "GOAL_002",
+        "artifact_id": "ART_GOAL_002",
+        "artifact_status": "created",
+        "approved": false,
+        "status": "rejected",
+        "findings": [
+            "Missing deliverable: memory_store.json"
+        ],
+        "validated_at": "2026-07-06T22:14:08.950643"
+    },
+    {
+        "goal_id": "GOAL_003",
+        "artifact_id": "ART_GOAL_003",
+        "artifact_status": "created",
+        "approved": false,
+        "status": "rejected",
+        "findings": [
+            "Missing deliverable: embeddings.json",
+            "Missing deliverable: chunks.json"
+        ],
+        "validated_at": "2026-07-06T22:14:08.951141"
+    },
+    {
+        "goal_id": "GOAL_004",
+        "artifact_id": "ART_GOAL_004",
+        "artifact_status": "created",
+        "approved": true,
+        "status": "approved",
+        "findings": [],
+        "validated_at": "2026-07-06T22:14:08.951141"
+    }
+]

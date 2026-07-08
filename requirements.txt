@@ -1,21 +1,17 @@
-# SwarmOS Root Requirements
-# Pinned to stable, patched versions to resolve vulnerabilities
-
 # Core Framework
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
 pydantic==2.7.1
-pydantic[email]==2.7.1
 pydantic-settings==2.2.1
 email-validator>=2.1.0
 starlette>=0.40.0,<0.42.0
 
-# LLM & AI Agents
+# AI Agents / LLM (COMPATIBLE SET)
 crewai==0.30.11
-langchain>=0.1.10,<0.2.0
-langchain-community>=0.0.30,<0.1.0
-langchain-core<0.2.0
-langchain-text-splitters<0.1.0
+langchain==0.1.20
+langchain-community==0.0.38
+langchain-core==0.1.52
+langchain-text-splitters==0.0.1
 embedchain==0.1.113
 
 google-cloud-aiplatform>=1.133.0
@@ -40,26 +36,20 @@ sqlalchemy==2.0.27
 psycopg2-binary==2.9.9
 alembic==1.13.1
 
-# Monitoring & Telemetry
-opentelemetry-api==1.22.0
-opentelemetry-sdk==1.22.0
-opentelemetry-exporter-otlp==1.22.0
-python-json-logger==2.0.7
-
-# Queue and async
+# Async / Queue
 redis==5.0.0
 celery==5.3.1
 kombu>=5.3.0
 flower==2.0.1
 
-# Prometheus metrics
+# Monitoring
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+opentelemetry-exporter-otlp==1.22.0
+python-json-logger==2.0.7
 prometheus-client==0.16.0
-
-# Sentry
 sentry-sdk==2.8.0
 
-# Payments
+# Payments / Docs
 stripe>=8.0.0
-
-# PDF generation
 reportlab>=4.0.0

@@ -1,0 +1,992 @@
+{
+    "generated_at": "2026-07-07T03:34:00.491938",
+    "classified": 58,
+    "results": [
+        {
+            "source": "Agent CLI Prompt 2025-08-07_dna.json",
+            "archetype": "researcher",
+            "confidence": 24.56,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 65,
+                "planner": 10,
+                "researcher": 70,
+                "reviewer": 10,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Agent loop_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 1000,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Agent Prompt 2.0_dna.json",
+            "archetype": "architect",
+            "confidence": 21.18,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 90,
+                "builder": 65,
+                "planner": 80,
+                "researcher": 45,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 65,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Agent Prompt 2025-09-03_dna.json",
+            "archetype": "planner",
+            "confidence": 27.63,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 65,
+                "planner": 105,
+                "researcher": 70,
+                "reviewer": 10,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Agent Prompt v1.0_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 16.67,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Agent Prompt v1.2_dna.json",
+            "archetype": "architect",
+            "confidence": 21.18,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 90,
+                "builder": 65,
+                "planner": 80,
+                "researcher": 45,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 65,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Agent Prompt_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 16.67,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "AI Studio vibe-coder_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Builder Prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Chat Prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "chat-titles_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Claude Code 2.0_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "claude-4-sonnet-agent-prompts_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 16.67,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "claude-4-sonnet_dna.json",
+            "archetype": "builder",
+            "confidence": 22.22,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 40,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "claude-sonnet-4_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Craft Prompt_dna.json",
+            "archetype": "architect",
+            "confidence": 26.09,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 90,
+                "builder": 65,
+                "planner": 80,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "DeepWiki Prompt_dna.json",
+            "archetype": "researcher",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 1000,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Default Prompt_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 1000,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "DocumentAction_dna.json",
+            "archetype": "reviewer",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 1000,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Enterprise Prompt_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 1000,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "ExplainAction_dna.json",
+            "archetype": "reviewer",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 1000,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Fast Prompt_dna.json",
+            "archetype": "planner",
+            "confidence": 25.81,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 65,
+                "planner": 80,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 65,
+                "executive": 10
+            }
+        },
+        {
+            "source": "gemini-2.5-pro_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "gemini-cli-system-prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "google-gemini-cli-system-prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "gpt-4.1_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "gpt-4o_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "gpt-5-agent-prompts_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "gpt-5-mini_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "gpt-5_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "MessageAction_dna.json",
+            "archetype": "reviewer",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 1000,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "MKT_006_IMAGE_GEN_PROMPTING_dna.json",
+            "archetype": "governance_director",
+            "confidence": 18.75,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 10,
+                "builder": 20,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 10,
+                "governance_director": 30,
+                "optimizer": 0,
+                "memory_manager": 30,
+                "executive": 20
+            }
+        },
+        {
+            "source": "Mode_Clasifier_Prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Modules_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 1000,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "nes-tab-completion_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "openai-codex-cli-system-prompt-20250820_dna.json",
+            "archetype": "builder",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 1000,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "phase_mode_prompts_dna.json",
+            "archetype": "planner",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 1000,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "planning-mode_dna.json",
+            "archetype": "planner",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 1000,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "PlaygroundAction_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke agent_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 16.67,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke_p1_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke_p2_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke_p3_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke_p4_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke_p5_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Poke_p6_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "PreviewAction_dna.json",
+            "archetype": "reviewer",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 1000,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Prompt Wave 11_dna.json",
+            "archetype": "governance_director",
+            "confidence": 22.22,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 40,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Prompts_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Quest Action_dna.json",
+            "archetype": "governance_director",
+            "confidence": 22.22,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 40,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Quest Design_dna.json",
+            "archetype": "architect",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 1000,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "Sonnet 4.5 Prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Spec_Prompt_dna.json",
+            "archetype": "architect",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 0,
+                "architect": 1000,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "System Prompt_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 100.0,
+            "scores": {
+                "orchestrator": 1000,
+                "architect": 0,
+                "builder": 0,
+                "planner": 0,
+                "researcher": 0,
+                "reviewer": 0,
+                "governance_director": 0,
+                "optimizer": 0,
+                "memory_manager": 0,
+                "executive": 0
+            }
+        },
+        {
+            "source": "System_dna.json",
+            "archetype": "orchestrator",
+            "confidence": 16.67,
+            "scores": {
+                "orchestrator": 30,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Tools Wave 11_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        },
+        {
+            "source": "Vibe_Prompt_dna.json",
+            "archetype": "builder",
+            "confidence": 17.65,
+            "scores": {
+                "orchestrator": 20,
+                "architect": 20,
+                "builder": 30,
+                "planner": 10,
+                "researcher": 10,
+                "reviewer": 0,
+                "governance_director": 30,
+                "optimizer": 10,
+                "memory_manager": 30,
+                "executive": 10
+            }
+        }
+    ]
+}

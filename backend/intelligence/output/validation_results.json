@@ -1,0 +1,37 @@
+[
+    {
+        "workflow_id": "WF_GOAL_001",
+        "goal_id": "GOAL_001",
+        "validated_at": "2026-07-06T05:28:59.726884",
+        "passed": true,
+        "findings": []
+    },
+    {
+        "workflow_id": "WF_GOAL_002",
+        "goal_id": "GOAL_002",
+        "validated_at": "2026-07-06T05:28:59.726884",
+        "passed": true,
+        "findings": []
+    },
+    {
+        "workflow_id": "WF_GOAL_003",
+        "goal_id": "GOAL_003",
+        "validated_at": "2026-07-06T05:28:59.726884",
+        "passed": true,
+        "findings": []
+    },
+    {
+        "workflow_id": "WF_GOAL_004",
+        "goal_id": "GOAL_004",
+        "validated_at": "2026-07-06T05:28:59.726884",
+        "passed": true,
+        "findings": []
+    },
+    {
+        "workflow_id": "WF_GOAL_005",
+        "goal_id": "GOAL_005",
+        "validated_at": "2026-07-06T05:28:59.726884",
+        "passed": true,
+        "findings": []
+    }
+]

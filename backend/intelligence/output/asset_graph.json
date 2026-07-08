@@ -1,0 +1,1880 @@
+{
+    "summary": {
+        "nodes": 125,
+        "edges": 199
+    },
+    "nodes": [
+        {
+            "id": "cf5ba0609a801057870bc3396c803612",
+            "name": "ASSETS_README.md",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "documentation"
+        },
+        {
+            "id": "7b297d02a47dc5c18d26247fa399a1ea",
+            "name": "registry.json",
+            "category": "governance",
+            "agent": "memory_manager",
+            "asset_type": "registry"
+        },
+        {
+            "id": "d1160e454f1cf3cc95a5284b4bc00b3e",
+            "name": "01_swarm_charter.md",
+            "category": "constitution",
+            "agent": "constitution_keeper",
+            "asset_type": "constitution"
+        },
+        {
+            "id": "7317cfbb0393f08a0cb5cf0fcf9f6d22",
+            "name": "asset_governance.md",
+            "category": "constitution",
+            "agent": "constitution_keeper",
+            "asset_type": "constitution"
+        },
+        {
+            "id": "e556acd38b6dce45f6812f2e508cd0b6",
+            "name": "Agent CLI Prompt 2025-08-07.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d4d870cfddf99eb823d59324affde1f0",
+            "name": "Agent loop.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "b31587e970369ebcca6c6aa1e1cad7ba",
+            "name": "Agent Prompt 2.0.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d6996a8cbdcd947b6b2478e2e008f28e",
+            "name": "Agent Prompt 2025-09-03.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "bf305b8b43ad01192edbfdef6508b38a",
+            "name": "Agent Prompt v1.0.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "eb62f78845f824b6b6ed696343e72860",
+            "name": "Agent Prompt v1.2.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "71fd127b8f1f64e20690ace87d9c4620",
+            "name": "Agent Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "5c134a549dee0785f466ff6d9ae61926",
+            "name": "AI Studio vibe-coder.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "da73ac82b84a6e783efbc912c6992fb2",
+            "name": "Builder Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "1993619fa50d7d74d8c21e3aa96020a4",
+            "name": "Chat Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "5a274246cbaed65d1ce848b1eb95d5c7",
+            "name": "chat-titles.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "1f2b55f6c7b57d434c5869749dee4f73",
+            "name": "Claude Code 2.0.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "9cc11763a2077c41d03cc2012c579838",
+            "name": "claude-4-sonnet-agent-prompts.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "6647a43b51aabfd52cabe25ae67e7650",
+            "name": "claude-4-sonnet.yaml",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "240979a5b624aa94b0b4e6717922db19",
+            "name": "claude-sonnet-4.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "42e24c9d24be6945901f5f33c28ad6d6",
+            "name": "Craft Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "e13b335ba55bc85b72323e65030f0a8b",
+            "name": "DeepWiki Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "a6e4c34502adf8a581377b54fcf2a7b0",
+            "name": "Default Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "96818b01a9f60d68a607f66f26d88131",
+            "name": "DocumentAction.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "2a597c3e92a38379a233baeafe0ae780",
+            "name": "Enterprise Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "36165ec8fa8f3ef52ad1fd9de3d1c1e4",
+            "name": "ExplainAction.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "196aaca62ece7e7dd8367cef460a9a2c",
+            "name": "Fast Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d5246e0e3282efd2aab2dc7684d6afd3",
+            "name": "gemini-2.5-pro.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "20101851d9635ee514b8d76a22d03c19",
+            "name": "gemini-cli-system-prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d3d3a245ec9298fe065cb1f949c3bf1a",
+            "name": "google-gemini-cli-system-prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "065e13690fe212458e11d827f6df7240",
+            "name": "gpt-4.1.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "12096842ea6953a475dabe61afd4ed92",
+            "name": "gpt-4o.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "4f8cc2933c52837abaace1afcd5a5dc6",
+            "name": "gpt-5-agent-prompts.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "92a5427595024cab1a20f5eded43a27e",
+            "name": "gpt-5-mini.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d9857d5c043b357224e287f29bcf88dc",
+            "name": "gpt-5.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "4286e860f6946e7b27e1a73275f3cf9a",
+            "name": "gpt-5.yaml",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "dc2b989d7dca3764eba174ed7c1ec9a1",
+            "name": "MessageAction.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "bcd6df2871172c5d742a4727c73373f2",
+            "name": "MKT_006_IMAGE_GEN_PROMPTING.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "ae8dc7bc12dce465233d0bfe1dbcba1b",
+            "name": "Mode_Clasifier_Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "7273c1770084cbceb5ea6ef25748d55b",
+            "name": "Modules.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "9c2ec5ffac31f5e3e65cf8c60740ef2d",
+            "name": "nes-tab-completion.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d7b9e6241fdd3a5caeaf3b79793b3975",
+            "name": "openai-codex-cli-system-prompt-20250820.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "9474b014c625af2f93772d9daa1247ff",
+            "name": "phase_mode_prompts.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "9f958b9004a7b828a0c6966d7ccce8a2",
+            "name": "planning-mode.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "3213cc8e66e27cc85775d661653829e6",
+            "name": "PlaygroundAction.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "f8ac965b44d151cfb397ad5f94780cec",
+            "name": "Poke agent.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "f850d83c63231ec565b4523ee171b650",
+            "name": "Poke_p1.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "f24d118e313f7d085c49b063ca4f8ca8",
+            "name": "Poke_p2.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "b9f839e3352674dc0303ff39a9ca7a0c",
+            "name": "Poke_p3.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "a1688bfc74176c816694e172dfad2f4d",
+            "name": "Poke_p4.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "b952db680979337645b0c30cc6e7aa9e",
+            "name": "Poke_p5.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "c6822f3ae2e7e37016977d2959942c50",
+            "name": "Poke_p6.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d81bd019883645b624d3afb3d1fbe009",
+            "name": "PreviewAction.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "2048da25dce443140a564678b8d41286",
+            "name": "Prompt Wave 11.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "3c2ef2aefe1adecb1a7b3aca348ebb0f",
+            "name": "Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "80cf9962033e4c12ff6717707d9c4c30",
+            "name": "Prompts.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "f5093807a3b173641744064dd3e4e0af",
+            "name": "Quest Action.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "d390a3298b9bb9fda686c42f454eeffa",
+            "name": "Quest Design.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "7a5e7b6e7c6e085da54ec19a04bcfc81",
+            "name": "Sonnet 4.5 Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "05febdad8f4a01c7bcb0ff389fee103b",
+            "name": "Spec_Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "ee9d45572dc4788787204935a5fd689a",
+            "name": "System Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "7b6fcb8ce82d2d150bc22ddaaf441dd5",
+            "name": "System.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "40c2bfebae192eee7479de763e1064cb",
+            "name": "Tools Wave 11.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "2037fe380b85379a6980e80afb8de954",
+            "name": "Vibe_Prompt.txt",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "prompt"
+        },
+        {
+            "id": "75bc978813e9425b8c4c1404e13d9665",
+            "name": "COLD_OUTREACH_SOP.md",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "15aa13e3172ff0af1ccde7c35c5736f3",
+            "name": "GOV_001_TICKET_ISSUANCE.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e9649d35a6721497656d92c497c9a793",
+            "name": "GOV_002_PERSONA_RESONANCE.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "526ae0abb50d96d3adf538340c695eff",
+            "name": "GOV_003_REVENUE_RECONCILIATION.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "8f892c4b074402f702fa77be6c95da50",
+            "name": "GOV_004_AUTONOMOUS_BACKLOG.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "6b9bc76a3bd1944e69847be24fbaf845",
+            "name": "GOV_005_TASK_PRIORITIZATION.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "de2d815aa2e3fe197562e20cf2a6a282",
+            "name": "GOV_006_AGENT_ONBOARDING.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "42c994c0f266128386ea1ab276cb0015",
+            "name": "GOV_007_LINEAGE_SIGNATURE.md",
+            "category": "governance",
+            "agent": "governance_director",
+            "asset_type": "sop"
+        },
+        {
+            "id": "647ee38a6d32d487a567800bf24237bb",
+            "name": "LEAD_EXTRACTION.md",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "b0b96c49a7950f031531e99be30cbca7",
+            "name": "MKT_001_TIKTOK_VIRALITY.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "504bdbe4b9e7102a8dd6370226ed73b5",
+            "name": "MKT_002_LINKEDIN_AUTHORITY.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "4a38703b81f187aa2cd723963859229a",
+            "name": "MKT_003_EMAIL_COPYWRITING.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "2601a64f56db42bce7d3f0686439cca3",
+            "name": "MKT_004_AD_COPY_PPC.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "d9d6332f6d7e50bdcb3a67d61f96c804",
+            "name": "MKT_005_SEO_KEYWORD_RESEARCH.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "c5a213152ba052b33ca514e112238ea6",
+            "name": "MKT_007_VIDEO_EDITING_DIRECTION.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e4fcc993bafa628e2d973ace5568a823",
+            "name": "MKT_008_SOCIAL_MEDIA_BROADCAST.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "430d5ec6456f350cf393f8909144fcc5",
+            "name": "MKT_009_LEAD_NURTURE_SEQUENCE.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "059823a8132170022f281fa72e687b79",
+            "name": "MKT_010_BRAND_VOICE_ALIGNMENT.md",
+            "category": "marketing",
+            "agent": "marketer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "2e667598964e733a27b59ea22e292426",
+            "name": "MON_001_AFFILIATE_ARBITRAGE.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "9a2ece1885d875b7586ecaaaa2dda01f",
+            "name": "MON_002_API_SAAS_BILLING.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "c3714a15a6025beba9786047d8ec3909",
+            "name": "MON_003_LEAD_GEN_BROKER.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "11a966f54186da601ef5fe6b25755bd8",
+            "name": "MON_004_DIGITAL_PRODUCT_STORE.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "46cee5c5048b83a69f3322d7c465fe43",
+            "name": "MON_005_NEWSLETTER_SPONSORSHIP.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e5db405395080dce65fd2cbb1bdb783b",
+            "name": "MON_006_PRINT_ON_DEMAND.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e31d7b984261364a425c2b720c8b075e",
+            "name": "MON_007_PROGRAMMATIC_ADS.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "4cdccf7011a38d287b3987839b2a07da",
+            "name": "MON_008_CRYPTO_YIELD_FARMING.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e0125812d56637723baba61d60642e03",
+            "name": "MON_009_PAID_COMMUNITY.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "6bcd820913c582603bf8517e42c98553",
+            "name": "MON_010_DATA_LICENSING.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "634bbace11ba72e887d2b711a82e07b0",
+            "name": "MON_011_SEO_TRAFFIC.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "584b485a83cd6b1c915ce442780f421b",
+            "name": "MON_012_COLD_OUTREACH.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "db517681c8b95ca5f3c9210dbe60a7c9",
+            "name": "MON_013_FAST_DEPLOY.md",
+            "category": "monetization",
+            "agent": "revenue_manager",
+            "asset_type": "sop"
+        },
+        {
+            "id": "cf84b410cd750ceb3b5eaeac7fa59d72",
+            "name": "OUTREACH_EXECUTION.md",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "cf1b3ee62be39c2cd7cdfd4dbe7b5861",
+            "name": "SEC_001_SECRET_PROTECTION.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "06d9b7e4e07339642baffde7af217d1a",
+            "name": "SEC_002_SANDBOX_ENFORCEMENT.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "01c607cd48f55b33ca236795cf0ee5a6",
+            "name": "SEC_003_PHISHING_DEFENSE.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e8a3eeeffa840806463ffa6af96a650a",
+            "name": "SEC_004_IP_REPUTATION_MANAGEMENT.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "9c9d02f6715971be48055409c5fcddfc",
+            "name": "SEC_005_DATA_PRIVACY_GDPR.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "f8a316127306c54ab27a44b674dc04a5",
+            "name": "SEC_006_INJECTION_PREVENTION.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "25bcc32f1253ce8509dbedb909ec2299",
+            "name": "SEC_007_RATE_LIMITING_SMTP.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "0687a678dc441ba35bd631ea4110e4a3",
+            "name": "SEC_008_STASIS_BRANCH_LOCK.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "3c9e373076ce42a4883ae547160450c0",
+            "name": "SEC_009_VIRTUAL_ENV_ISOLATION.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "1929dc9387e0322003a671b10be6280d",
+            "name": "SEC_010_AUDIT_TRAIL_INTEGRITY.md",
+            "category": "security",
+            "agent": "security_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "1bfb77a54a5025c8e6d168e2200551da",
+            "name": "SELF_HEALING.md",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "f77922c8b2b1c6402ee020be7c63ff3b",
+            "name": "TEC_001_DB_SCHEMA_MIGRATION.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "866a9a76751b496d7b0c46aea3d19df0",
+            "name": "TEC_002_DEPENDENCY_AUDIT.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "9936fcb35f00aad26109143586d39b85",
+            "name": "TEC_003_LOG_ROTATION.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "f3c655f79cda6c8fdf21977d660f5989",
+            "name": "TEC_004_RAG_MEMORY_INDEXING.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e56f83af19d673f358d52381ab303269",
+            "name": "TEC_005_DOCKER_CONTAINER_UPKEEP.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "19190da8acba187d6fac62a3878f41a3",
+            "name": "TEC_006_API_KEY_ROTATION.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "2785c17df6c01d3091d21a9a16d2e456",
+            "name": "TEC_007_ERROR_HANDLING_HARDENING.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "66e88ca640ba593889ccd722638e3d17",
+            "name": "TEC_008_CODE_COMPILATION_TEST.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "bd499eae3811e844ac1bffa2663fadf2",
+            "name": "TEC_009_SUBMODULE_SYNC.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "b96fc6bead3870e135d63cb6d0634fa9",
+            "name": "TEC_010_TELEMETRY_DASHBOARD.md",
+            "category": "technology",
+            "agent": "infrastructure_engineer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "358989a9317d8b8b14cd8d42355d9b77",
+            "name": "TRAFFIC_DOMINANCE_v1.md",
+            "category": "governance",
+            "agent": "executive_officer",
+            "asset_type": "sop"
+        },
+        {
+            "id": "e5b5a4d766c7270404e88337c95d38f6",
+            "name": "Agent Tools v1.0.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "42d20f4c4d903bf71a1f7c7e15f48f21",
+            "name": "Agent Tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "eece4c3b58aeb4e4b9f493c275363a7f",
+            "name": "Builder Tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "7f7a8802250e9a77cbb7a88dd0a62a4b",
+            "name": "claude-4-sonnet-tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "125e0bc8a105ac0a1724286da8ebb25d",
+            "name": "gpt-5-tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "e47650b5f0bb91a9adfbcc695b331f61",
+            "name": "phase_mode_tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "9b57299a254a69b2da58484457e66491",
+            "name": "plan_mode_tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        },
+        {
+            "id": "c0c54645a29c31338a2a914b99c983ed",
+            "name": "Tools.json",
+            "category": "technology",
+            "agent": "developer",
+            "asset_type": "tool"
+        }
+    ],
+    "edges": [
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_001",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_001_TICKET_ISSUANCE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_002",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_002_PERSONA_RESONANCE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_003",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_003_REVENUE_RECONCILIATION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_004",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_004_AUTONOMOUS_BACKLOG",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_005",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_005_TASK_PRIORITIZATION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_006",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_006_AGENT_ONBOARDING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_007",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "GOV_007_LINEAGE_SIGNATURE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_001",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_001_TIKTOK_VIRALITY",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_002",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_002_LINKEDIN_AUTHORITY",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_003",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_003_EMAIL_COPYWRITING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_004",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_004_AD_COPY_PPC",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_005",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_005_SEO_KEYWORD_RESEARCH",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_006",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_006_IMAGE_GEN_PROMPTING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_007",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_007_VIDEO_EDITING_DIRECTION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_008",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_008_SOCIAL_MEDIA_BROADCAST",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_009",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_009_LEAD_NURTURE_SEQUENCE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_010",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MKT_010_BRAND_VOICE_ALIGNMENT",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_001",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_001_AFFILIATE_ARBITRAGE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_002",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_002_API_SAAS_BILLING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_003",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_003_LEAD_GEN_BROKER",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_004",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_004_DIGITAL_PRODUCT_STORE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_005",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_005_NEWSLETTER_SPONSORSHIP",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_006",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_006_PRINT_ON_DEMAND",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_007",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_007_PROGRAMMATIC_ADS",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_008",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_008_CRYPTO_YIELD_FARMING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_009",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_009_PAID_COMMUNITY",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_010",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_010_DATA_LICENSING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_011",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_011_SEO_TRAFFIC",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_012",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_012_COLD_OUTREACH",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_013",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "MON_013_FAST_DEPLOY",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_001",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_001_SECRET_PROTECTION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_002",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_002_SANDBOX_ENFORCEMENT",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_003",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_003_PHISHING_DEFENSE",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_004",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_004_IP_REPUTATION_MANAGEMENT",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_005",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_005_DATA_PRIVACY_GDPR",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_006",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_006_INJECTION_PREVENTION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_007",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_007_RATE_LIMITING_SMTP",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_008",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_008_STASIS_BRANCH_LOCK",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_009",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_009_VIRTUAL_ENV_ISOLATION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_010",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "SEC_010_AUDIT_TRAIL_INTEGRITY",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_001",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_001_DB_SCHEMA_MIGRATION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_002",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_002_DEPENDENCY_AUDIT",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_003",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_003_LOG_ROTATION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_004",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_004_RAG_MEMORY_INDEXING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_005",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_005_DOCKER_CONTAINER_UPKEEP",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_006",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_006_API_KEY_ROTATION",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_007",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_007_ERROR_HANDLING_HARDENING",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_008",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_008_CODE_COMPILATION_TEST",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_009",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_009_SUBMODULE_SYNC",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_010",
+            "relationship": "references"
+        },
+        {
+            "source": "cf5ba0609a801057870bc3396c803612",
+            "target": "TEC_010_TELEMETRY_DASHBOARD",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_001",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_001_TICKET_ISSUANCE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_002",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_002_PERSONA_RESONANCE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_003",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_003_REVENUE_RECONCILIATION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_004",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_004_AUTONOMOUS_BACKLOG",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_005",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_005_TASK_PRIORITIZATION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_006",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_006_AGENT_ONBOARDING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_007",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "GOV_007_LINEAGE_SIGNATURE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_001",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_001_TIKTOK_VIRALITY",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_002",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_002_LINKEDIN_AUTHORITY",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_003",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_003_EMAIL_COPYWRITING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_004",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_004_AD_COPY_PPC",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_005",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_005_SEO_KEYWORD_RESEARCH",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_006_IMAGE_GEN_PROMPTING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_007",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_007_VIDEO_EDITING_DIRECTION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_008",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_008_SOCIAL_MEDIA_BROADCAST",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_009",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_009_LEAD_NURTURE_SEQUENCE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_010",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MKT_010_BRAND_VOICE_ALIGNMENT",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_001",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_001_AFFILIATE_ARBITRAGE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_002",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_002_API_SAAS_BILLING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_003",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_003_LEAD_GEN_BROKER",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_004",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_004_DIGITAL_PRODUCT_STORE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_005",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_005_NEWSLETTER_SPONSORSHIP",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_006",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_006_PRINT_ON_DEMAND",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_007",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_007_PROGRAMMATIC_ADS",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_008",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_008_CRYPTO_YIELD_FARMING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_009",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_009_PAID_COMMUNITY",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_010",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_010_DATA_LICENSING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_011",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_011_SEO_TRAFFIC",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_012",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_012_COLD_OUTREACH",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_013",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "MON_013_FAST_DEPLOY",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_001",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_001_SECRET_PROTECTION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_002",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_002_SANDBOX_ENFORCEMENT",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_003",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_003_PHISHING_DEFENSE",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_004",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_004_IP_REPUTATION_MANAGEMENT",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_005",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_005_DATA_PRIVACY_GDPR",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_006",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_006_INJECTION_PREVENTION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_007",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_007_RATE_LIMITING_SMTP",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_008",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_008_STASIS_BRANCH_LOCK",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_009",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_009_VIRTUAL_ENV_ISOLATION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_010",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "SEC_010_AUDIT_TRAIL_INTEGRITY",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_001",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_001_DB_SCHEMA_MIGRATION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_002",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_002_DEPENDENCY_AUDIT",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_003",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_003_LOG_ROTATION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_004",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_004_RAG_MEMORY_INDEXING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_005",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_005_DOCKER_CONTAINER_UPKEEP",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_006",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_006_API_KEY_ROTATION",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_007",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_007_ERROR_HANDLING_HARDENING",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_008",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_008_CODE_COMPILATION_TEST",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_009",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_009_SUBMODULE_SYNC",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_010",
+            "relationship": "references"
+        },
+        {
+            "source": "7b297d02a47dc5c18d26247fa399a1ea",
+            "target": "TEC_010_TELEMETRY_DASHBOARD",
+            "relationship": "references"
+        }
+    ]
+}

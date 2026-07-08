@@ -1,0 +1,104 @@
+[
+    {
+        "artifact_id": "ART_GOAL_001",
+        "workflow_id": "WF_GOAL_001",
+        "goal_id": "GOAL_001",
+        "goal": "Build constitution_validator.py",
+        "artifact_type": "python_file",
+        "assigned_agent": "governance_director",
+        "target": {
+            "type": "file",
+            "path": "asset_processor/constitution_validator.py"
+        },
+        "deliverables": [
+            "constitution_validator.py"
+        ],
+        "required_inputs": [
+            "goals.json",
+            "workflow_queue.json"
+        ],
+        "success_criteria": [
+            "Validator file exists",
+            "Workflow validation succeeds",
+            "Goals can be evaluated"
+        ],
+        "priority": 1,
+        "status": "pending",
+        "created_at": "2026-07-06T05:42:00.339164"
+    },
+    {
+        "artifact_id": "ART_GOAL_002",
+        "workflow_id": "WF_GOAL_002",
+        "goal_id": "GOAL_002",
+        "goal": "Build memory_manager.py",
+        "artifact_type": "python_file",
+        "assigned_agent": "developer",
+        "target": {
+            "type": "file",
+            "path": "asset_processor/memory_manager.py"
+        },
+        "deliverables": [
+            "memory_manager.py",
+            "memory_store.json"
+        ],
+        "required_inputs": [],
+        "success_criteria": [
+            "Memory persists",
+            "Memory reloads correctly",
+            "Memory updates successfully"
+        ],
+        "priority": 2,
+        "status": "pending",
+        "created_at": "2026-07-06T05:42:00.339164"
+    },
+    {
+        "artifact_id": "ART_GOAL_003",
+        "workflow_id": "WF_GOAL_003",
+        "goal_id": "GOAL_003",
+        "goal": "Build rag_builder.py",
+        "artifact_type": "python_file",
+        "assigned_agent": "developer",
+        "target": {
+            "type": "file",
+            "path": "asset_processor/rag_builder.py"
+        },
+        "deliverables": [
+            "rag_builder.py",
+            "embeddings.json",
+            "chunks.json"
+        ],
+        "required_inputs": [],
+        "success_criteria": [
+            "Chunks generated",
+            "Embeddings generated",
+            "Searchable retrieval index created"
+        ],
+        "priority": 3,
+        "status": "pending",
+        "created_at": "2026-07-06T05:42:00.339164"
+    },
+    {
+        "artifact_id": "ART_GOAL_004",
+        "workflow_id": "WF_GOAL_004",
+        "goal_id": "GOAL_004",
+        "goal": "Build dashboard_api.py",
+        "artifact_type": "python_file",
+        "assigned_agent": "developer",
+        "target": {
+            "type": "file",
+            "path": "asset_processor/dashboard_api.py"
+        },
+        "deliverables": [
+            "dashboard_api.py"
+        ],
+        "required_inputs": [],
+        "success_criteria": [
+            "Metrics endpoint works",
+            "Registry endpoint works",
+            "Graph endpoint works"
+        ],
+        "priority": 4,
+        "status": "pending",
+        "created_at": "2026-07-06T05:42:00.340192"
+    }
+]

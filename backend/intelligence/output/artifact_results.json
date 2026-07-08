@@ -1,0 +1,34 @@
+[
+    {
+        "artifact_id": "ART_GOAL_001",
+        "workflow_id": "WF_GOAL_001",
+        "goal_id": "GOAL_001",
+        "status": "created",
+        "output_file": "asset_processor\\constitution_validator.py",
+        "timestamp": "2026-07-06T22:01:57.413778"
+    },
+    {
+        "artifact_id": "ART_GOAL_002",
+        "workflow_id": "WF_GOAL_002",
+        "goal_id": "GOAL_002",
+        "status": "created",
+        "output_file": "asset_processor\\memory_manager.py",
+        "timestamp": "2026-07-06T22:01:57.414807"
+    },
+    {
+        "artifact_id": "ART_GOAL_003",
+        "workflow_id": "WF_GOAL_003",
+        "goal_id": "GOAL_003",
+        "status": "created",
+        "output_file": "asset_processor\\rag_builder.py",
+        "timestamp": "2026-07-06T22:01:57.415804"
+    },
+    {
+        "artifact_id": "ART_GOAL_004",
+        "workflow_id": "WF_GOAL_004",
+        "goal_id": "GOAL_004",
+        "status": "created",
+        "output_file": "asset_processor\\dashboard_api.py",
+        "timestamp": "2026-07-06T22:01:57.416786"
+    }
+]

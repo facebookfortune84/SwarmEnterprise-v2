@@ -1,0 +1,88 @@
+[
+    {
+        "goal": "Finish building this project until it is fully automated and monetized",
+        "category": "monetization",
+        "assigned_agent": "revenue_manager",
+        "task_count": 13,
+        "tasks": [
+            {
+                "asset_id": "2e667598964e733a27b59ea22e292426",
+                "name": "MON_001_AFFILIATE_ARBITRAGE.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "9a2ece1885d875b7586ecaaaa2dda01f",
+                "name": "MON_002_API_SAAS_BILLING.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "c3714a15a6025beba9786047d8ec3909",
+                "name": "MON_003_LEAD_GEN_BROKER.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "11a966f54186da601ef5fe6b25755bd8",
+                "name": "MON_004_DIGITAL_PRODUCT_STORE.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "46cee5c5048b83a69f3322d7c465fe43",
+                "name": "MON_005_NEWSLETTER_SPONSORSHIP.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "e5db405395080dce65fd2cbb1bdb783b",
+                "name": "MON_006_PRINT_ON_DEMAND.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "e31d7b984261364a425c2b720c8b075e",
+                "name": "MON_007_PROGRAMMATIC_ADS.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "4cdccf7011a38d287b3987839b2a07da",
+                "name": "MON_008_CRYPTO_YIELD_FARMING.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "e0125812d56637723baba61d60642e03",
+                "name": "MON_009_PAID_COMMUNITY.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "6bcd820913c582603bf8517e42c98553",
+                "name": "MON_010_DATA_LICENSING.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "634bbace11ba72e887d2b711a82e07b0",
+                "name": "MON_011_SEO_TRAFFIC.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "584b485a83cd6b1c915ce442780f421b",
+                "name": "MON_012_COLD_OUTREACH.md",
+                "asset_type": "sop",
+                "priority": 3
+            },
+            {
+                "asset_id": "db517681c8b95ca5f3c9210dbe60a7c9",
+                "name": "MON_013_FAST_DEPLOY.md",
+                "asset_type": "sop",
+                "priority": 3
+            }
+        ]
+    }
+]

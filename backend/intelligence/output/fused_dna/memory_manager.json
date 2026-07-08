@@ -1,0 +1,28 @@
+{
+    "dna_version": "fusion_1.0",
+    "identity": {
+        "role": "memory_manager"
+    },
+    "mission": {
+        "primary": "Synthetic memory_manager agent"
+    },
+    "capabilities": [
+        "research",
+        "software_engineering"
+    ],
+    "reasoning_framework": [
+        "discover",
+        "search",
+        "understand"
+    ],
+    "constraints": [
+        "no_hallucination"
+    ],
+    "metadata": {
+        "generated_at": "2026-07-07T03:47:11.373765",
+        "sources": [
+            "researcher",
+            "orchestrator"
+        ]
+    }
+}

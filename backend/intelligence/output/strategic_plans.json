@@ -1,0 +1,44 @@
+[
+    {
+        "goal": "Finish building a production level project to completion",
+        "workstream_count": 1,
+        "workstreams": [
+            {
+                "category": "governance",
+                "agent": "governance_director",
+                "asset_count": 72
+            }
+        ]
+    },
+    {
+        "goal": "Finish building this project until it is fully automated and monetized",
+        "workstream_count": 5,
+        "workstreams": [
+            {
+                "category": "governance",
+                "agent": "governance_director",
+                "asset_count": 72
+            },
+            {
+                "category": "marketing",
+                "agent": "marketer",
+                "asset_count": 10
+            },
+            {
+                "category": "monetization",
+                "agent": "revenue_manager",
+                "asset_count": 13
+            },
+            {
+                "category": "security",
+                "agent": "security_officer",
+                "asset_count": 10
+            },
+            {
+                "category": "technology",
+                "agent": "infrastructure_engineer",
+                "asset_count": 18
+            }
+        ]
+    }
+]

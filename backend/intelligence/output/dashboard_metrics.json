@@ -1,0 +1,53 @@
+{
+    "total_assets": 125,
+    "categories": {
+        "governance": 72,
+        "constitution": 2,
+        "marketing": 10,
+        "monetization": 13,
+        "security": 10,
+        "technology": 18
+    },
+    "agents": {
+        "executive_officer": 64,
+        "memory_manager": 1,
+        "constitution_keeper": 2,
+        "marketer": 10,
+        "governance_director": 7,
+        "revenue_manager": 13,
+        "security_officer": 10,
+        "infrastructure_engineer": 10,
+        "developer": 8
+    },
+    "asset_types": {
+        "documentation": 1,
+        "registry": 1,
+        "constitution": 2,
+        "prompt": 59,
+        "sop": 54,
+        "tool": 8
+    },
+    "tiers": {
+        "5": 60,
+        "2": 1,
+        "1": 2,
+        "3": 54,
+        "4": 8
+    },
+    "graph": {
+        "nodes": 125,
+        "edges": 199
+    },
+    "search_records": 125,
+    "agent_workloads": {
+        "executive_officer": 64,
+        "memory_manager": 1,
+        "constitution_keeper": 2,
+        "marketer": 10,
+        "governance_director": 7,
+        "revenue_manager": 13,
+        "security_officer": 10,
+        "infrastructure_engineer": 10,
+        "developer": 8
+    }
+}
