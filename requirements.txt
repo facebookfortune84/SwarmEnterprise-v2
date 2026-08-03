@@ -3,7 +3,7 @@ fastapi==0.115.6
 uvicorn[standard]==0.32.1
 pydantic==2.7.1
 pydantic-settings==2.2.1
-email-validator>=2.1.0
+email-validator>=2.3.0
 starlette>=0.40.0,<0.42.0
 
 # AI Agents / LLM (COMPATIBLE SET)
