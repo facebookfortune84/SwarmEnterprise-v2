@@ -554,7 +554,7 @@ jobs:
           PROD_URL: ${{ env.PROD_URL }}
 
       - name: Upload verification report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: verify-production-report-${{ github.sha }}
