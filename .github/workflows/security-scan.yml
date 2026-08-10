@@ -22,7 +22,7 @@ jobs:
     name: "Trivy — Repository FS Scan"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Run Trivy on repository filesystem
         uses: aquasecurity/trivy-action@0.28.0
@@ -47,7 +47,7 @@ jobs:
     # Only runs on pushes to main where an image was just built
     if: github.event_name == 'push' || github.event_name == 'schedule'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -92,7 +92,7 @@ jobs:
     name: "OWASP Dependency Check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5

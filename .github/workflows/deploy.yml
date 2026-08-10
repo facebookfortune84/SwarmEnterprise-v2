@@ -86,7 +86,7 @@ jobs:
       short_sha: ${{ steps.sha.outputs.short }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set short SHA
         id: sha
@@ -145,7 +145,7 @@ jobs:
       url: https://staging.${{ secrets.PRIMARY_DOMAIN }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # ── Inject GitHub Secrets into staging .env before restart ─────────────
       - name: Write staging secrets to server .env
@@ -260,7 +260,7 @@ jobs:
       BASE_URL: "https://staging.${{ secrets.PRIMARY_DOMAIN }}"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
@@ -341,7 +341,7 @@ jobs:
       url: https://${{ secrets.PRIMARY_DOMAIN }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Notify — Deploy started
         run: |
@@ -508,7 +508,7 @@ jobs:
       PROD_URL: "https://${{ secrets.PRIMARY_DOMAIN }}"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
@@ -578,7 +578,7 @@ jobs:
     needs: verify-production
     if: success()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Send success notification
         run: |
           python scripts/notify.py --status success \
@@ -600,7 +600,7 @@ jobs:
     needs: [deploy-production, verify-production]
     if: failure()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Send failure notification
         run: |
           python scripts/notify.py --status failure \
@@ -624,7 +624,7 @@ jobs:
     needs: verify-production
     if: failure() && needs.deploy-production.result == 'success'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Notify — Rollback started
         run: |
