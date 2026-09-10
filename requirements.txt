@@ -46,7 +46,7 @@ flower==2.0.1
 opentelemetry-api==1.22.0
 opentelemetry-sdk==1.22.0
 opentelemetry-exporter-otlp==1.22.0
-python-json-logger==2.0.7
+python-json-logger==4.2.0
 prometheus-client==0.16.0
 sentry-sdk==2.8.0
 
