@@ -14,7 +14,7 @@ langchain-core==0.1.52
 langchain-text-splitters==0.0.1
 embedchain==0.1.113
 
-google-cloud-aiplatform>=1.133.0
+google-cloud-aiplatform>=2.5.0
 langsmith>=0.1.147
 
 # Utilities
