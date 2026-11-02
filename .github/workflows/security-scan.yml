@@ -35,7 +35,7 @@ jobs:
           exit-code: "0"  # Report only; blocking is done via SARIF upload
 
       - name: Upload Trivy SARIF (repo)
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: "trivy-repo.sarif"
@@ -73,7 +73,7 @@ jobs:
           exit-code: "0"
 
       - name: Upload Trivy SARIF (image)
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: "trivy-image.sarif"
